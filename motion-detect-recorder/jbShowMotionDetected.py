@@ -50,7 +50,7 @@ def showSegFrames(win, segMgr, segCount, lag=166):
 
 
 def main():
-	homeDir = '../camCache'
+	homeDir = '../../../camCache'
 	camCacheMgr = CamCacheMgr(homeDir)
 	segMgr = camCacheMgr.getLastCache()
 	print 'cache dir: ' + segMgr.baseDir
@@ -70,7 +70,7 @@ def main():
 
 
 if __name__ == "__main__":
-	print "main"
+	main()
 
 '''
 # frame folder
