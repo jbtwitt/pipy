@@ -48,73 +48,29 @@ def showSegFrames(win, segMgr, segCount, lag=166):
 			return False
 	return True
 
-homeDir = '../camCache'
-camCacheMgr = CamCacheMgr(homeDir)
-segMgr = camCacheMgr.getLastCache()
-print 'cache dir: ' + segMgr.baseDir
-print 'segs: %d, frames: %d' % (len(segMgr.segs), segMgr.totalFrames)
-segMgr.rptSegCap()
 
-win = 'win'
-cv2.namedWindow(win, flags=cv2.WINDOW_AUTOSIZE)
-cv2.moveWindow(win, 5, 45)
-count = 0
-for seg in segMgr.segs:
-	if not showSegFrames(win, segMgr, count, 360):
-		break
-	count += 1
-	#time.sleep(5)
-cv2.destroyAllWindows()
+def main():
+	homeDir = '../camCache'
+	camCacheMgr = CamCacheMgr(homeDir)
+	segMgr = camCacheMgr.getLastCache()
+	print 'cache dir: ' + segMgr.baseDir
+	print 'segs: %d, frames: %d' % (len(segMgr.segs), segMgr.totalFrames)
+	segMgr.rptSegCap()
 
-'''
-def toTimestamp(file):
-	year = int(file[1:5])
-	month = int(file[5:7])
-	day = int(file[7:9])
-	h = int(file[10:12])
-	min = int(file[12:14])
-	sec = int(file[14:16])
-	msec = int(file[17:23])
-	#print 'yr: %d, mon: %d, day: %d, hr: %d, min: %d, sec: %d, msec %d' % (
-	#	year, month, day, h, min, sec, msec)
-	return datetime.datetime(year, month, day, h, min, sec, msec)
-
-def findSegments(frames, capSeconds=5):
-	segs = []
-	segCount = 0
-	totalFrames = 0
-	startTs = None
-	prev = None
-	for filename in frames:
-		ts = toTimestamp(filename)
-		if startTs is None:
-			startTs = ts
-		if prev is not None:
-			if (ts - prev).seconds > capSeconds:
-				segs.append([startTs, prev, segCount])
-				startTs = ts
-				totalFrames += segCount
-				segCount = 0
-		segCount += 1
-		prev = ts
-	if segCount > 0:
-		segs.append([startTs, prev, segCount])
-		totalFrames += segCount
-	return segs, totalFrames
-
-def ts2filename(ts):
-	return 'f' + ts.strftime("%Y%m%d_%H%M%S_%f") + '.jpg'
-
-def findSegImgFiles(imgFiles, seg):
-	segFiles = []
-	begin, end = ts2filename(seg[0]), ts2filename(seg[1])
-	for img in imgFiles:
-		if len(segFiles) >= seg[2]:
+	win = 'win'
+	cv2.namedWindow(win, flags=cv2.WINDOW_AUTOSIZE)
+	cv2.moveWindow(win, 5, 45)
+	count = 0
+	for seg in segMgr.segs:
+		if not showSegFrames(win, segMgr, count, 360):
 			break
-		if img >= begin and img <= end:
-			segFiles.append(img)
-	return segFiles
-'''
+		count += 1
+		#time.sleep(5)
+	cv2.destroyAllWindows()
+
+
+if __name__ == "__main__":
+	print "main"
 
 '''
 # frame folder
