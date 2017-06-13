@@ -1,6 +1,7 @@
 from time import sleep
 import datetime
 import json
+from classes.MdrMail import MdrMail
 
 def snapshot(mdrConf):
     from picamera import PiCamera
@@ -30,4 +31,4 @@ def main(mdrConf):
 
 if __name__ == "__main__":
     mdrConf = json.load(open('mdr.json'))
-    main()
+    main(mdrConf)
