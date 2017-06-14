@@ -7,12 +7,15 @@ M_SNAPSHOT = 'snapshot'
 def snapshot(mdrConf):
     from picamera import PiCamera
     res = mdrConf[M_SNAPSHOT]['camera']['resolution']
-    camera = PiCamera()
-    camera.resolution = (res[0], res[1])
-    camera.start_preview()
     jpgName = filename(mdrConf)
-    camera.capture(jpgName)
-    camera.stop_preview()
+    camera = PiCamera()
+    try:
+        camera.resolution = (res[0], res[1])
+        camera.start_preview()
+        camera.capture(jpgName)
+        camera.stop_preview()
+    finally:
+        camera.close()
     return jpgName
 
 
@@ -25,7 +28,7 @@ def main(mdrConf):
     frequency = int(mdrConf[M_SNAPSHOT]['frequency'])
     interval = int(mdrConf[M_SNAPSHOT]['interval'])
     jpgFiles = []
-    for i in range(frequency - 1):
+    for i in range(frequency):
         jpgFiles.append(snapshot(mdrConf))
         sleep(interval)  # in second
     mdrConf['email']['body'] = 'interval:' + str(interval)
@@ -35,4 +38,4 @@ def main(mdrConf):
 
 if __name__ == "__main__":
     mdrConf = json.load(open('mdr.json'))
-    # main(mdrConf)
+    main(mdrConf)
