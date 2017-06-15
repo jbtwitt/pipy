@@ -8,7 +8,10 @@ class MdrSnapshot:
         self.mdrConf = mdrConf
         self.repository = mdrConf['snapshotRepository']
         self.snapshotFiles = []
-        self.cleanRepository()
+        if not os.path.exists(self.repository):
+            os.makedirs(self.repository)
+        else:
+            self.cleanRepository()
 
 
     def snapshotFilename(self):
@@ -54,5 +57,5 @@ class MdrSnapshot:
 
 
 if __name__ == "__main__":
-    # from MdrUtil import freeSpace
-    # print freeSpace()
+    mdrConf = json.load(open('../mdr.json'))
+    mdrSnapshot = MdrSnapshot(mdrConf)
