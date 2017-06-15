@@ -6,7 +6,6 @@ from classes.MdrSnapshot import MdrSnapshot
 from classes.MdrMail import MdrMail
 
 def mail(mdrConf, jpgFiles):
-    mdrConf['email']['body'] = 'interval:' + str(mdrConf[M_SNAPSHOT]['frequency'])
     mdrMail = MdrMail(mdrConf)
     mdrMail.attachImages(jpgFiles)
     mdrMail.send()
@@ -16,7 +15,7 @@ def mdrSnapshotMain(mdrConf):
     from classes.MotionDetect import CMotionDetect
     # init motion detect
     mdrSnapshot = MdrSnapshot(mdrConf)
-    jpgFile = mdrUtil.cameraSnapshot()
+    jpgFile = mdrSnapshot.cameraSnapshot()
     im = cv2.imread(jpgFile)
     cMotion = CMotionDetect(im, alpha=0.4)
 
@@ -36,6 +35,7 @@ def mdrSnapshotMain(mdrConf):
             cv2.imwrite(jpgFile, im)
             mdFoundJpgFiles.append(jpgFile)
     # send mail
+    mdrConf['email']['body'] = 'md found ' + str(len(mdFoundJpgFiles))
     mail(mdrConf, mdFoundJpgFiles)
     mdrSnapshot.delSnapshotFiles()
 
@@ -49,11 +49,11 @@ def snapshotMain(mdrConf):
         sleep(interval)  # in second
         mdrSnapshot.cameraSnapshot()
     # send mail
-    mail(mdrConf, mdrUtil.getSnapshotFiles())
+    mail(mdrConf, mdrSnapshot.getSnapshotFiles())
     mdrSnapshot.delSnapshotFiles()
 
 
 if __name__ == "__main__":
     mdrConf = json.load(open('mdr.json'))
     # snapshotMain(mdrConf)
-    mdrSnapMain(mdrConf)
+    mdrSnapshotMain(mdrConf)
