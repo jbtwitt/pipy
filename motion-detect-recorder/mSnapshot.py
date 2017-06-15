@@ -1,6 +1,7 @@
 from time import sleep
 import datetime
 import json
+import cv2
 from classes.MdrMail import MdrMail
 
 M_SNAPSHOT = 'snapshot'
@@ -53,6 +54,11 @@ def mdrMain(mdrConf):
         jpgFiles.append(jpgFile)
         if len(cnts) > 0:
             print 'md found ...'
+            # nparr = []
+            # for a in cnts:
+            #     nparr.append(np.array(a))
+            cv2.drawContours(im, cnts, -1, (0,155,0), 1)
+            cv2.imwrite(jpgFile)
 
 def main(mdrConf):
     frequency = mdrConf[M_SNAPSHOT]['frequency'] - 1
