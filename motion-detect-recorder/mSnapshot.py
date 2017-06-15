@@ -31,6 +31,29 @@ def mail(mdrConf, jpgFiles):
     mdrMail.send()
 
 
+def mdrMain(mdrConf):
+    from classes.MotionDetect import CMotionDetect
+    jpgFiles = []
+    # motion detect
+    jpgFile = snapshot(mdrConf)
+    im = cv2.imread(jpgFile)
+    cMotion = CMotionDetect(im, alpha=0.4)
+
+    jpgFiles.append(jpgFile)
+
+    frequency = mdrConf[M_SNAPSHOT]['frequency'] - 1
+    interval = mdrConf[M_SNAPSHOT]['interval']
+    for i in range(frequency):
+        sleep(interval)  # in second
+        # motion detect
+        jpgFile = snapshot(mdrConf)
+        im = cv2.imread(jpgFile)
+        cnts = cMotion.update(im)
+
+        jpgFiles.append(jpgFile)
+        if len(cnts) > 0:
+            print 'md found ...'
+
 def main(mdrConf):
     frequency = mdrConf[M_SNAPSHOT]['frequency'] - 1
     interval = mdrConf[M_SNAPSHOT]['interval']
@@ -45,4 +68,5 @@ def main(mdrConf):
 
 if __name__ == "__main__":
     mdrConf = json.load(open('mdr.json'))
-    main(mdrConf)
+    # main(mdrConf)
+    mdrMain(mdrConf)
