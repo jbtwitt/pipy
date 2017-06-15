@@ -51,14 +51,13 @@ def mdrMain(mdrConf):
         im = cv2.imread(jpgFile)
         cnts = cMotion.update(im)
 
-        jpgFiles.append(jpgFile)
         if len(cnts) > 0:
             print 'md found ...'
-            # nparr = []
-            # for a in cnts:
-            #     nparr.append(np.array(a))
             cv2.drawContours(im, cnts, -1, (0,155,0), 1)
-            cv2.imwrite(jpgFile)
+            cv2.imwrite(jpgFile, im)
+            jpgFiles.append(jpgFile)
+        else:
+            os.remove(jpgFile)
 
 def main(mdrConf):
     frequency = mdrConf[M_SNAPSHOT]['frequency'] - 1
