@@ -24,17 +24,24 @@ def filename(mdrConf):
     return mdrConf['camCacheRepository'] + '/snapshot_' + timestamp.strftime("%Y%m%d_%H%M%S_%f") + '.jpg'
 
 
-def main(mdrConf):
-    frequency = int(mdrConf[M_SNAPSHOT]['frequency'])
-    interval = int(mdrConf[M_SNAPSHOT]['interval'])
-    jpgFiles = []
-    for i in range(frequency):
-        jpgFiles.append(snapshot(mdrConf))
-        sleep(interval)  # in second
-    mdrConf['email']['body'] = 'interval:' + str(interval)
+def mail(mdrConf, jpgFiles):
+    mdrConf['email']['body'] = 'interval:' + str(mdrConf[M_SNAPSHOT]['frequency'])
     mdrMail = MdrMail(mdrConf)
     mdrMail.attachImages(jpgFiles)
     mdrMail.send()
+
+
+def main(mdrConf):
+    frequency = mdrConf[M_SNAPSHOT]['frequency'] - 1
+    interval = mdrConf[M_SNAPSHOT]['interval']
+    jpgFiles = []
+    jpgFiles.append(snapshot(mdrConf))
+    for i in range(frequency):
+        sleep(interval)  # in second
+        jpgFiles.append(snapshot(mdrConf))
+    # send mail
+    mail(mdrConf, jpgFiles)
+
 
 if __name__ == "__main__":
     mdrConf = json.load(open('mdr.json'))
