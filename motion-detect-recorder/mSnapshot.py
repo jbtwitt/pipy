@@ -30,14 +30,12 @@ def mdrSnapshotMain(mdrConf):
         cnts = cMotion.update(im)
 
         if len(cnts) > 0:
-            print 'md found ...'
             cv2.drawContours(im, cnts, -1, (0,155,0), 1)
             cv2.imwrite(jpgFile, im)
             mdFoundJpgFiles.append(jpgFile)
     # send mail
     mdrConf['email']['body'] = 'md found ' + str(len(mdFoundJpgFiles))
     mail(mdrConf, mdFoundJpgFiles)
-    mdrSnapshot.delSnapshotFiles()
 
 
 def snapshotMain(mdrConf):
@@ -50,7 +48,6 @@ def snapshotMain(mdrConf):
         mdrSnapshot.cameraSnapshot()
     # send mail
     mail(mdrConf, mdrSnapshot.getSnapshotFiles())
-    mdrSnapshot.delSnapshotFiles()
 
 
 if __name__ == "__main__":

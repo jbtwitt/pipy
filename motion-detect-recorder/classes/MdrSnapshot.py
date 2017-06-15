@@ -6,20 +6,28 @@ M_SNAPSHOT = 'snapshot'
 class MdrSnapshot:
     def __init__(self, mdrConf):
         self.mdrConf = mdrConf
+        self.repository = mdrConf['snapshotRepository']
         self.snapshotFiles = []
+        self.cleanRepository()
 
 
     def snapshotFilename(self):
         timestamp = datetime.datetime.now()
-        return self.mdrConf['camCacheRepository'] + '/snapshot_' + timestamp.strftime("%Y%m%d_%H%M%S_%f") + '.jpg'
+        return self.repository + '/at_' + timestamp.strftime("%Y%m%d_%H%M%S_%f") + '.jpg'
 
 
-    def getSnapshotFiles():
+    def getSnapshotFiles(self):
         return self.snapshotFiles
 
 
-    def delSnapshotFiles(files):
+    def delSnapshotFiles(self):
         for f in self.snapshotFiles:
+            os.remove(f)
+
+
+    def cleanRepository(self):
+        snapshotFiles = os.listdir(self.repository)
+        for f in snapshotFiles:
             os.remove(f)
 
 
@@ -48,4 +56,3 @@ class MdrSnapshot:
 if __name__ == "__main__":
     # from MdrUtil import freeSpace
     # print freeSpace()
-    print os.listdir('.')
