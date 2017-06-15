@@ -33,6 +33,7 @@ class MdrUtil:
         fs = os.statvfs(dir)
         return (fs.f_bavail * fs.f_frsize) / 1024
 
+
 if __name__ == "__main__":
     # from MdrUtil import freeSpace
     # print freeSpace()

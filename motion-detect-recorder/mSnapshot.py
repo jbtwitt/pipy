@@ -24,8 +24,8 @@ def mdrMain(mdrConf):
     jpgFiles = []
     jpgFiles.append(jpgFile)
 
-    frequency = mdrConf[M_SNAPSHOT]['mdr']['frequency'] - 1
-    interval = mdrConf[M_SNAPSHOT]['mdr']['interval']
+    frequency = mdrConf['snapshot']['mdr']['frequency'] - 1
+    interval = mdrConf['snapshot']['mdr']['interval']
     for i in range(frequency):
         sleep(interval)  # in second
         # motion detect
@@ -43,8 +43,8 @@ def mdrMain(mdrConf):
 
 def main(mdrConf):
     mdrUtil = MdrUtil(mdrConf)
-    frequency = mdrConf[M_SNAPSHOT]['frequency'] - 1
-    interval = mdrConf[M_SNAPSHOT]['interval']
+    frequency = mdrConf['snapshot']['frequency'] - 1
+    interval = mdrConf['snapshot']['interval']
     jpgFiles = []
     jpgFiles.append(mdrUtil.cameraSnapshot())
     for i in range(frequency):
