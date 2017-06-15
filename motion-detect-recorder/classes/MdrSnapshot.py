@@ -3,14 +3,24 @@ import datetime
 from picamera import PiCamera
 
 M_SNAPSHOT = 'snapshot'
-class MdrUtil:
+class MdrSnapshot:
     def __init__(self, mdrConf):
         self.mdrConf = mdrConf
+        self.snapshotFiles = []
 
 
     def snapshotFilename(self):
         timestamp = datetime.datetime.now()
         return self.mdrConf['camCacheRepository'] + '/snapshot_' + timestamp.strftime("%Y%m%d_%H%M%S_%f") + '.jpg'
+
+
+    def getSnapshotFiles():
+        return self.snapshotFiles
+
+
+    def delSnapshotFiles(files):
+        for f in self.snapshotFiles:
+            os.remove(f)
 
 
     def cameraSnapshot(self):
@@ -24,6 +34,7 @@ class MdrUtil:
             camera.start_preview()
             camera.capture(jpgName)
             camera.stop_preview()
+            self.snapshotFiles.append(jpgName)
         finally:
             camera.close()
         return jpgName

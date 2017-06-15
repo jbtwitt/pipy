@@ -1,9 +1,8 @@
-import os
 import cv2
 import json
 import datetime
 from time import sleep
-from classes.MdrUtil import MdrUtil
+from classes.MdrSnapshot import MdrSnapshot
 from classes.MdrMail import MdrMail
 
 def mail(mdrConf, jpgFiles):
@@ -13,23 +12,21 @@ def mail(mdrConf, jpgFiles):
     mdrMail.send()
 
 
-def mdrMain(mdrConf):
+def mdrSnapshotMain(mdrConf):
     from classes.MotionDetect import CMotionDetect
-    mdrUtil = MdrUtil(mdrConf)
-    # motion detect
+    # init motion detect
+    mdrSnapshot = MdrSnapshot(mdrConf)
     jpgFile = mdrUtil.cameraSnapshot()
     im = cv2.imread(jpgFile)
     cMotion = CMotionDetect(im, alpha=0.4)
 
-    jpgFiles = []
-    jpgFiles.append(jpgFile)
-
     frequency = mdrConf['snapshot']['mdr']['frequency'] - 1
     interval = mdrConf['snapshot']['mdr']['interval']
+    mdFoundJpgFiles = []
     for i in range(frequency):
         sleep(interval)  # in second
         # motion detect
-        jpgFile = mdrUtil.cameraSnapshot()
+        jpgFile = mdrSnapshot.cameraSnapshot()
         im = cv2.imread(jpgFile)
         cnts = cMotion.update(im)
 
@@ -37,24 +34,26 @@ def mdrMain(mdrConf):
             print 'md found ...'
             cv2.drawContours(im, cnts, -1, (0,155,0), 1)
             cv2.imwrite(jpgFile, im)
-            jpgFiles.append(jpgFile)
-        else:
-            os.remove(jpgFile)
+            mdFoundJpgFiles.append(jpgFile)
+    # send mail
+    mail(mdrConf, mdFoundJpgFiles)
+    mdrSnapshot.delSnapshotFiles()
 
-def main(mdrConf):
-    mdrUtil = MdrUtil(mdrConf)
+
+def snapshotMain(mdrConf):
     frequency = mdrConf['snapshot']['frequency'] - 1
     interval = mdrConf['snapshot']['interval']
-    jpgFiles = []
-    jpgFiles.append(mdrUtil.cameraSnapshot())
+    mdrSnapshot = MdrSnapshot(mdrConf)
+    mdrSnapshot.cameraSnapshot()
     for i in range(frequency):
         sleep(interval)  # in second
-        jpgFiles.append(mdrUtil.cameraSnapshot())
+        mdrSnapshot.cameraSnapshot()
     # send mail
-    mail(mdrConf, jpgFiles)
+    mail(mdrConf, mdrUtil.getSnapshotFiles())
+    mdrSnapshot.delSnapshotFiles()
 
 
 if __name__ == "__main__":
     mdrConf = json.load(open('mdr.json'))
-    # main(mdrConf)
-    mdrMain(mdrConf)
+    # snapshotMain(mdrConf)
+    mdrSnapMain(mdrConf)
