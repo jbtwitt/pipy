@@ -3,30 +3,8 @@ import cv2
 import json
 import datetime
 from time import sleep
+from classes.MdrUtil import MdrUtil
 from classes.MdrMail import MdrMail
-
-M_SNAPSHOT = 'snapshot'
-def snapshotFilename(mdrConf):
-    timestamp = datetime.datetime.now()
-    return mdrConf['camCacheRepository'] + '/snapshot_' + timestamp.strftime("%Y%m%d_%H%M%S_%f") + '.jpg'
-
-
-def snapshot(mdrConf):
-    """Snapshot: init camera, take a picture and close camera
-    """
-    from picamera import PiCamera
-    camera = PiCamera()
-    jpgName = snapshotFilename(mdrConf)
-    resolution = mdrConf[M_SNAPSHOT]['camera']['resolution']
-    try:
-        camera.resolution = (resolution[0], resolution[1])
-        camera.start_preview()
-        camera.capture(jpgName)
-        camera.stop_preview()
-    finally:
-        camera.close()
-    return jpgName
-
 
 def mail(mdrConf, jpgFiles):
     mdrConf['email']['body'] = 'interval:' + str(mdrConf[M_SNAPSHOT]['frequency'])
@@ -37,20 +15,21 @@ def mail(mdrConf, jpgFiles):
 
 def mdrMain(mdrConf):
     from classes.MotionDetect import CMotionDetect
+    mdrUtil = MdrUtil(mdrConf)
     # motion detect
-    jpgFile = snapshot(mdrConf)
+    jpgFile = mdrUtil.cameraSnapshot()
     im = cv2.imread(jpgFile)
     cMotion = CMotionDetect(im, alpha=0.4)
 
     jpgFiles = []
     jpgFiles.append(jpgFile)
 
-    frequency = mdrConf[M_SNAPSHOT]['frequency'] - 1
-    interval = mdrConf[M_SNAPSHOT]['interval']
+    frequency = mdrConf[M_SNAPSHOT]['mdr']['frequency'] - 1
+    interval = mdrConf[M_SNAPSHOT]['mdr']['interval']
     for i in range(frequency):
         sleep(interval)  # in second
         # motion detect
-        jpgFile = snapshot(mdrConf)
+        jpgFile = mdrUtil.cameraSnapshot()
         im = cv2.imread(jpgFile)
         cnts = cMotion.update(im)
 
@@ -63,13 +42,14 @@ def mdrMain(mdrConf):
             os.remove(jpgFile)
 
 def main(mdrConf):
+    mdrUtil = MdrUtil(mdrConf)
     frequency = mdrConf[M_SNAPSHOT]['frequency'] - 1
     interval = mdrConf[M_SNAPSHOT]['interval']
     jpgFiles = []
-    jpgFiles.append(snapshot(mdrConf))
+    jpgFiles.append(mdrUtil.cameraSnapshot())
     for i in range(frequency):
         sleep(interval)  # in second
-        jpgFiles.append(snapshot(mdrConf))
+        jpgFiles.append(mdrUtil.cameraSnapshot())
     # send mail
     mail(mdrConf, jpgFiles)
 
