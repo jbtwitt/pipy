@@ -34,8 +34,9 @@ def mdrSnapshotMain(mdrConf):
             cv2.imwrite(jpgFile, im)
             mdFoundJpgFiles.append(jpgFile)
     # send mail
-    mdrConf['email']['body'] = 'md found ' + str(len(mdFoundJpgFiles))
-    mail(mdrConf, mdFoundJpgFiles)
+    if len(mdFoundJpgFiles) > 0 and mdrConf['snapshot']['mdr']['sendmail']:
+        mdrConf['email']['body'] = 'md found ' + str(len(mdFoundJpgFiles))
+        mail(mdrConf, mdFoundJpgFiles)
 
 
 def snapshotMain(mdrConf):
@@ -53,4 +54,4 @@ def snapshotMain(mdrConf):
 if __name__ == "__main__":
     mdrConf = json.load(open('mdr.json'))
     # snapshotMain(mdrConf)
-    mdrSnapshotMain(mdrConf)
+    # mdrSnapshotMain(mdrConf)
