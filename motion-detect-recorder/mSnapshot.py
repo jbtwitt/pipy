@@ -54,4 +54,4 @@ def snapshotMain(mdrConf):
 if __name__ == "__main__":
     mdrConf = json.load(open('mdr.json'))
     # snapshotMain(mdrConf)
-    # mdrSnapshotMain(mdrConf)
+    mdrSnapshotMain(mdrConf)

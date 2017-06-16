@@ -31,7 +31,7 @@ class MdrSnapshot:
     def cleanRepository(self):
         snapshotFiles = os.listdir(self.repository)
         for f in snapshotFiles:
-            os.remove(f)
+            os.remove(self.repository + '/' + f)
 
 
     def cameraSnapshot(self):
