@@ -42,6 +42,7 @@ def findContoursCenters(cnts):
         cX = int(M["m10"] / M["m00"])
         cY = int(M["m01"] / M["m00"])
         centers.append([cX, cY])
+    return centers
 
 
 if __name__ == "__main__":
@@ -62,7 +63,7 @@ if __name__ == "__main__":
             cv2.imwrite('/tmp/test_' + str(i) + '.jpg', im)
             print 'contours: ' + str(len(cnts))
             # test contours to string
-            jsonStr = '{"cnts":' + countours2ArrsStr(cnts) + '}'
+            jsonStr = '{"cnts":' + contours2ArrsStr(cnts) + '}'
             jsonObj = json.loads(jsonStr)
             im = cv2.imread(dir + jpgFiles[i + 1])
             cv2.drawContours(im, arrs2Contours(jsonObj['cnts']), -1, (0,155,0), 1)

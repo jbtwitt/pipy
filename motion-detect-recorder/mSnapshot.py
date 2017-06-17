@@ -4,6 +4,7 @@ import json
 import datetime
 from time import sleep
 from classes.MdrMail import MdrMail
+import classes.MdrUtil as MdrUtil
 
 def mail(mdrConf, jpgFiles):
     mdrMail = MdrMail(mdrConf)
@@ -42,20 +43,44 @@ def mdrSnapshotMain(mdrConf):
 
 def snapshotMain(mdrConf):
     from classes.MdrSnapshot import MdrSnapshot
+    doMdRecord = mdrConf['snapshot']['mdRecord']
     frequency = mdrConf['snapshot']['frequency'] - 1
     interval = mdrConf['snapshot']['interval']
+    mdRecords = []
     mdrSnapshot = MdrSnapshot(mdrConf)
-    mdrSnapshot.cameraSnapshot()
+    prevJpgFile = mdrSnapshot.cameraSnapshot()
     for i in range(frequency):
         sleep(interval)  # in second
-        mdrSnapshot.cameraSnapshot()
+        jpgFile = mdrSnapshot.cameraSnapshot()
+        # md record
+        if doMdRecord:
+            cnts = MdrUtil.diff2JpgFiles(prevJpgFile, jpgFile)
+            if len(cnts) > 0:
+                mdRecords.append(i + 1, cnts)
+
+    if len(mdRecords) > 0:
+        color = (0,155,0)
+        lastSnapshot = jpgFile
+        im = cv2.imread(lastSnapshot)
+        jpgFiles = mdrSnapshot.getSnapshotFiles()
+        for jpgIdx, cnts in mdRecords:
+            print str(jpgIdx) + ': ' jpgFiles[jpgIdx]
+            cv2.drawContours(im, cnts, -1, color, 1)
+        cv2.imwrite(lastSnapshot, im)
+
     # send mail
-    mail(mdrConf, mdrSnapshot.getSnapshotFiles())
+    if mdrConf['snapshot']['sendmail']:
+        mail(mdrConf, mdrSnapshot.getSnapshotFiles())
 
 
 if __name__ == "__main__":
     mdrConf = json.load(open('mdr.json'))
-    if len(sys.argv) > 1 and sys.argv[1] == 'mdrSnapshot':
-        mdrSnapshotMain(mdrConf)
-    else:
-        snapshotMain(mdrConf)
+    snapshotMain(mdrConf)
+    # if len(sys.argv) > 1 and sys.argv[1] == 'mdrSnapshot':
+    #     mdrSnapshotMain(mdrConf)
+    # else:
+    #     snapshotMain(mdrConf)
+    # arr = [('jpg1', [11, 2]), ('jpg2', [12, 2])]
+    # for jpgFile, cnts in arr:
+    #     print cnts
+    #     print jpgFile
