@@ -6,7 +6,7 @@ import datetime
 import time
 import json
 
-mdrUtil = MdrUtil
+mdrUtil = MdrUtil()
 # def arr2nparr(arr):
 #     nparr = []
 #     for a in arr:
@@ -52,8 +52,8 @@ def showSegFrames(win, segMgr, segCount, lag=166):
 	return True
 
 
-def main():
-	homeDir = '../../../camCache'
+def main(mdrConf):
+	homeDir = mdrConf['camCacheRepository']
 	camCacheMgr = CamCacheMgr(homeDir)
 	segMgr = camCacheMgr.getLastCache()
 	print 'cache dir: ' + segMgr.baseDir
@@ -73,8 +73,8 @@ def main():
 
 
 if __name__ == "__main__":
-	# main()
-	print ''
+    mdrConf = json.load(open('mdr.json'))
+	main(mdrConf)
 
 '''
 # frame folder

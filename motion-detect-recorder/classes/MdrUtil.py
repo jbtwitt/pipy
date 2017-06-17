@@ -1,7 +1,7 @@
 import numpy as np
 
 class MdrUtil:
-    def countours2ArrStr(cnts):
+    def countours2ArrStr(self, cnts):
         # cntFile = open(path + '.json', "w")
         # cntFile.write('{"f' + mdrTs + '.jpg":[')
         arrStr = '['
@@ -23,7 +23,7 @@ class MdrUtil:
         # cntFile.close
 
 
-    def arr2Contours(arr):
+    def arr2Contours(self, arr):
         contours = []
         for a in arr:
             contours.append(np.array(a))
