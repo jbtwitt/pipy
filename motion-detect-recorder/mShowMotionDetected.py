@@ -1,15 +1,13 @@
 from classes.CamCacheMgr import CamCacheMgr
-from classes.MdrUtil import MdrUtil
+import classes.MdrUtil as MdrUtil
 import cv2
 import datetime
 import time
 import json
 
-mdrUtil = MdrUtil()
-
 def drawData(img, jsonData):
 	for k, v in jsonData.items():
-		cnts = mdrUtil.arrs2Contours(v)
+		cnts = MdrUtil.arrs2Contours(v)
 		cv2.drawContours(img, cnts, -1, (0,155,0), 1)
 
 def showSegFrames(win, segMgr, segCount, lag=166):
