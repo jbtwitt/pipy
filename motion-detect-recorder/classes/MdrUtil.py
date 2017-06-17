@@ -25,11 +25,23 @@ def contours2ArrsStr(cnts):
     arrsStr += ']'
     return arrsStr
 
-def diff2JpgFiles(jpg1, jpg2):
+def cropArea(im, mdArea):
+    x1 = mdArea[0]
+    y1 = mdArea[1]
+    x2 = mdArea[2]
+    y2 = mdArea[3]
+    return im[y1:y2, x1:x2]
+
+
+def diff2JpgFiles(jpg1, jpg2, mdArea=None):
     im = cv2.imread(jpg1)
+    if not mdArea == None:
+        im = cropArea(im, mdArea)
     cMotion = CMotionDetect(im, alpha=0.4)
     # motion detect
     im = cv2.imread(jpg2)
+    if not mdArea == None:
+        im = cropArea(im, mdArea)
     cnts = cMotion.update(im)
     return cnts
 

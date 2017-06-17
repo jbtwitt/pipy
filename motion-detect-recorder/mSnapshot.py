@@ -54,7 +54,10 @@ def main(mdrConf):
         jpgFile = mdrSnapshot.cameraSnapshot()
         # md record
         if doMdRecord:
-            cnts = MdrUtil.diff2JpgFiles(prevJpgFile, jpgFile)
+            mdArea = None
+            if 'mdArea' in mdrConf['snapshot']:
+                mdArea = mdrConf['snapshot']['mdArea']
+            cnts = MdrUtil.diff2JpgFiles(prevJpgFile, jpgFile, mdArea)
             if len(cnts) > 0:
                 mdRecords.append((i + 1, cnts))
 
