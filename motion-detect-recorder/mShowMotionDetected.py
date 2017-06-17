@@ -1,19 +1,22 @@
 from classes.CamCacheMgr import CamCacheMgr
-import numpy as np
+from classes.MdrUtil import MdrUtil
+# import numpy as np
 import cv2
 import datetime
 import time
 import json
 
-def arr2nparr(arr):
-    nparr = []
-    for a in arr:
-        nparr.append(np.array(a))
-    return nparr
+mdrUtil = MdrUtil
+# def arr2nparr(arr):
+#     nparr = []
+#     for a in arr:
+#         nparr.append(np.array(a))
+#     return nparr
 
 def drawData(img, jsonData):
 	for k, v in jsonData.items():
-		cnts = arr2nparr(v)
+		# cnts = arr2nparr(v)
+		cnts = mdrUtil.arr2Contours(v)
 		cv2.drawContours(img, cnts, -1, (0,155,0), 1)
 
 def showSegFrames(win, segMgr, segCount, lag=166):
@@ -70,7 +73,8 @@ def main():
 
 
 if __name__ == "__main__":
-	main()
+	# main()
+	print ''
 
 '''
 # frame folder
