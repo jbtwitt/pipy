@@ -1,8 +1,8 @@
+import sys
 import cv2
 import json
 import datetime
 from time import sleep
-from classes.MdrSnapshot import MdrSnapshot
 from classes.MdrMail import MdrMail
 
 def mail(mdrConf, jpgFiles):
@@ -12,6 +12,7 @@ def mail(mdrConf, jpgFiles):
 
 
 def mdrSnapshotMain(mdrConf):
+    from classes.MdrSnapshot import MdrSnapshot
     from classes.MotionDetect import CMotionDetect
     # init motion detect
     mdrSnapshot = MdrSnapshot(mdrConf)
@@ -40,6 +41,7 @@ def mdrSnapshotMain(mdrConf):
 
 
 def snapshotMain(mdrConf):
+    from classes.MdrSnapshot import MdrSnapshot
     frequency = mdrConf['snapshot']['frequency'] - 1
     interval = mdrConf['snapshot']['interval']
     mdrSnapshot = MdrSnapshot(mdrConf)
@@ -53,5 +55,7 @@ def snapshotMain(mdrConf):
 
 if __name__ == "__main__":
     mdrConf = json.load(open('mdr.json'))
-    # snapshotMain(mdrConf)
-    mdrSnapshotMain(mdrConf)
+    if len(sys.argv) > 1 and sys.argv[1] == 'mdrSnapshot':
+        mdrSnapshotMain(mdrConf)
+    else:
+        snapshotMain(mdrConf)
