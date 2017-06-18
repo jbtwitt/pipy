@@ -1,6 +1,7 @@
 import os
 import datetime
 from picamera import PiCamera
+import MdrUtil as MdrUtil
 
 M_SNAPSHOT = 'snapshot'
 class MdrSnapshot:
@@ -12,6 +13,11 @@ class MdrSnapshot:
             os.makedirs(self.repository)
         else:
             self.cleanRepository()
+        self.mdArea = None
+        if 'mdArea' in mdrConf['snapshot']:
+            self.mdArea = mdrConf[M_SNAPSHOT]['mdArea']
+        res = mdrConf[M_SNAPSHOT]['camera']['resolution']
+        self.resolution = (res[0], res[1])
 
 
     def snapshotFilename(self):
@@ -39,12 +45,15 @@ class MdrSnapshot:
         """
         camera = PiCamera()
         jpgName = self.snapshotFilename()
-        resolution = self.mdrConf[M_SNAPSHOT]['camera']['resolution']
         try:
-            camera.resolution = (resolution[0], resolution[1])
+            camera.resolution = self.resolution
             camera.start_preview()
             camera.capture(jpgName)
             camera.stop_preview()
+            if not self.mdArea == None:
+                im = cv2.imread(jpgName)
+                im = MdrUtil.cropArea(im, self.mdArea)
+                cv2.imwrite(jpgName, im)
             self.snapshotFiles.append(jpgName)
         finally:
             camera.close()
