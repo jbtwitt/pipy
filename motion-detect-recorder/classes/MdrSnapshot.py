@@ -1,4 +1,5 @@
 import os
+import cv2
 import datetime
 from picamera import PiCamera
 import MdrUtil as MdrUtil

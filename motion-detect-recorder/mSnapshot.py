@@ -28,7 +28,7 @@ def main(mdrConf):
         jpgFile = mdrSnapshot.cameraSnapshot()
         # md record
         if doMdRecord:
-            cnts = MdrUtil.diff2JpgFiles(prevJpgFile, jpgFile, mdArea)
+            cnts = MdrUtil.diff2JpgFiles(prevJpgFile, jpgFile)
             if len(cnts) > 0:
                 mdRecords.append((i + 1, cnts))
     summary = "mdr summary<br>"

@@ -33,7 +33,7 @@ def cropArea(im, mdArea):
     return im[y1:y2, x1:x2]
 
 
-def diff2JpgFiles(jpg1, jpg2, mdArea=None):
+def diff2JpgFiles(jpg1, jpg2):
     im = cv2.imread(jpg1)
     # if not mdArea == None:
     #     im = cropArea(im, mdArea)
