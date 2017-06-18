@@ -28,21 +28,21 @@ def main(mdrConf):
             cnts = MdrUtil.diff2JpgFiles(prevJpgFile, jpgFile)
             if len(cnts) > 0:
                 mdRecords.append((i + 1, cnts))
-    summary = "mdr summary<br>"
+    summary = "summary\n"
     if len(mdRecords) > 0:
         color = (0,155,0)
-        lastSnapshot = jpgFile
-        im = cv2.imread(lastSnapshot)
         jpgFiles = mdrSnapshot.getSnapshotFiles()
         for jpgIdx, cnts in mdRecords:
-            summary += str(jpgIdx) + ': ' + jpgFiles[jpgIdx] + ', contours: ' + str(len(cnts)) + '<br>'
+            jpgFile = jpgFiles[jpgIdx]
+            summary += str(jpgIdx) + ': ' + jpgFile + ', contours: ' + str(len(cnts)) + '\n'
+            im = cv2.imread(jpgFile)
             cv2.drawContours(im, cnts, -1, color, 1)
-        cv2.imwrite(lastSnapshot, im)
+            cv2.imwrite(jpgFile, im)
 
         # send mail
         if mdrConf['snapshot']['sendmail']:
             mdrConf['email']['body'] = summary
-            mail(mdrConf, mdrSnapshot.getSnapshotFiles())
+            mail(mdrConf, jpgFiles)
 
 
 if __name__ == "__main__":
