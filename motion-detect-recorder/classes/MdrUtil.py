@@ -35,13 +35,9 @@ def cropArea(im, mdArea):
 
 def diff2JpgFiles(jpg1, jpg2):
     im = cv2.imread(jpg1)
-    # if not mdArea == None:
-    #     im = cropArea(im, mdArea)
     cMotion = CMotionDetect(im, alpha=0.4)
     # motion detect
-    # im = cv2.imread(jpg2)
-    # if not mdArea == None:
-    #     im = cropArea(im, mdArea)
+    im = cv2.imread(jpg2)
     cnts = cMotion.update(im)
     return cnts
 

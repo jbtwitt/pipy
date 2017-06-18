@@ -17,9 +17,6 @@ def main(mdrConf):
     doMdRecord = mdrConf['snapshot']['mdRecord']
     frequency = mdrConf['snapshot']['frequency'] - 1
     interval = mdrConf['snapshot']['interval']
-    # mdArea = None
-    # if 'mdArea' in mdrConf['snapshot']:
-    #     mdArea = mdrConf['snapshot']['mdArea']
     mdRecords = []
     mdrSnapshot = MdrSnapshot(mdrConf)
     prevJpgFile = mdrSnapshot.cameraSnapshot()
@@ -36,8 +33,6 @@ def main(mdrConf):
         color = (0,155,0)
         lastSnapshot = jpgFile
         im = cv2.imread(lastSnapshot)
-        # if not mdArea == None:
-        #     im = MdrUtil.cropArea(im, mdArea)
         jpgFiles = mdrSnapshot.getSnapshotFiles()
         for jpgIdx, cnts in mdRecords:
             summary += str(jpgIdx) + ': ' + jpgFiles[jpgIdx] + ', contours: ' + str(len(cnts)) + '<br>'
