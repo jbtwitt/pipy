@@ -12,6 +12,27 @@ def mail(mdrConf, jpgFiles):
     mdrMail.send()
 
 
+def getContourFilename(mdrConf):
+    repository = mdrConf['snapshotRepository']
+    timestamp = datetime.datetime.now()
+    return repository + '/contour_' + timestamp.strftime("%Y%m%d_%H%M%S_%f") + '.json'
+
+
+def saveSnapshotContours(mdrConf, snapshotFiles, mdRecords):
+    cntFile = open(getContourFilename(mdrConf), "w")
+    jsonStr = ''
+    i = 1
+    for jpgIdx, cnts in mdRecords:
+        jpgFile = snapshotFiles[jpgIdx]
+        # json format "jpgIdx": [jpgFile, contour array string]
+        jsonStr += '"' + str(jpgIdx) + '":["' + jpgFile + '",' + MdrUtil.contours2ArrsStr(cnts) + ']'
+        if i < len(mdRecords):
+            jsonStr += ','
+        i += 1
+    cntFile.write('{' + jsonStr + '}')
+    cntFile.close
+
+
 RUN_SNAPSHOT = 'run-snapshot'
 def main(mdrConf):
     times = 1
@@ -55,6 +76,7 @@ def mainSnapshot(mdrConf):
             cv2.imwrite(jpgFile, im)
             mdrFiles.append(jpgFile)
 
+        saveSnapshotContours(mdrConf, jpgFiles, mdRecords)
         # send mail
         if mdrConf['snapshot']['sendmail']:
             mdrConf['email']['body'] = summary

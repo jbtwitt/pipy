@@ -67,5 +67,7 @@ class MdrSnapshot:
 
 
 if __name__ == "__main__":
+    import json
     mdrConf = json.load(open('../mdr.json'))
     mdrSnapshot = MdrSnapshot(mdrConf)
+    print mdrSnapshot.repository
