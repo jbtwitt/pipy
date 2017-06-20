@@ -14,11 +14,12 @@ def testContours():
     dir = '/tmp/snapshot/'
     jsonFiles = glob.glob(dir + '*.json')
     contours = json.load(open(jsonFiles[0]))
+    print 'mdRecords: ' + str(len(contours))
     idxs = contours.keys()
     for idx in idxs:
         im = cv2.imread(idx)
         snapshotCnts = arrs2Contours(contours[idx]['contours'])
-        print "prev snapshot:" + snapshotCnts[idx]['snapshot']
+        print "prev snapshot:" + contours[idx]['snapshot']
         print "snapshot jpg: " + idx
         print "contours: " + str(len(snapshotCnts))
         for cnts in snapshotCnts:
@@ -26,11 +27,11 @@ def testContours():
             cX = int(moments["m10"] / moments["m00"])
             cY = int(moments["m01"] / moments["m00"])
             cv2.circle(im, (cX, cY), 3, (255, 255, 255), -1)
-            print "\tcontour area/center: " + str(moments['m00']) + ", (" + str(cX) + ', ' + str(cY) + ')'
+            print "\tcontour area/center: " + str(moments['m00']) + " / (" + str(cX) + ', ' + str(cY) + ')'
             x,y,w,h = cv2.boundingRect(cnts)
             cv2.rectangle(im, (x, y), (x+w, y+h), (0,0,155), 1)
 
-        cv2.drawContours(im, cnts, -1, (0,155,0), 1)
+        cv2.drawContours(im, snapshotCnts, -1, (0,155,0), 1)
         cv2.imshow('frame', im)
         while(True):
             if cv2.waitKey(1) & 0xFF == ord('q'):

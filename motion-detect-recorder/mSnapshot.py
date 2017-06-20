@@ -6,14 +6,14 @@ from time import sleep
 from classes.MdrMail import MdrMail
 import classes.MdrUtil as MdrUtil
 
-def mail(mdrConf, mdRecords, jpgFiles):
+def mail(mdrConf, mdRecords):
     if len(mdRecords) > 0:
         color = (0,155,0)
         mdrFiles = []
         for prevJpgFile, snapshotFile, cnts in mdRecords:
-            jpgFile = snapshotFile.replace('.jpg', '_.jpg')
-            im = cv2.imread(jpgFile)
+            im = cv2.imread(snapshotFile)
             cv2.drawContours(im, cnts, -1, color, 1)
+            jpgFile = snapshotFile.replace('.jpg', '_.jpg')
             cv2.imwrite(jpgFile, im)
             mdrFiles.append(jpgFile)
         mdrMail = MdrMail(mdrConf)
