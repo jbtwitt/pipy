@@ -11,6 +11,9 @@ def arrs2Contours(arrs):
 def testContours():
     import glob
     import json
+    win = 'snapshot'
+    cv2.namedWindow(win, flags=cv2.WINDOW_AUTOSIZE)
+    cv2.moveWindow(win, 5, 45)
     dir = '/tmp/snapshot/'
     jsonFiles = glob.glob(dir + '*.json')
     contours = json.load(open(jsonFiles[0]))
@@ -32,7 +35,7 @@ def testContours():
             cv2.rectangle(im, (x, y), (x+w, y+h), (0,0,155), 1)
 
         cv2.drawContours(im, snapshotCnts, -1, (0,155,0), 1)
-        cv2.imshow('frame', im)
+        cv2.imshow(win, im)
         while(True):
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
