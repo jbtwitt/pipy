@@ -63,15 +63,17 @@ def mainSnapshot(mdrConf):
         if doMdRecord:
             cnts = MdrUtil.diff2JpgFiles(prevJpgFile, jpgFile)
             if len(cnts) > 0:
-                mdRecords.append((i + 1, cnts))
+                mdRecords.append((jpgFile, cnts))
+        prevJpgFile = jpgFile
+
     if len(mdRecords) > 0:
         jpgFiles = mdrSnapshot.getSnapshotFiles()
         summary = "summary " + str(len(mdRecords)) + '/' + str(len(jpgFiles)) + "\n"
         color = (0,155,0)
         mdrFiles = []
-        for jpgIdx, cnts in mdRecords:
-            jpgFile = jpgFiles[jpgIdx]
-            summary += str(jpgIdx) + ': ' + jpgFile + ', contours: ' + str(len(cnts)) + '\n'
+        for jpgFile, cnts in mdRecords:
+            # jpgFile = jpgFiles[jpgIdx]
+            summary += jpgFile + ' contours: ' + str(len(cnts)) + '\n'
             im = cv2.imread(jpgFile)
             cv2.drawContours(im, cnts, -1, color, 1)
             cv2.imwrite(jpgFile, im)

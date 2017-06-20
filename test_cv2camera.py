@@ -13,19 +13,19 @@ def testContours():
     import json
     dir = '/tmp/snapshot/'
     jsonFiles = glob.glob(dir + '*.json')
-    mdRecords = json.load(open(jsonFiles[0]))
-    idxs = mdRecords.keys()
+    contours = json.load(open(jsonFiles[0]))
+    idxs = contours.keys()
     for idx in idxs:
-        # cntArr = mdRecords[idx][1]
-        cnts = arrs2Contours(mdRecords[idx])
-        moments = cv2.moments(cnts)
-        cX = int(moments["m10"] / moments["m00"])
-        cY = int(moments["m01"] / moments["m00"])
-        print "center: " + str(cX) + ', ' + str(cY)
-        print moments['m00']    # area
+        snapshotCnts = arrs2Contours(contours[idx])
+        for cnts in snapshotCnts:
+            moments = cv2.moments(cnts)
+            cX = int(moments["m10"] / moments["m00"])
+            cY = int(moments["m01"] / moments["m00"])
+            print "snapshot jpg:" + idx
+            print "contour center: " + str(cX) + ', ' + str(cY)
+            print "contour area: " + str(moments['m00'])
 
-        jpgFile = idx   # mdRecords[idx][0]
-        im = cv2.imread(jpgFile)
+        im = cv2.imread(idx)
         cv2.drawContours(im, cnts, -1, (0,155,0), 1)
         cv2.imshow('frame', im)
         while(True):
