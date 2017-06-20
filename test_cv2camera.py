@@ -16,16 +16,17 @@ def testContours():
     contours = json.load(open(jsonFiles[0]))
     idxs = contours.keys()
     for idx in idxs:
+        im = cv2.imread(idx)
         snapshotCnts = arrs2Contours(contours[idx])
+        print "snapshot jpg:" + idx
+        print "contours: " + str(len(snapshotCnts))
         for cnts in snapshotCnts:
             moments = cv2.moments(cnts)
             cX = int(moments["m10"] / moments["m00"])
             cY = int(moments["m01"] / moments["m00"])
-            print "snapshot jpg:" + idx
-            print "contour center: " + str(cX) + ', ' + str(cY)
-            print "contour area: " + str(moments['m00'])
+            cv2.circle(im, (c[0], c[1]), 3, (255, 255, 255), -1)
+            print "\tcontour area/center: " + str(moments['m00']) + ", (" + str(cX) + ', ' + str(cY) + ')'
 
-        im = cv2.imread(idx)
         cv2.drawContours(im, cnts, -1, (0,155,0), 1)
         cv2.imshow('frame', im)
         while(True):
@@ -35,14 +36,15 @@ def testContours():
 
 def testSnapshot():
     import os
+    import classes.MdrUtil as MdrUtil
     dir = '/tmp/snapshot/'
     jpgFiles = os.listdir(dir)
     for i in range(2):
-        cnts = diff2JpgFiles(dir + jpgFiles[i], dir + jpgFiles[i + 1])
+        cnts = MdrUtil.diff2JpgFiles(dir + jpgFiles[i], dir + jpgFiles[i + 1])
         if len(cnts) > 0:
             im = cv2.imread(dir + jpgFiles[i + 1])
             cv2.drawContours(im, cnts, -1, (0,155,0), 1)
-            centers = findContoursCenters(cnts)
+            centers = MdrUtil.findContoursCenters(cnts)
             for c in centers:
                 cv2.circle(im, (c[0], c[1]), 3, (255, 255, 255), -1)
             cv2.imwrite('/tmp/test_' + str(i) + '.jpg', im)

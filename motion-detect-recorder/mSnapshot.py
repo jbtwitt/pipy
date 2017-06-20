@@ -22,10 +22,8 @@ def saveSnapshotContours(mdrConf, snapshotFiles, mdRecords):
     cntFile = open(getContourFilename(mdrConf), "w")
     jsonStr = ''
     i = 1
-    for jpgIdx, cnts in mdRecords:
-        jpgFile = snapshotFiles[jpgIdx]
-        # json format "jpgIdx": [jpgFile, contour array string]
-        # jsonStr += '"' + str(jpgIdx) + '":["' + jpgFile + '",' + MdrUtil.contours2ArrsStr(cnts) + ']'
+    for jpgFile, cnts in mdRecords:
+        # json format "jpgFile": contour array string
         jsonStr += '"' + jpgFile + '": ' + MdrUtil.contours2ArrsStr(cnts)
         if i < len(mdRecords):
             jsonStr += ','
@@ -63,7 +61,7 @@ def mainSnapshot(mdrConf):
         if doMdRecord:
             cnts = MdrUtil.diff2JpgFiles(prevJpgFile, jpgFile)
             if len(cnts) > 0:
-                mdRecords.append((jpgFile, cnts))
+                mdRecords.append((prevJpgFile, cnts))
         prevJpgFile = jpgFile
 
     if len(mdRecords) > 0:
@@ -72,7 +70,6 @@ def mainSnapshot(mdrConf):
         color = (0,155,0)
         mdrFiles = []
         for jpgFile, cnts in mdRecords:
-            # jpgFile = jpgFiles[jpgIdx]
             summary += jpgFile + ' contours: ' + str(len(cnts)) + '\n'
             im = cv2.imread(jpgFile)
             cv2.drawContours(im, cnts, -1, color, 1)
