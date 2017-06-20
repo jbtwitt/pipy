@@ -6,10 +6,19 @@ from time import sleep
 from classes.MdrMail import MdrMail
 import classes.MdrUtil as MdrUtil
 
-def mail(mdrConf, jpgFiles):
-    mdrMail = MdrMail(mdrConf)
-    mdrMail.attachImages(jpgFiles)
-    mdrMail.send()
+def mail(mdrConf, mdRecords, jpgFiles):
+    if len(mdRecords) > 0:
+        color = (0,155,0)
+        mdrFiles = []
+        for prevJpgFile, snapshotFile, cnts in mdRecords:
+            jpgFile = snapshotFile.replace('.jpg', '_.jpg')
+            im = cv2.imread(jpgFile)
+            cv2.drawContours(im, cnts, -1, color, 1)
+            cv2.imwrite(jpgFile, im)
+            mdrFiles.append(jpgFile)
+        mdrMail = MdrMail(mdrConf)
+        mdrMail.attachImages(mdrFiles)
+        mdrMail.send()
 
 
 def getContourFilename(mdrConf):
@@ -18,13 +27,14 @@ def getContourFilename(mdrConf):
     return repository + '/contour_' + timestamp.strftime("%Y%m%d_%H%M%S_%f") + '.json'
 
 
-def saveSnapshotContours(mdrConf, snapshotFiles, mdRecords):
+def saveSnapshotContours(mdrConf, mdRecords):
     cntFile = open(getContourFilename(mdrConf), "w")
     jsonStr = ''
     i = 1
-    for jpgFile, cnts in mdRecords:
+    for prevJpgFile, jpgFile, cnts in mdRecords:
         # json format "jpgFile": contour array string
-        jsonStr += '"' + jpgFile + '": ' + MdrUtil.contours2ArrsStr(cnts)
+        jsonStr += '"' + jpgFile + '": {"contours":' + MdrUtil.contours2ArrsStr(cnts)
+        jsonStr += ',"snapshot": "' + prevJpgFile + '"}'
         if i < len(mdRecords):
             jsonStr += ','
         i += 1
@@ -61,26 +71,26 @@ def mainSnapshot(mdrConf):
         if doMdRecord:
             cnts = MdrUtil.diff2JpgFiles(prevJpgFile, jpgFile)
             if len(cnts) > 0:
-                mdRecords.append((prevJpgFile, cnts))
+                mdRecords.append((prevJpgFile, jpgFile, cnts))
         prevJpgFile = jpgFile
 
     if len(mdRecords) > 0:
         jpgFiles = mdrSnapshot.getSnapshotFiles()
         summary = "summary " + str(len(mdRecords)) + '/' + str(len(jpgFiles)) + "\n"
-        color = (0,155,0)
-        mdrFiles = []
-        for jpgFile, cnts in mdRecords:
+        # color = (0,155,0)
+        # mdrFiles = []
+        for prevJpgFile, jpgFile, cnts in mdRecords:
             summary += jpgFile + ' contours: ' + str(len(cnts)) + '\n'
-            im = cv2.imread(jpgFile)
-            cv2.drawContours(im, cnts, -1, color, 1)
-            cv2.imwrite(jpgFile, im)
-            mdrFiles.append(jpgFile)
+            # im = cv2.imread(jpgFile)
+            # cv2.drawContours(im, cnts, -1, color, 1)
+            # cv2.imwrite(jpgFile, im)
+            # mdrFiles.append(jpgFile)
 
-        saveSnapshotContours(mdrConf, jpgFiles, mdRecords)
+        saveSnapshotContours(mdrConf, mdRecords)
         # send mail
         if mdrConf['snapshot']['sendmail']:
             mdrConf['email']['body'] = summary
-            mail(mdrConf, mdrFiles)
+            mail(mdrConf, mdRecords)
 
 
 if __name__ == "__main__":

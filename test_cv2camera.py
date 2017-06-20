@@ -17,8 +17,9 @@ def testContours():
     idxs = contours.keys()
     for idx in idxs:
         im = cv2.imread(idx)
-        snapshotCnts = arrs2Contours(contours[idx])
-        print "snapshot jpg:" + idx
+        snapshotCnts = arrs2Contours(contours[idx]['contours'])
+        print "prev snapshot:" + snapshotCnts[idx]['snapshot']
+        print "snapshot jpg: " + idx
         print "contours: " + str(len(snapshotCnts))
         for cnts in snapshotCnts:
             moments = cv2.moments(cnts)
