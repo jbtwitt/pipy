@@ -25,7 +25,8 @@ def saveSnapshotContours(mdrConf, snapshotFiles, mdRecords):
     for jpgIdx, cnts in mdRecords:
         jpgFile = snapshotFiles[jpgIdx]
         # json format "jpgIdx": [jpgFile, contour array string]
-        jsonStr += '"' + str(jpgIdx) + '":["' + jpgFile + '",' + MdrUtil.contours2ArrsStr(cnts) + ']'
+        # jsonStr += '"' + str(jpgIdx) + '":["' + jpgFile + '",' + MdrUtil.contours2ArrsStr(cnts) + ']'
+        jsonStr += '"' + jpgFile + '": ' + MdrUtil.contours2ArrsStr(cnts)
         if i < len(mdRecords):
             jsonStr += ','
         i += 1

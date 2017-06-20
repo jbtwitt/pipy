@@ -13,18 +13,18 @@ def testContours():
     import json
     dir = '/tmp/snapshot/'
     jsonFiles = glob.glob(dir + '*.json')
-    mdRecords = json.load(open(jpgFiles[0]))
+    mdRecords = json.load(open(jsonFiles[0]))
     idxs = mdRecords.keys()
     for idx in idxs:
-        cntStr = mdRecords[idx][1]
-        cnts = arrs2Contours(cntStr)
+        # cntArr = mdRecords[idx][1]
+        cnts = arrs2Contours(mdRecords[idx])
         moments = cv2.moments(cnts)
         cX = int(moments["m10"] / moments["m00"])
-        cY = moments(M["m01"] / moments["m00"])
+        cY = int(moments["m01"] / moments["m00"])
         print "center: " + str(cX) + ', ' + str(cY)
         print moments['m00']    # area
 
-        jpgFile = mdRecords[idx][0]
+        jpgFile = idx   # mdRecords[idx][0]
         im = cv2.imread(jpgFile)
         cv2.drawContours(im, cnts, -1, (0,155,0), 1)
         cv2.imshow('frame', im)
@@ -42,10 +42,9 @@ def testSnapshot():
         if len(cnts) > 0:
             im = cv2.imread(dir + jpgFiles[i + 1])
             cv2.drawContours(im, cnts, -1, (0,155,0), 1)
-            # centers = findContoursCenters(cnts)
-            # for c in centers:
-            #     cv2.circle(im, (c[0], c[1]), 3, (255, 255, 255), -1)
-            moments = cv2.moments(cnts)
+            centers = findContoursCenters(cnts)
+            for c in centers:
+                cv2.circle(im, (c[0], c[1]), 3, (255, 255, 255), -1)
             cv2.imwrite('/tmp/test_' + str(i) + '.jpg', im)
             print 'contours: ' + str(len(cnts))
             # test contours to string
