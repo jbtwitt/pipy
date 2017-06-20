@@ -24,8 +24,10 @@ def testContours():
             moments = cv2.moments(cnts)
             cX = int(moments["m10"] / moments["m00"])
             cY = int(moments["m01"] / moments["m00"])
-            cv2.circle(im, (c[0], c[1]), 3, (255, 255, 255), -1)
+            cv2.circle(im, (cX, cY), 3, (255, 255, 255), -1)
             print "\tcontour area/center: " + str(moments['m00']) + ", (" + str(cX) + ', ' + str(cY) + ')'
+            x,y,w,h = cv2.boundingRect(cnts)
+            cv2.rectangle(im, (x, y), (x+w, y+h), (0,0,155), 1)
 
         cv2.drawContours(im, cnts, -1, (0,155,0), 1)
         cv2.imshow('frame', im)
