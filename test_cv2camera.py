@@ -27,10 +27,12 @@ def testContours():
         print "contours: " + str(len(snapshotCnts))
         for cnts in snapshotCnts:
             moments = cv2.moments(cnts)
-            cX = int(moments["m10"] / moments["m00"])
-            cY = int(moments["m01"] / moments["m00"])
-            cv2.circle(im, (cX, cY), 3, (255, 255, 255), -1)
-            print "\tcontour area/center: " + str(moments['m00']) + " / (" + str(cX) + ', ' + str(cY) + ')'
+            area = moments["m00"]
+            if area > 0:
+                cX = int(moments["m10"] / area)
+                cY = int(moments["m01"] / area)
+                cv2.circle(im, (cX, cY), 3, (255, 255, 255), -1)
+                print "\tcontour area/center: " + str(area) + " / (" + str(cX) + ', ' + str(cY) + ')'
             x,y,w,h = cv2.boundingRect(cnts)
             cv2.rectangle(im, (x, y), (x+w, y+h), (0,0,155), 1)
 

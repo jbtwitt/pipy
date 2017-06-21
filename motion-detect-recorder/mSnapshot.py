@@ -27,14 +27,25 @@ def getContourFilename(mdrConf):
     return repository + '/contour_' + timestamp.strftime("%Y%m%d_%H%M%S_%f") + '.json'
 
 
+def mdRecord2Json(mdRecord):
+    prevJpgFile, jpgFile, cnts = mdRecord
+    return (
+        '"' + jpgFile + '":{'
+            '"contours":' + MdrUtil.contours2ArrsStr(cnts) + ','
+            '"snapshot":"' + prevJpgFile + '"'
+        '}'
+    )
+
+
 def saveSnapshotContours(mdrConf, mdRecords):
     cntFile = open(getContourFilename(mdrConf), "w")
     jsonStr = ''
     i = 1
-    for prevJpgFile, jpgFile, cnts in mdRecords:
-        # json format "jpgFile": contour array string
-        jsonStr += '"' + jpgFile + '": {"contours":' + MdrUtil.contours2ArrsStr(cnts)
-        jsonStr += ',"snapshot": "' + prevJpgFile + '"}'
+    for mdRecord in mdRecords:
+        # for prevJpgFile, jpgFile, cnts in mdRecords:
+        #     jsonStr += '"' + jpgFile + '": {"contours":' + MdrUtil.contours2ArrsStr(cnts)
+        #     jsonStr += ',"snapshot": "' + prevJpgFile + '"}'
+        jsonStr += mdRecord2Json(mdRecord)
         if i < len(mdRecords):
             jsonStr += ','
         i += 1
