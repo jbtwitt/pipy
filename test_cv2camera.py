@@ -33,6 +33,22 @@ def compare(imSrc, imTgt, mdCnts):
         # diff = (diff * 255).astype("uint8")
         print "SSIM: {}".format(score)
 
+
+def compareContourArea(imSrc, imTgt, cnts):
+    x,y,w,h = cv2.boundingRect(cnts)
+    srcImg = cropArea(imSrc, [x, y, x+w, y+h])
+    tgtImg = cropArea(imTgt, [x, y, x+w, y+h])
+
+    # convert the images to grayscale
+    grayA = cv2.cvtColor(srcImg, cv2.COLOR_BGR2GRAY)
+    grayB = cv2.cvtColor(tgtImg, cv2.COLOR_BGR2GRAY)
+
+    # compute the Structural Similarity Index (SSIM) between the two
+    # images, ensuring that the difference image is returned
+    (score, diff) = compare_ssim(grayA, grayB, full=True)
+    retur score
+
+
 def testContours():
     import glob
     import json
@@ -46,6 +62,7 @@ def testContours():
     idxs = contours.keys()
     for idx in idxs:
         im = cv2.imread(idx)
+        imPrev = cv2.imread(contours[idx]['snapshot'])
         snapshotCnts = arrs2Contours(contours[idx]['contours'])
         print "prev snapshot:" + contours[idx]['snapshot']
         print "snapshot jpg: " + idx
@@ -57,15 +74,14 @@ def testContours():
                 cX = int(moments["m10"] / area)
                 cY = int(moments["m01"] / area)
                 cv2.circle(im, (cX, cY), 3, (255, 255, 255), -1)
-                print "\tcontour area/center: " + str(area) + " / (" + str(cX) + ', ' + str(cY) + ')'
+                score = compareContourArea(imPrev, im, cnts)
+                print "\tcontour area/center: " + str(area) + " / (" + str(cX) + ', ' + str(cY) + ')' + ' / score - ' + str(score)
             x,y,w,h = cv2.boundingRect(cnts)
             cv2.rectangle(im, (x, y), (x+w, y+h), (0,0,155), 1)
 
         cv2.drawContours(im, snapshotCnts, -1, (0,155,0), 1)
         cv2.imshow(win, im)
 
-        imPrev = cv2.imread(contours[idx]['snapshot'])
-        compare(imPrev, im, snapshotCnts)
 
         while(True):
             if cv2.waitKey(1) & 0xFF == ord('q'):
