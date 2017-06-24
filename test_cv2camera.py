@@ -9,12 +9,19 @@ def arrs2Contours(arrs):
     return contours
 
 
-def compare(imSrc, imTgt, cots):
-    for cnts in snapshotCnts:
+def cropArea(im, mdArea):
+    x1 = mdArea[0]
+    y1 = mdArea[1]
+    x2 = mdArea[2]
+    y2 = mdArea[3]
+    return im[y1:y2, x1:x2]
+
+
+def compare(imSrc, imTgt, mdCnts):
+    for cnts in mdCnts:
         x,y,w,h = cv2.boundingRect(cnts)
-        cv2.rectangle(im, (x, y), (x+w, y+h), (0,0,155), 1)
-        srcImg = MdrUtil.cropArea(imSrc, [x, y, x+w, y+h])
-        tgtImg = MdrUtil.cropArea(imTgt, [x, y, x+w, y+h])
+        srcImg = cropArea(imSrc, [x, y, x+w, y+h])
+        tgtImg = cropArea(imTgt, [x, y, x+w, y+h])
 
         # convert the images to grayscale
         grayA = cv2.cvtColor(srcImg, cv2.COLOR_BGR2GRAY)
