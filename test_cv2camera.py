@@ -1,5 +1,6 @@
 import numpy as np
 import cv2
+from skimage.measure import compare_ssim
 
 def arrs2Contours(arrs):
     contours = []
@@ -7,6 +8,23 @@ def arrs2Contours(arrs):
         contours.append(np.array(arr))
     return contours
 
+
+def compare(imSrc, imTgt, cots):
+    for cnts in snapshotCnts:
+        x,y,w,h = cv2.boundingRect(cnts)
+        cv2.rectangle(im, (x, y), (x+w, y+h), (0,0,155), 1)
+        srcImg = MdrUtil.cropArea(imSrc, [x, y, x+w, y+h])
+        tgtImg = MdrUtil.cropArea(imTgt, [x, y, x+w, y+h])
+
+        # convert the images to grayscale
+        grayA = cv2.cvtColor(srcImg, cv2.COLOR_BGR2GRAY)
+        grayB = cv2.cvtColor(tgtImg, cv2.COLOR_BGR2GRAY)
+
+        # compute the Structural Similarity Index (SSIM) between the two
+        # images, ensuring that the difference image is returned
+        (score, diff) = compare_ssim(grayA, grayB, full=True)
+        # diff = (diff * 255).astype("uint8")
+        print "SSIM: {}".format(score)
 
 def testContours():
     import glob
@@ -38,6 +56,10 @@ def testContours():
 
         cv2.drawContours(im, snapshotCnts, -1, (0,155,0), 1)
         cv2.imshow(win, im)
+
+        imPrev = cv2.imread(contours[idx]['snapshot'])
+        compare(imPrev, im, snapshotCnts)
+
         while(True):
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break

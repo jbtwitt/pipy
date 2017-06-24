@@ -28,10 +28,10 @@ def getContourFilename(mdrConf):
 
 
 def mdRecord2Json(mdRecord):
-    prevJpgFile, jpgFile, cnts = mdRecord
+    prevJpgFile, jpgFile, jpgDiffCnts = mdRecord
     return (
         '"' + jpgFile + '":{'
-            '"contours":' + MdrUtil.contours2ArrsStr(cnts) + ','
+            '"contours":' + MdrUtil.contours2ArrsStr(jpgDiffCnts) + ','
             '"snapshot":"' + prevJpgFile + '"'
         '}'
     )
@@ -42,9 +42,6 @@ def saveSnapshotContours(mdrConf, mdRecords):
     jsonStr = ''
     i = 1
     for mdRecord in mdRecords:
-        # for prevJpgFile, jpgFile, cnts in mdRecords:
-        #     jsonStr += '"' + jpgFile + '": {"contours":' + MdrUtil.contours2ArrsStr(cnts)
-        #     jsonStr += ',"snapshot": "' + prevJpgFile + '"}'
         jsonStr += mdRecord2Json(mdRecord)
         if i < len(mdRecords):
             jsonStr += ','
