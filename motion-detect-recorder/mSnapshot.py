@@ -5,6 +5,7 @@ import datetime
 from time import sleep
 from classes.MdrMail import MdrMail
 import classes.MdrUtil as MdrUtil
+import os
 
 def mail(mdrConf, mdRecords):
     if len(mdRecords) > 0:
@@ -52,15 +53,22 @@ def saveSnapshotContours(mdrConf, mdRecords):
 
 RUN_SNAPSHOT = 'run-snapshot'
 def main(mdrConf):
-    times = 1
-    seconds = 0
+    seconds = 1
+    exitCmd = None
     if RUN_SNAPSHOT in mdrConf:
-        if 'times' in mdrConf[RUN_SNAPSHOT]:
-            times = mdrConf[RUN_SNAPSHOT]['times']
-        if 'sleep' in mdrConf[RUN_SNAPSHOT]:
-            seconds = mdrConf[RUN_SNAPSHOT]['sleep']
-    for i in range(times):
+        runConf = mdrConf[RUN_SNAPSHOT]
+        if 'exit' in runConf:
+            exitCmd = runConf['exit']
+        if 'sleep' in runConf:
+            seconds = runConf['sleep']
+    while(True):
         mainSnapshot(mdrConf)
+        if exitCmd is None:
+            break
+        else:
+            if os.path.exists(exitCmd):
+                os.remove(exitCmd)
+                break
         sleep(seconds)
 
 
