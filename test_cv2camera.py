@@ -36,17 +36,18 @@ def compare(imSrc, imTgt, mdCnts):
 
 def compareContourArea(imSrc, imTgt, cnts):
     x,y,w,h = cv2.boundingRect(cnts)
-    if w > 9 or h > 9:
+    if w > 9 and h > 9:
         # somehow compare_ssim throw error if w or h are small
         srcImg = cropArea(imSrc, [x, y, x+w, y+h])
         tgtImg = cropArea(imTgt, [x, y, x+w, y+h])
         (score, diff) = compare_ssim(srcImg, tgtImg, multichannel=True, full=True)
+        return score
 
     # convert the images to grayscale
     # grayA = cv2.cvtColor(srcImg, cv2.COLOR_BGR2GRAY)
     # grayB = cv2.cvtColor(tgtImg, cv2.COLOR_BGR2GRAY)
     # (score, diff) = compare_ssim(grayA, grayB, full=True)
-    return score
+    return -1
 
 
 def testContours():
@@ -75,8 +76,9 @@ def testContours():
                 cY = int(moments["m01"] / area)
                 cv2.circle(im, (cX, cY), 3, (255, 255, 255), -1)
                 score = compareContourArea(imPrev, im, cnts)
-                print "\tcontour area/center: " + str(area) + " / (" + str(cX) + ', ' + str(cY) + ')' + ' / score - ' + str(score)
             x,y,w,h = cv2.boundingRect(cnts)
+            print "\tcontour area/center: " + str(area) + ', ' + str(w*h) + " / (" + str(cX) + ', ' + str(cY) + ')'
+            print "\tarea ratio/score: " + str(area/(w*h)) + " / " + str(score)
             cv2.rectangle(im, (x, y), (x+w, y+h), (0,0,155), 1)
 
         cv2.drawContours(im, snapshotCnts, -1, (0,155,0), 1)

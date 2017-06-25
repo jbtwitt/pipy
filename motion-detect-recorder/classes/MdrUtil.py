@@ -37,7 +37,7 @@ def cropArea(im, mdArea):
 
 def imgCompareContourArea(imSrc, imTgt, cnt):
     x,y,w,h = cv2.boundingRect(cnt)
-    if w > 9 or h > 9:
+    if w > 7 and h > 7:
         # somehow compare_ssim throw error if w or h are small
         moments = cv2.moments(cnt)
         cntArea = moments["m00"]
@@ -51,6 +51,7 @@ def imgCompareContourArea(imSrc, imTgt, cnt):
 def imgCompareFound(imSrc, imTgt, cnts):
     for cnt in cnts:
         score, cntAreaRatio = imgCompareContourArea(imSrc, imTgt, cnt)
+        # if score < area ratio, object movement found
         if score is not None and score < cntAreaRatio:
             return True
     return False
@@ -63,7 +64,7 @@ def diff2JpgFiles(jpg1, jpg2):
     im2 = cv2.imread(jpg2)
     cnts = cMotion.update(im2)
     if len(cnts) > 0:
-        if imgCompare(im1, im2, cnts):
+        if imgCompareFound(im1, im2, cnts):
             return cnts
     return None
 
