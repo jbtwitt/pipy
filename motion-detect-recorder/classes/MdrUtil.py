@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 from MotionDetect import CMotionDetect
+from skimage.measure import compare_ssim
 
 def arrs2Contours(arrs):
     contours = []
@@ -25,6 +26,7 @@ def contours2ArrsStr(cnts):
     arrsStr += ']'
     return arrsStr
 
+
 def cropArea(im, mdArea):
     x1 = mdArea[0]
     y1 = mdArea[1]
@@ -33,13 +35,37 @@ def cropArea(im, mdArea):
     return im[y1:y2, x1:x2]
 
 
+def imgCompareContourArea(imSrc, imTgt, cnt):
+    x,y,w,h = cv2.boundingRect(cnt)
+    if w > 9 or h > 9:
+        # somehow compare_ssim throw error if w or h are small
+        moments = cv2.moments(cnt)
+        cntArea = moments["m00"]
+        src = cropArea(imSrc, [x, y, x+w, y+h])
+        tgt = cropArea(imTgt, [x, y, x+w, y+h])
+        (score, diff) = compare_ssim(src, tgt, multichannel=True, full=True)
+        return (score, cntArea / w * h)
+    return (None, None)
+
+
+def imgCompareFound(imSrc, imTgt, cnts):
+    for cnt in cnts:
+        score, cntAreaRatio = imgCompareContourArea(imSrc, imTgt, cnt)
+        if score is not None and score < cntAreaRatio:
+            return True
+    return False
+
+
 def diff2JpgFiles(jpg1, jpg2):
-    im = cv2.imread(jpg1)
-    cMotion = CMotionDetect(im, alpha=0.4)
+    im1 = cv2.imread(jpg1)
+    cMotion = CMotionDetect(im1, alpha=0.4)
     # motion detect
-    im = cv2.imread(jpg2)
-    cnts = cMotion.update(im)
-    return cnts
+    im2 = cv2.imread(jpg2)
+    cnts = cMotion.update(im2)
+    if len(cnts) > 0:
+        if imgCompare(im1, im2, cnts):
+            return cnts
+    return None
 
 
 def findContoursCenters(cnts):

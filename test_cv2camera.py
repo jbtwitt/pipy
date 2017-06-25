@@ -36,17 +36,17 @@ def compare(imSrc, imTgt, mdCnts):
 
 def compareContourArea(imSrc, imTgt, cnts):
     x,y,w,h = cv2.boundingRect(cnts)
-    srcImg = cropArea(imSrc, [x, y, x+w, y+h])
-    tgtImg = cropArea(imTgt, [x, y, x+w, y+h])
+    if w > 9 or h > 9:
+        # somehow compare_ssim throw error if w or h are small
+        srcImg = cropArea(imSrc, [x, y, x+w, y+h])
+        tgtImg = cropArea(imTgt, [x, y, x+w, y+h])
+        (score, diff) = compare_ssim(srcImg, tgtImg, multichannel=True, full=True)
 
     # convert the images to grayscale
-    grayA = cv2.cvtColor(srcImg, cv2.COLOR_BGR2GRAY)
-    grayB = cv2.cvtColor(tgtImg, cv2.COLOR_BGR2GRAY)
-
-    # compute the Structural Similarity Index (SSIM) between the two
-    # images, ensuring that the difference image is returned
-    (score, diff) = compare_ssim(grayA, grayB, full=True)
-    retur score
+    # grayA = cv2.cvtColor(srcImg, cv2.COLOR_BGR2GRAY)
+    # grayB = cv2.cvtColor(tgtImg, cv2.COLOR_BGR2GRAY)
+    # (score, diff) = compare_ssim(grayA, grayB, full=True)
+    return score
 
 
 def testContours():

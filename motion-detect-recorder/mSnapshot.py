@@ -78,21 +78,15 @@ def mainSnapshot(mdrConf):
         # md record
         if doMdRecord:
             cnts = MdrUtil.diff2JpgFiles(prevJpgFile, jpgFile)
-            if len(cnts) > 0:
+            if cnts != None:
                 mdRecords.append((prevJpgFile, jpgFile, cnts))
         prevJpgFile = jpgFile
 
     if len(mdRecords) > 0:
         jpgFiles = mdrSnapshot.getSnapshotFiles()
         summary = "summary " + str(len(mdRecords)) + '/' + str(len(jpgFiles)) + "\n"
-        # color = (0,155,0)
-        # mdrFiles = []
         for prevJpgFile, jpgFile, cnts in mdRecords:
             summary += jpgFile + ' contours: ' + str(len(cnts)) + '\n'
-            # im = cv2.imread(jpgFile)
-            # cv2.drawContours(im, cnts, -1, color, 1)
-            # cv2.imwrite(jpgFile, im)
-            # mdrFiles.append(jpgFile)
 
         saveSnapshotContours(mdrConf, mdRecords)
         # send mail
