@@ -78,7 +78,7 @@ def mainSnapshot(mdrConf):
         # md record
         if doMdRecord:
             cnts = MdrUtil.diff2JpgFiles(prevJpgFile, jpgFile)
-            if cnts != None:
+            if cnts is not None:
                 mdRecords.append((prevJpgFile, jpgFile, cnts))
         prevJpgFile = jpgFile
 
