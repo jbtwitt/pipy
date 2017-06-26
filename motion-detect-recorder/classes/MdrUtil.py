@@ -44,7 +44,7 @@ def imgCompareContourArea(imSrc, imTgt, cnt):
         src = cropArea(imSrc, [x, y, x+w, y+h])
         tgt = cropArea(imTgt, [x, y, x+w, y+h])
         (score, diff) = compare_ssim(src, tgt, multichannel=True, full=True)
-        return (score, cntArea / w * h)
+        return (score, cntArea / (w * h))
     return (None, None)
 
 
@@ -52,7 +52,7 @@ def imgCompareFound(imSrc, imTgt, cnts):
     for cnt in cnts:
         score, cntAreaRatio = imgCompareContourArea(imSrc, imTgt, cnt)
         # if score < area ratio, object movement found
-        if score is not None and score < (1 - cntAreaRatio):
+        if score is not None and score < cntAreaRatio:
             return True
     return False
 
