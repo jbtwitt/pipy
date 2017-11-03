@@ -1,5 +1,5 @@
 #
 /motion-detect-recorder/classes/*.pyc
 
-hq/rdp/__pycache__/__init__.cpython-35.pyc
-hq/__pycache__/HqGoog.cpython-35.pyc
+hq/rdp/__pycache__/*.pyc
+hq/__pycache__
