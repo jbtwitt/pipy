@@ -1,10 +1,12 @@
 // Place your settings in this file to overwrite default and user settings.
 {
   "files.autoSave": "afterDelay",
-  "files.autoSaveDelay": 3000,
+  "files.autoSaveDelay": 5,
 
   // Configure glob patterns for excluding files and folders.
   "files.exclude": {
+    "hq/__pycache__": true,    
+    "hq/rdp/__pycache__": true,    
     "**/.git": true,
     "**/.svn": true,
     "**/.hg": true,
