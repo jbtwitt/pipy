@@ -15,17 +15,20 @@ class ImgData:
         labels = []
         for i in range(batchSize):
             jpg = self.train[self.batchPointer][0]
-            label = self.train[self.batchPointer][1]
+            label = [float(self.train[self.batchPointer][1]), float(self.train[self.batchPointer][2])]
             images.append(self.img2Array(jpg))
-            labels.append([float(label)])
+            labels.append(label)
             self.batchPointer = self.batchPointer + 1
+            if self.batchPointer >= len(self.train):
+                self.batchPointer = 0
         return np.array(images), np.array(labels)
 
     def jpg2Array(self, emptyFolder, notEmptyFolder):
+        # 2 column labels: first one: empty, second: not empty
         emptyJpgs = glob.glob(emptyFolder + '*.jpg')
-        emptyJpgs = np.array([emptyJpgs, np.zeros(len(emptyJpgs))]).T
+        emptyJpgs = np.array([emptyJpgs, np.ones(len(emptyJpgs)), np.zeros(len(emptyJpgs))]).T
         notEmptyJpgs = glob.glob(notEmptyFolder + '*.jpg')
-        notEmptyJpgs = np.array([notEmptyJpgs, np.ones(len(notEmptyJpgs))]).T
+        notEmptyJpgs = np.array([notEmptyJpgs, np.zeros(len(notEmptyJpgs)), np.ones(len(notEmptyJpgs))]).T
         arr = np.concatenate((emptyJpgs, notEmptyJpgs))
         np.random.shuffle(arr)
         return arr
