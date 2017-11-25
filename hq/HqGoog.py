@@ -1,6 +1,7 @@
-"""
+""" chart image https://finance.google.com/finance/getchart?q=SVA&x=NASD&p=3d&i=240
 """
 from urllib.request import urlopen, Request, URLError
+import urllib.parse
 import numpy as np
 
 csvFileName = "/temp/{0}.g.csv"
@@ -11,7 +12,8 @@ class HqGoog:
             txt = self.csvIutput(self.ticker)
         else:
             txt = self.hqGoogRobot(self.ticker)
-        self.lines = txt.split("\n")
+        # self.lines = txt.split("\n")
+        self.lines = txt.replace(",-", ",0").split("\n")  # replace missing number
         hq = []
         for idx, line in enumerate(self.lines[1:]):  # skip header row
             cols = line.split(',')
@@ -44,9 +46,16 @@ class HqGoog:
         return self._hqVolume
 
     def hqGoogRobot(self, ticker):
-        googUrl = "https://www.google.com/finance/historical?q={0}&output=csv"
+        # googUrl = "https://www.google.com/finance/historical?q={0}&output=csv"
+        # googUrl = "https://www.google.com/finance/historical?q={0}&output=csv&startdate=Nov 11,2015&enddate=Nov 10,2017"
+        # url = googUrl.format(ticker)+'&'+params
+        googUrl = "https://www.google.com/finance/historical"
+        # params = urllib.parse.urlencode({'output': "csv", 'enddate': "Nov 10, 2017", 'startdate': "Nov 11, 2015", 'q': ticker })
+        params = urllib.parse.urlencode({'output': "csv", 'q': ticker })
+        url = googUrl + '?' + params
+        print(url)
         try:
-            response = urlopen(googUrl.format(ticker))
+            response = urlopen(url)
             # print(str(response.info()))
             txt = response.read().decode("utf-8-sig")  # contain b'\xef\xbb\xbf...
             self.csvOutput(ticker, txt)
