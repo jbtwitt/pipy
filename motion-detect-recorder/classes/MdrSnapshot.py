@@ -19,6 +19,9 @@ class MdrSnapshot:
             self.mdArea = mdrConf[M_SNAPSHOT]['mdArea']
         res = mdrConf[M_SNAPSHOT]['camera']['resolution']
         self.resolution = (res[0], res[1])
+        self.blackAndWhite = False
+        if 'blackAndWhite' in mdrConf[M_SNAPSHOT]['camera']:
+            self.blackAndWhite = True
 
 
     def snapshotFilename(self):
@@ -48,6 +51,8 @@ class MdrSnapshot:
         jpgName = self.snapshotFilename()
         try:
             camera.resolution = self.resolution
+            if self.blackAndWhite == True:
+                camera.color_effects = (128, 128)
             camera.start_preview()
             camera.capture(jpgName)
             camera.stop_preview()
