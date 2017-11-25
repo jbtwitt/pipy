@@ -2,6 +2,16 @@ from PIL import Image, ImageFilter
 import numpy as np
 import glob
 
+def img2Array(jpg):
+    original = Image.open(jpg)
+    imgArray = np.asarray(original).flatten()
+    # print(imgArray.shape)
+    imgArray = imgArray / 255   # encode
+    # print(imgArray[:100])
+    # imgArray = imgArray * 255 # decode
+    # print(imgArray[0])
+    return imgArray
+
 class ImgData:
     def __init__(self, emptyFolder, notEmptyFolder):
         np.random.seed(7)
@@ -16,7 +26,7 @@ class ImgData:
         for i in range(batchSize):
             jpg = self.train[self.batchPointer][0]
             label = [float(self.train[self.batchPointer][1]), float(self.train[self.batchPointer][2])]
-            images.append(self.img2Array(jpg))
+            images.append(img2Array(jpg))
             labels.append(label)
             self.batchPointer = self.batchPointer + 1
             if self.batchPointer >= len(self.train):
@@ -32,16 +42,6 @@ class ImgData:
         arr = np.concatenate((emptyJpgs, notEmptyJpgs))
         np.random.shuffle(arr)
         return arr
-
-    def img2Array(self, jpg):
-        original = Image.open(jpg)
-        imgArray = np.asarray(original).flatten()
-        # print(imgArray.shape)
-        imgArray = imgArray / 255   # encode
-        # print(imgArray[:100])
-        # imgArray = imgArray * 255 # decode
-        # print(imgArray[0])
-        return imgArray
 
 if __name__ == "__main__":
     # emptyFolder = '/pirepo/train/empty/ResizeW100/'
