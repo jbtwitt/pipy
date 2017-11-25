@@ -155,10 +155,10 @@ def main(_):
     correct_prediction = tf.cast(correct_prediction, tf.float32)
   accuracy = tf.reduce_mean(correct_prediction)
 
-  graph_location = tempfile.mkdtemp()
-  print('Saving graph to: %s' % graph_location)
-  train_writer = tf.summary.FileWriter(graph_location)
-  train_writer.add_graph(tf.get_default_graph())
+  # graph_location = tempfile.mkdtemp()
+  # print('Saving graph to: %s' % graph_location)
+  # train_writer = tf.summary.FileWriter(graph_location)
+  # train_writer.add_graph(tf.get_default_graph())
 
   # for save model
   saver = tf.train.Saver()
@@ -168,7 +168,7 @@ def main(_):
 
   with tf.Session() as sess:
     sess.run(tf.global_variables_initializer())
-    for i in range(300):
+    for i in range(500):
       batch = trainData.nextBatch(10)
       if i % 50 == 0:
         train_accuracy = accuracy.eval(feed_dict={
@@ -178,7 +178,7 @@ def main(_):
 
     saver.save(sess, "C:\\temp\\saver\\emNemModel")
 
-    testBatch = testData.nextBatch(7)
+    testBatch = testData.nextBatch(9)
     print('test accuracy %g' % accuracy.eval(feed_dict={
         x: testBatch[0], y_: testBatch[1], keep_prob: 1.0}))
     # pred = tf.argmax(y_conv, 1)
