@@ -52,7 +52,7 @@ def imgCompareFound(imSrc, imTgt, cnts):
     for cnt in cnts:
         score, cntAreaRatio = imgCompareContourArea(imSrc, imTgt, cnt)
         # if score < area ratio, object movement found
-        if score is not None and score < cntAreaRatio:
+        if score is not None and score < (1-cntAreaRatio):
             return True
     return False
 
