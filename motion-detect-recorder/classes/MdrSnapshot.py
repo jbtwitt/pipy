@@ -21,7 +21,7 @@ class MdrSnapshot:
         self.resolution = (res[0], res[1])
         self.blackAndWhite = False
         if 'blackAndWhite' in mdrConf[M_SNAPSHOT]['camera']:
-            self.blackAndWhite = True
+            self.blackAndWhite = mdrConf[M_SNAPSHOT]['camera']['blackAndWhite']
 
 
     def snapshotFilename(self):
