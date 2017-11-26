@@ -2,6 +2,21 @@ from PIL import Image, ImageFilter
 import numpy as np
 import glob
 
+def imgResize2Array(jpg, resizeWidth):
+    original = Image.open(jpg)
+
+    resize = resizeWidth, int(original.size[1]*resizeWidth/original.size[0])
+    # print(resize)
+    original.thumbnail(resize, Image.ANTIALIAS)
+
+    imgArray = np.asarray(original).flatten()
+    # print(imgArray.shape)
+    imgArray = imgArray / 255   # encode
+    # print(imgArray[:100])
+    # imgArray = imgArray * 255 # decode
+    # print(imgArray[0])
+    return imgArray
+
 def img2Array(jpg):
     original = Image.open(jpg)
     imgArray = np.asarray(original).flatten()
@@ -20,13 +35,13 @@ class ImgData:
         # print(self.train.shape)
         self.batchPointer = 0
 
-    def nextBatch(self, batchSize=1):
+    def nextBatch(self, batchSize=1, resizeWidth=100):
         images = []
         labels = []
         for i in range(batchSize):
             jpg = self.train[self.batchPointer][0]
             label = [float(self.train[self.batchPointer][1]), float(self.train[self.batchPointer][2])]
-            images.append(img2Array(jpg))
+            images.append(imgResize2Array(jpg, resizeWidth))
             labels.append(label)
             self.batchPointer = self.batchPointer + 1
             if self.batchPointer >= len(self.train):
@@ -60,5 +75,9 @@ if __name__ == "__main__":
     applyStore = '/pirepo/garage/apply/'
     jpgs = glob.glob(applyStore + '*.jpg')
     imgArray = img2Array(jpgs[0])
+    print(imgArray.shape)
+    print(imgArray[:10])
+
+    imgArray = imgResize2Array(jpgs[0], resizeWidth=100)
     print(imgArray.shape)
     print(imgArray[:10])

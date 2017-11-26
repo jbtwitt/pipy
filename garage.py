@@ -10,10 +10,11 @@ ws = Workspace('garage')
 model = 'mnst'
 modelStore = ws.modelStore(model)
 
+imgWidth = 100
+imgHeight = 76
+labelSize = 2
+
 def learn():
-    imgWidth = 100
-    imgHeight = 76
-    labelSize = 2
 
     x = tf.placeholder(tf.float32, [None, imgWidth*imgHeight])
     # Define loss and optimizer
@@ -39,7 +40,7 @@ def learn():
     with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())
         for i in range(100):
-            batch = trainData.nextBatch(10)
+            batch = trainData.nextBatch(10, imgWidth)
             if i % 50 == 0:
                 train_accuracy = accuracy.eval(feed_dict={
                     x: batch[0], y_: batch[1], keep_prob: 1.0})
@@ -64,16 +65,14 @@ def apply():
         predictCloseStore = ws.applyStore('close')
         predictOpenStore = ws.applyStore('open')
         jpgs = glob.glob(applyStore + '*.jpg')
-        print(applyStore)
         for jpg in jpgs:
-            imgArray = jb.img2Array(jpg)
+            imgArray = jb.imgResize2Array(jpg, imgWidth)
             classification = pred.eval(feed_dict={x: [imgArray], keep_prob: 1.0})
-            print(jpg, 'is', classification)
             if classification[0] == 0:  # close
                 mvTo = jpg.replace('/apply\\', '/apply\\close/')
             else:
                 mvTo = jpg.replace('/apply\\', '/apply\\open/')
-            print(mvTo)
+            print(mvTo, classification)
             os.rename(jpg, mvTo)
 
 
