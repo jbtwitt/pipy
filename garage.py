@@ -1,4 +1,6 @@
 import tensorflow as tf
+import os
+import sys
 import glob
 from dl.workspace import Workspace
 from dl.mnst_model import mnstModel
@@ -26,13 +28,13 @@ def learn():
     tf.add_to_collection('y_conv', y_conv)
 
     # Import data
-    emptyFolder = '/pirepo/train/empty/ResizeW100/'
-    notEmptyFolder = '/pirepo/train/not-empty/ResizeW100/'
+    emptyFolder = ws.learnStore('close/')
+    notEmptyFolder = ws.learnStore('open/')
     trainData = jb.ImgData(emptyFolder, notEmptyFolder)
 
-    emptyFolder = '/pirepo/test/empty/ResizeW100/'
-    notEmptyFolder = '/pirepo/test/not-empty/ResizeW100/'
-    testData = jb.ImgData(emptyFolder, notEmptyFolder)
+    # emptyFolder = '/pirepo/test/empty/ResizeW100/'
+    # notEmptyFolder = '/pirepo/test/not-empty/ResizeW100/'
+    # testData = jb.ImgData(emptyFolder, notEmptyFolder)
 
     with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())
@@ -59,14 +61,27 @@ def apply():
 
         pred = tf.argmax(y_conv, 1)
         applyStore = ws.applyStore('')
+        predictCloseStore = ws.applyStore('close')
+        predictOpenStore = ws.applyStore('open')
         jpgs = glob.glob(applyStore + '*.jpg')
         print(applyStore)
         for jpg in jpgs:
             imgArray = jb.img2Array(jpg)
             classification = pred.eval(feed_dict={x: [imgArray], keep_prob: 1.0})
             print(jpg, 'is', classification)
+            if classification[0] == 0:  # close
+                mvTo = jpg.replace('/apply\\', '/apply\\close/')
+            else:
+                mvTo = jpg.replace('/apply\\', '/apply\\open/')
+            print(mvTo)
+            os.rename(jpg, mvTo)
 
 
 if __name__ == "__main__":
-    # learn()
-    apply()
+    cmd = 'apply'
+    if len(sys.argv) > 1:
+        cmd = sys.argv[1]
+    if cmd == 'learn':
+        learn()
+    else:
+        apply()
