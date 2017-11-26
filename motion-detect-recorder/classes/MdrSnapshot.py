@@ -56,6 +56,10 @@ class MdrSnapshot:
             camera.start_preview()
             camera.capture(jpgName)
             camera.stop_preview()
+            if self.blackAndWhite == True:
+                im = cv2.imread(jpgName)
+                im = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
+                cv2.imwrite(jpgName, im)
             if not self.mdArea == None:
                 im = cv2.imread(jpgName)
                 im = MdrUtil.cropArea(im, self.mdArea)

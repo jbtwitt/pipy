@@ -56,3 +56,7 @@ if __name__ == "__main__":
         print(batch[0].shape)
         print(batch[1].shape)
         print(batch[0][:10], batch[1])
+
+    jpg = '/pirepo/at_20171125_202423_797570.jpg'
+    imgArray = img2Array(jpg)
+    print(imgArray.shape)
