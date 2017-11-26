@@ -19,9 +19,9 @@ class MdrSnapshot:
             self.mdArea = mdrConf[M_SNAPSHOT]['mdArea']
         res = mdrConf[M_SNAPSHOT]['camera']['resolution']
         self.resolution = (res[0], res[1])
-        self.blackAndWhite = False
-        if 'blackAndWhite' in mdrConf[M_SNAPSHOT]['camera']:
-            self.blackAndWhite = mdrConf[M_SNAPSHOT]['camera']['blackAndWhite']
+        self.grayColor = False
+        if 'grayColor' in mdrConf[M_SNAPSHOT]['camera']:
+            self.grayColor = mdrConf[M_SNAPSHOT]['camera']['grayColor']
 
 
     def snapshotFilename(self):
@@ -51,12 +51,12 @@ class MdrSnapshot:
         jpgName = self.snapshotFilename()
         try:
             camera.resolution = self.resolution
-            if self.blackAndWhite == True:
+            if self.grayColor == True:
                 camera.color_effects = (128, 128)
             camera.start_preview()
             camera.capture(jpgName)
             camera.stop_preview()
-            if self.blackAndWhite == True:
+            if self.grayColor == True:
                 im = cv2.imread(jpgName)
                 im = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
                 cv2.imwrite(jpgName, im)
