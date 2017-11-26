@@ -57,6 +57,8 @@ if __name__ == "__main__":
         print(batch[1].shape)
         print(batch[0][:10], batch[1])
 
-    jpg = '/pirepo/at_20171125_202423_797570.jpg'
-    imgArray = img2Array(jpg)
+    applyStore = '/pirepo/garage/apply/'
+    jpgs = glob.glob(applyStore + '*.jpg')
+    imgArray = img2Array(jpgs[0])
     print(imgArray.shape)
+    print(imgArray[:10])
