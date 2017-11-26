@@ -1,6 +1,6 @@
 import tensorflow as tf
 
-def mnstModel(x, imgWidth, imgHeight, labelSize):
+def mnstModel(x, y_, imgWidth, imgHeight, labelSize):
   """deepnn builds the graph for a deep net for classifying digits.
 
   Args:
@@ -60,7 +60,22 @@ def mnstModel(x, imgWidth, imgHeight, labelSize):
     b_fc2 = bias_variable([labelSize])
 
     y_conv = tf.matmul(h_fc1_drop, W_fc2) + b_fc2
-  return y_conv, keep_prob
+
+  #
+  with tf.name_scope('loss'):
+      cross_entropy = tf.nn.softmax_cross_entropy_with_logits(labels=y_,
+                                                          logits=y_conv)
+  cross_entropy = tf.reduce_mean(cross_entropy)
+
+  with tf.name_scope('adam_optimizer'):
+      train_step = tf.train.AdamOptimizer(1e-4).minimize(cross_entropy)
+
+  with tf.name_scope('accuracy'):
+      correct_prediction = tf.equal(tf.argmax(y_conv, 1), tf.argmax(y_, 1))
+      correct_prediction = tf.cast(correct_prediction, tf.float32)
+  accuracy = tf.reduce_mean(correct_prediction)
+
+  return y_conv, keep_prob, train_step, accuracy
 
 
 def conv2d(x, W):

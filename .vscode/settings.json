@@ -6,6 +6,7 @@
   // Configure glob patterns for excluding files and folders.
   "files.exclude": {
     "hq/__pycache__": true,    
+    "dl/__pycache__": true,    
     "hq/rdp/__pycache__": true,    
     "**/.git": true,
     "**/.svn": true,
