@@ -32,7 +32,7 @@ class ImgData:
         np.random.seed(7)
         self.train = self.jpg2Array(emptyFolder, notEmptyFolder)
         # print(self.train)
-        # print(self.train.shape)
+        print('jpgs labels:', self.train.shape)
         self.batchPointer = 0
 
     def nextBatch(self, batchSize=1, resizeWidth=100):

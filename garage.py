@@ -33,9 +33,9 @@ def learn():
     notEmptyFolder = ws.learnStore('open/')
     trainData = jb.ImgData(emptyFolder, notEmptyFolder)
 
-    # emptyFolder = '/pirepo/test/empty/ResizeW100/'
-    # notEmptyFolder = '/pirepo/test/not-empty/ResizeW100/'
-    # testData = jb.ImgData(emptyFolder, notEmptyFolder)
+    emptyFolder = ws.applyStore('close/')
+    notEmptyFolder = ws.applyStore('open/')
+    testData = jb.ImgData(emptyFolder, notEmptyFolder)
 
     with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())
@@ -49,6 +49,10 @@ def learn():
 
         saver.save(sess, modelStore)
         print("model saved in", modelStore)
+
+        testBatch = testData.nextBatch(2)
+        print('test accuracy %g' % accuracy.eval(feed_dict={
+            x: testBatch[0], y_: testBatch[1], keep_prob: 1.0}))
 
 def apply():
     modelMeta = ws.modelMeta(model)
