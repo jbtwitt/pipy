@@ -49,7 +49,8 @@ class HqGoog:
         # googUrl = "https://www.google.com/finance/historical?q={0}&output=csv"
         # googUrl = "https://www.google.com/finance/historical?q={0}&output=csv&startdate=Nov 11,2015&enddate=Nov 10,2017"
         # url = googUrl.format(ticker)+'&'+params
-        googUrl = "https://www.google.com/finance/historical"
+        # googUrl = "https://www.google.com/finance/historical"
+        googUrl = "https://finance.google.com/finance/historical"
         # params = urllib.parse.urlencode({'output': "csv", 'enddate': "Nov 10, 2017", 'startdate': "Nov 11, 2015", 'q': ticker })
         params = urllib.parse.urlencode({'output': "csv", 'q': ticker })
         url = googUrl + '?' + params
