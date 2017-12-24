@@ -1,0 +1,29 @@
+{
+    "snapshotRepository": "/tmp/bw_snapshot",
+    "snapshot": {
+        "camera": {
+            "resolution": [800, 608],
+            "fps": 30,
+            "grayColor": true
+        },
+        "mdRecord": false,
+        "sendmail": false,
+        "frequency": 1,
+        "interval": 1
+    },
+    "camCacheRepository": "../../../camCache",
+    "startTs": null,
+    "endTs": null,
+    "camera": {
+        "resolution": [800, 608],
+        "fps": 30
+    },
+    "email": {
+        "smtp-server": "smtp.cox.net",
+        "from": "jbshiao@cox.net",
+        "to": ["jbshiao@yahoo.com"],
+        "subject": "mdr",
+        "body": ""
+    }
+}
+
