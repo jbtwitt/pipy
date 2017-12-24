@@ -6,6 +6,9 @@ from dl.workspace import Workspace
 from dl.mnst_model import mnstModel
 import train.ImgData as jb
 
+from urllib.request import urlopen, Request, URLError
+import urllib.parse
+
 ws = Workspace('garage')
 model = 'mnst'
 modelStore = ws.modelStore(model)
@@ -80,6 +83,22 @@ def apply():
             os.rename(jpg, mvTo)
 
 
+def prod_apply():
+    applyStore = ws.applyStore('')
+    try:
+        garageUrl = 'http://192.168.2.12:5000/snapshot'
+        response = urlopen(garageUrl)
+        # print(str(response.info()))
+        filename = response.getheader('Content-Disposition').split('=')[1]
+        data = response.read()
+        jpgFile = open(applyStore + filename, "wb")
+        jpgFile.write(data)
+        jpgFile.close()
+        apply()
+    except URLError:
+        print ("garage failed at attempt")
+
+
 if __name__ == "__main__":
     cmd = 'apply'
     if len(sys.argv) > 1:
@@ -87,4 +106,4 @@ if __name__ == "__main__":
     if cmd == 'learn':
         learn()
     else:
-        apply()
+        prod_apply()
