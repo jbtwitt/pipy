@@ -12,15 +12,16 @@ garage/savedModels
 """
 import os
 
-# my repository
+# root repository
 Pirepo = "/pirepo/"
 
 class Workspace:
-    def __init__(self, name):
+    def __init__(self, name, labels):
         self.rootPath = Pirepo + name
         if not os.path.exists(self.rootPath):
             os.makedirs(self.rootPath)
-
+        self.labels = labels
+        # self.initLabelStores()
 
     def modelStore(self, modelName):
         folder = self.rootPath + '/savedModels/' + modelName
@@ -32,18 +33,40 @@ class Workspace:
         folder = self.rootPath + '/savedModels/' + modelName
         return folder + '/' + modelName + '_model.meta'
 
-    def applyStore(self, sub='open'):
-        folder = self.rootPath + '/apply/' + sub
+    def applyStore(self):
+        folder = self.rootPath + '/apply/'
         if not os.path.exists(folder):
             os.makedirs(folder)
         return folder
 
-    def learnStore(self, sub='open'):
-        folder = self.rootPath + '/learn/' + sub
+    def learnStore(self):
+        folder = self.rootPath + '/learn/'
         if not os.path.exists(folder):
             os.makedirs(folder)
         return folder
 
+    def initLabelStores(self):
+        applyFolder = self.applyStore()
+        learnFolder = self.learnStore()
+        for label in self.labels:
+            folder = applyFolder + label
+            if not os.path.exists(folder):
+                os.makedirs(folder)
+            folder = learnFolder + label
+            if not os.path.exists(folder):
+                os.makedirs(folder)
+
+    def getLabels(self):
+        return self.labels
+
+    def getLearnLabelStore(self, idx):
+        learnFolder = self.learnStore()
+        folder = learnFolder + self.labels[idx]
+        if not os.path.exists(folder):
+            os.makedirs(folder)
+        return folder
+            
 if __name__ == "__main__":
-    ws = Workspace('garage')
+    labels = ['car-brother', 'car-vivian', 'empty', 'others']
+    ws = Workspace('nono-parking-lot', labels)
     print(ws.modelStore('mnst'))
