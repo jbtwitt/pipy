@@ -6,10 +6,11 @@ from dl.workspace import Workspace
 from dl.mnst_model import mnstModel
 import train.ImgData as jb
 
+from time import sleep
 from urllib.request import urlopen, Request, URLError
 import urllib.parse
 
-ws = Workspace('garage')
+ws = Workspace('garage', ['close', 'open'])
 model = 'mnst'
 modelStore = ws.modelStore(model)
 
@@ -32,12 +33,12 @@ def learn():
     tf.add_to_collection('y_conv', y_conv)
 
     # Import data
-    emptyFolder = ws.learnStore('close/')
-    notEmptyFolder = ws.learnStore('open/')
+    emptyFolder = ws.learnStore() + '/close/'
+    notEmptyFolder = ws.learnStore() + '/open/'
     trainData = jb.ImgData(emptyFolder, notEmptyFolder)
 
-    emptyFolder = ws.applyStore('close/')
-    notEmptyFolder = ws.applyStore('open/')
+    emptyFolder = ws.applyStore() + '/close/'
+    notEmptyFolder = ws.applyStore() + '/open/'
     testData = jb.ImgData(emptyFolder, notEmptyFolder)
 
     with tf.Session() as sess:
@@ -68,9 +69,7 @@ def apply():
         keep_prob = tf.get_collection('keep_prob')[0]
 
         pred = tf.argmax(y_conv, 1)
-        applyStore = ws.applyStore('')
-        predictCloseStore = ws.applyStore('close')
-        predictOpenStore = ws.applyStore('open')
+        applyStore = ws.applyStore()
         jpgs = glob.glob(applyStore + '*.jpg')
         for jpg in jpgs:
             imgArray = jb.imgResize2Array(jpg, imgWidth)
@@ -83,20 +82,50 @@ def apply():
             os.rename(jpg, mvTo)
 
 
-def prod_apply():
-    applyStore = ws.applyStore('')
+def getSnapshot():
+    applyStore = ws.applyStore()
     try:
         garageUrl = 'http://192.168.2.12:5000/snapshot'
         response = urlopen(garageUrl)
         # print(str(response.info()))
         filename = response.getheader('Content-Disposition').split('=')[1]
         data = response.read()
-        jpgFile = open(applyStore + filename, "wb")
+        path = applyStore + filename
+        jpgFile = open(path, "wb")
         jpgFile.write(data)
         jpgFile.close()
-        apply()
+        return path
     except URLError:
         print ("garage failed at attempt")
+
+
+def classify(pred, x, keep_prob, jpg):
+    imgArray = jb.imgResize2Array(jpg, imgWidth)
+    classification = pred.eval(feed_dict={x: [imgArray], keep_prob: 1.0})
+    if classification[0] == 0:  # close
+        mvTo = jpg.replace('/apply/', '/apply/close/')
+    else:
+        mvTo = jpg.replace('/apply/', '/apply/open/')
+    print(mvTo, classification)
+    os.rename(jpg, mvTo)
+
+
+def prod_apply():
+    modelMeta = ws.modelMeta(model)
+    print(modelMeta)
+    with tf.Session() as sess:
+        saver = tf.train.import_meta_graph(modelMeta, clear_devices=True)
+        saver.restore(sess, modelStore)
+        x = tf.get_collection('x')[0]
+        y_conv = tf.get_collection('y_conv')[0]
+        keep_prob = tf.get_collection('keep_prob')[0]
+        pred = tf.argmax(y_conv, 1)
+
+        while(True):
+            jpgFile = getSnapshot()
+            if jpgFile is not None:
+                classify(pred, x, keep_prob, jpgFile)
+            sleep(5)
 
 
 if __name__ == "__main__":
@@ -106,4 +135,4 @@ if __name__ == "__main__":
     if cmd == 'learn':
         learn()
     else:
-        prod_apply()
+        apply()
