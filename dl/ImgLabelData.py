@@ -1,10 +1,14 @@
 from PIL import Image, ImageFilter
 import numpy as np
 import glob
-from workspace import Workspace
+from .workspace import Workspace
+from .train_store import TrainStore
 
-def imgResize2Array(jpg, resizeWidth):
+def imgResize2Array(jpg, resizeWidth, toGray=True):
     original = Image.open(jpg)
+
+    if (toGray == True):
+        original = original.convert('L')    # convert RGB to Gray
 
     resize = resizeWidth, int(original.size[1]*resizeWidth/original.size[0])
     # print(resize)
@@ -29,10 +33,10 @@ def img2Array(jpg):
     return imgArray
 
 class ImgLabelData:
-    def __init__(self, workspace):
-        self.workspace = workspace
+    def __init__(self, trainStore):
+        self.trainStore = trainStore
         np.random.seed(7)
-        self.train = self.jpg2Array(self.workspace)
+        self.train = self.jpg2Array()
         # print(self.train)
         print('jpgs labels:', self.train.shape)
         self.batchPointer = 0
@@ -50,13 +54,12 @@ class ImgLabelData:
                 self.batchPointer = 0
         return np.array(images), np.array(labels)
 
-    def jpg2Array(self, workspace):
-        labels = workspace.getLabels()
-        labelsLen = len(workspace.getLabels())
+    def jpg2Array(self):
+        labelsLen = len(self.trainStore.getLabels())
         arr = np.empty((0, labelsLen+1), dtype=object)
         for i in range(labelsLen):
-            learnLabelStore = workspace.getLearnLabelStore(i)
-            jpgs = glob.glob(learnLabelStore + '/*.jpg')
+            labelStore = self.trainStore.getLabelStore(i)
+            jpgs = glob.glob(labelStore + '/*.jpg')
             # label array with extra column for jpg file
             vecs = np.empty((len(jpgs), labelsLen+1), dtype=object)
             vecs[:,] = "0"

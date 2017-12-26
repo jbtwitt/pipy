@@ -23,6 +23,9 @@ class Workspace:
         self.labels = labels
         # self.initLabelStores()
 
+    def getRootPath(self):
+        return self.rootPath
+
     def modelStore(self, modelName):
         folder = self.rootPath + '/savedModels/' + modelName
         if not os.path.exists(folder):
@@ -58,13 +61,6 @@ class Workspace:
 
     def getLabels(self):
         return self.labels
-
-    def getLearnLabelStore(self, idx):
-        learnFolder = self.learnStore()
-        folder = learnFolder + self.labels[idx]
-        if not os.path.exists(folder):
-            os.makedirs(folder)
-        return folder
             
 if __name__ == "__main__":
     labels = ['car-brother', 'car-vivian', 'empty', 'others']

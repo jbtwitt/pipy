@@ -1,0 +1,85 @@
+import tensorflow as tf
+import sys
+import datetime
+from time import sleep
+import base64
+from urllib.request import urlopen, Request, URLError
+
+from dl.workspace import Workspace
+from dl.train_store import TrainStore
+from dl.mnst_model import mnstModel
+import dl.ImgLabelData as jb
+
+imgWidth = 88   # 352 / 4
+imgHeight = 60  # 240 / 4
+labels = ['car-brother', 'car-vivian', 'empty', 'others']
+labelSize = len(labels)
+
+ws = Workspace('nono-parking-lot', labels)
+model = 'mnst'
+modelStore = ws.modelStore(model)
+
+def learn():
+
+    x = tf.placeholder(tf.float32, [None, imgWidth*imgHeight])
+    # Define loss and optimizer
+    y_ = tf.placeholder(tf.float32, [None, labelSize])
+    y_conv, keep_prob, train_step, accuracy = mnstModel(x, y_,
+                                                    imgWidth, imgHeight, labelSize)
+
+    # for save model
+    saver = tf.train.Saver()
+    tf.add_to_collection('x', x)
+    tf.add_to_collection('keep_prob', keep_prob)
+    tf.add_to_collection('y_conv', y_conv)
+
+    # Import data
+    learnStore = TrainStore(ws, 'learn')
+    trainData = jb.ImgLabelData(learnStore)
+
+    applyStore = TrainStore(ws, 'apply')
+    testData = jb.ImgLabelData(applyStore)
+
+    with tf.Session() as sess:
+        sess.run(tf.global_variables_initializer())
+        for i in range(100):
+            batch = trainData.nextBatch(10, imgWidth)
+            if i % 50 == 0:
+                train_accuracy = accuracy.eval(feed_dict={
+                    x: batch[0], y_: batch[1], keep_prob: 1.0})
+                print('step %d, training accuracy %g' % (i, train_accuracy))
+            train_step.run(feed_dict={x: batch[0], y_: batch[1], keep_prob: 0.5})
+
+        saver.save(sess, modelStore)
+        print("model saved in", modelStore)
+
+        testBatch = testData.nextBatch(2, imgWidth)
+        print('test accuracy %g' % accuracy.eval(feed_dict={
+            x: testBatch[0], y_: testBatch[1], keep_prob: 1.0}))
+
+
+def take_snapshot(username, password):
+    url = 'http://114.35.223.91/cgi-bin/net_jpeg.cgi?ch=2'  # + ch  # + '&1514199511126'
+    request = Request(url)
+    credentials = ('%s:%s' % (username, password))
+    encoded_credentials = base64.b64encode(credentials.encode('ascii'))
+    request.add_header('Authorization', 'Basic %s' % encoded_credentials.decode("ascii"))
+
+    for i in range(72):
+        response = urlopen(request)
+        data = response.read()
+        timestamp = datetime.datetime.now()
+        jpgFilename = learnStore + 'at_' + timestamp.strftime("%Y%m%d_%H%M%S_%f") + '.jpg'
+        jpgFile = open(jpgFilename, "wb")
+        jpgFile.write(data)
+        jpgFile.close()
+        print(jpgFilename)
+        sleep(3600)
+
+if __name__ == "__main__":
+    if len(sys.argv) > 1:
+        usr = sys.argv[1]
+    if len(sys.argv) > 2:
+        pwd = sys.argv[2]
+        # take_snapshot(usr, pwd)
+    learn()
