@@ -8,6 +8,9 @@ class TrainStore:
         if not os.path.exists(self.rootPath):
             os.makedirs(self.rootPath)
 
+    def getRootPath(self):
+        return self.rootPath
+
     def getLabels(self):
         return self.workspace.getLabels()
 

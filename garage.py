@@ -135,4 +135,4 @@ if __name__ == "__main__":
     if cmd == 'learn':
         learn()
     else:
-        apply()
+        prod_apply()
