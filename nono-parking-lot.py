@@ -5,11 +5,13 @@ import datetime
 from time import sleep
 import base64
 from urllib.request import urlopen, Request, URLError
+import json
 
 from dl.workspace import Workspace
 from dl.train_store import TrainStore
 from dl.mnst_model import mnstModel
 import dl.ImgLabelData as jb
+from JbMail import JbMail
 
 imgWidth = 88   # 352 / 4
 imgHeight = 60  # 240 / 4
@@ -19,6 +21,10 @@ labelSize = len(labels)
 ws = Workspace('nono-parking-lot', labels)
 model = 'mnst'
 modelStore = ws.modelStore(model)
+conf = json.load(open(ws.getJson()))
+sendmail = conf['sendmail']
+# print(conf)
+# sys.exit()
 
 def learn():
     x = tf.placeholder(tf.float32, [None, imgWidth*imgHeight])
@@ -41,8 +47,8 @@ def learn():
 
     with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())
-        for i in range(100):
-            batch = trainData.nextBatch(10, imgWidth)
+        for i in range(250):
+            batch = trainData.nextBatch(12, imgWidth)
             if i % 50 == 0:
                 train_accuracy = accuracy.eval(feed_dict={
                     x: batch[0], y_: batch[1], keep_prob: 1.0})
@@ -52,7 +58,7 @@ def learn():
         saver.save(sess, modelStore)
         print("model saved in", modelStore)
 
-        testBatch = testData.nextBatch(2, imgWidth)
+        testBatch = testData.nextBatch(100, imgWidth)
         print('test accuracy %g' % accuracy.eval(feed_dict={
             x: testBatch[0], y_: testBatch[1], keep_prob: 1.0}))
 
@@ -65,6 +71,7 @@ def classify(pred, x, keep_prob, jpg):
     mvTo = jpg.replace('/apply/', '/apply/' + label + '/')
     print(mvTo, label)
     os.rename(jpg, mvTo)
+    return label, mvTo
 
 def prod_apply(username, password, channel):
     modelMeta = ws.modelMeta(model)
@@ -82,8 +89,14 @@ def prod_apply(username, password, channel):
         while(True):
             jpgFile = urlSnapshot.pull()
             if jpgFile is not None:
-                classify(pred, x, keep_prob, jpgFile)
-            sleep(5)
+                label, moveTo = classify(pred, x, keep_prob, jpgFile)
+                if sendmail:
+                    conf['email']['body'] = label
+                    jbMail = jbMail(conf)
+                    jbMail.attachImages([moveTo])
+                    jbMail.send()
+            sleep(15)
+            break
 
 class UrlSnapshot:
     def __init__(self, store, username, password, channel=2):
@@ -108,10 +121,10 @@ class UrlSnapshot:
 def robot(username, password):
     learnStore = TrainStore(ws, 'learn').getRootPath()
     urlSnapshot = UrlSnapshot(learnStore, username, password, channel=2)
-    for i in range(72):
+    for i in range(360):
         jpgFilename = urlSnapshot.pull()
         print(jpgFilename)
-        sleep(1800)
+        sleep(10)
 
 def take_snapshot(username, password):
     url = 'http://114.35.223.91/cgi-bin/net_jpeg.cgi?ch=2'  # + ch  # + '&1514199511126'
@@ -135,8 +148,11 @@ def take_snapshot(username, password):
 if __name__ == "__main__":
     if len(sys.argv) > 1:
         usr = sys.argv[1]
+        if sys.argv[1] == 'learn':
+            learn()
     if len(sys.argv) > 2:
         pwd = sys.argv[2]
+    if len(sys.argv) == 3:
         robot(usr, pwd)
-        # prod_apply(usr, pwd, 2)
-    # learn()
+    if len(sys.argv) > 3:
+        prod_apply(usr, pwd, 2)

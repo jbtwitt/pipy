@@ -21,10 +21,13 @@ class Workspace:
         if not os.path.exists(self.rootPath):
             os.makedirs(self.rootPath)
         self.labels = labels
-        # self.initLabelStores()
+        self.json = os.path.join(self.rootPath, name + ".json")
 
     def getRootPath(self):
         return self.rootPath
+
+    def getJson(self):
+        return self.json
 
     def modelStore(self, modelName):
         folder = self.rootPath + '/savedModels/' + modelName
