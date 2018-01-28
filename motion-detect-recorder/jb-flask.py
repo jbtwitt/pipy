@@ -18,17 +18,19 @@ def hello():
 @app.route("/snapshot")
 def snapshot():
 	asAttachment = False
-	# if (request.args.get('download') is not None):
-	# 	asAttachment = True
+	if (request.args.get('download') is not None):
+		asAttachment = True
 	#jpgFile = '/home/pi/camCache/d20160917_232959/f20160918_061321_472937.jpg'
 	jpgFile = mdrSnapshot.cameraSnapshot()
-	# return send_file(jpgFile, mimetype='image/jpg', as_attachment=True)
-	return send_file(jpgFile, mimetype='image/jpg', cache_timeout=0, as_attachment=asAttachment, add_etags=False)
+	if asAttachment:
+		return send_file(jpgFile, mimetype='image/jpg', cache_timeout=0, as_attachment=True)
+	else:
+		return send_file(jpgFile, mimetype='image/jpg', cache_timeout=0, as_attachment=asAttachment, add_etags=False)
 
 @app.route("/snapshot_download")
 def snapshot_download():
 	jpgFile = mdrSnapshot.cameraSnapshot()
-	return send_file(jpgFile, mimetype='image/jpg', as_attachment=True)
+	return send_file(jpgFile, mimetype='image/jpg', as_attachment=True, cache_timeout=0)
 
 if __name__ == "__main__":
 	app.run(host='0.0.0.0')
