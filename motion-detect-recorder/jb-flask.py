@@ -34,12 +34,12 @@ def snapshot():
 	#snapshotSize = os.stat(jpgFile).st_size
 	#print "response len: " + str(os.path.getsize(jpgFile))
 	response = Response()
-	#response.headers.add('Connection', 'close')
-	response.headers.add('Keep-Alive', 'timeout=0, max=1')
+	response.headers.add('Connection', 'close')
+	#response.headers.add('Keep-Alive', 'timeout=0, max=1')
 	response.headers.add('Content-Lenght', str(os.path.getsize(jpgFile)))
 	return send_file(jpgFile, mimetype='image/jpg', cache_timeout=0, as_attachment=asAttachment, add_etags=False)
 	#return send_file(jpgFile, mimetype='image/jpg', cache_timeout=0, as_attachment=asAttachment)
 
 if __name__ == "__main__":
-	app.run(host='0.0.0.0')
+	app.run(host='0.0.0.0', threaded=True)
 
