@@ -1,7 +1,4 @@
 #
 /motion-detect-recorder/classes/*.pyc
-/train/__pycache__
-hq/rdp/__pycache__
-hq/__pycache__
-dl/__pycache__
+/**/__pycache__
 .vscode

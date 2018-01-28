@@ -26,6 +26,21 @@ class JbMail:
         smtp.sendmail(smtpConf['from'], smtpConf['to'], self.mdrMail.as_string())
         smtp.quit()
         
+    def send_ssl(self):
+        smtpConf = self.mdrConf['email']
+        host = smtpConf['smtp-server']
+        port = smtpConf['smtp-port']
+        log = smtpConf['log']
+        sender = smtpConf['from']
+        try:
+            smtp = smtplib.SMTP_SSL(host, port)
+            smtp.login(sender, log)
+            smtp.sendmail(smtpConf['from'], smtpConf['to'], self.mdrMail.as_string())
+            print('send_ssl ok')
+        except Exception as e:
+            print(e) 
+
+
     def attachImage(self, imgFile):
         fp = open(imgFile, 'rb')
         img = MIMEImage(fp.read(), name=os.path.basename(imgFile))
@@ -40,7 +55,7 @@ class JbMail:
 def test():
     import json
     conf = json.load(open('../mdr.json'))
-    mdrMail = MdrMail(conf)
+    mdrMail = JbMail(conf)
     imgFiles = ['../../../../camCache/img001.jpg']
     mdrMail.attachImage(imgFiles[0])
     mdrMail.attachImages(imgFiles)
