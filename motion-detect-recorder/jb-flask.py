@@ -1,5 +1,5 @@
 from flask import Flask
-from flask import request
+from flask import request, Response
 from flask import send_file
 
 import os
@@ -10,6 +10,15 @@ mdrConf = json.load(open('garage-flask.json'))
 mdrSnapshot = MdrSnapshot(mdrConf)
 
 app = Flask(__name__)
+#@app.after_request
+def after_request(response):
+	#response.headers.add('Keep-Alive', 'timeout=0, max=1')
+	response.headers.add('Connection', 'close')
+	#response.headers.add('Access-Control-Allow-Origin', '*')
+	#response.headers.add('Access-Control-Allow-Headers', 'Access-Control-Allow-Headers, Origin, Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers')
+	#response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+	return response
+
 
 @app.route("/")
 def hello():
@@ -22,15 +31,14 @@ def snapshot():
 		asAttachment = True
 	#jpgFile = '/home/pi/camCache/d20160917_232959/f20160918_061321_472937.jpg'
 	jpgFile = mdrSnapshot.cameraSnapshot()
-	if asAttachment:
-		return send_file(jpgFile, mimetype='image/jpg', cache_timeout=0, as_attachment=True)
-	else:
-		return send_file(jpgFile, mimetype='image/jpg', cache_timeout=0, as_attachment=asAttachment, add_etags=False)
-
-@app.route("/snapshot_download")
-def snapshot_download():
-	jpgFile = mdrSnapshot.cameraSnapshot()
-	return send_file(jpgFile, mimetype='image/jpg', as_attachment=True, cache_timeout=0)
+	#snapshotSize = os.stat(jpgFile).st_size
+	#print "response len: " + str(os.path.getsize(jpgFile))
+	response = Response()
+	#response.headers.add('Connection', 'close')
+	response.headers.add('Keep-Alive', 'timeout=0, max=1')
+	response.headers.add('Content-Lenght', str(os.path.getsize(jpgFile)))
+	return send_file(jpgFile, mimetype='image/jpg', cache_timeout=0, as_attachment=asAttachment, add_etags=False)
+	#return send_file(jpgFile, mimetype='image/jpg', cache_timeout=0, as_attachment=asAttachment)
 
 if __name__ == "__main__":
 	app.run(host='0.0.0.0')
