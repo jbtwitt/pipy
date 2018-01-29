@@ -11,7 +11,7 @@ from dl.workspace import Workspace
 from dl.train_store import TrainStore
 from dl.mnst_model import mnstModel
 import dl.ImgLabelData as jb
-from JbMail import JbMail
+from util.JbMail import JbMail
 
 imgWidth = 88   # 352 / 4
 imgHeight = 60  # 240 / 4
@@ -89,12 +89,17 @@ def prod_apply(username, password, channel):
         while(True):
             jpgFile = urlSnapshot.pull()
             if jpgFile is not None:
+                # prit detail
+                imgArray = jb.imgResize2Array(jpgFile, imgWidth)
+                print(y_conv.eval(feed_dict={x: [imgArray], keep_prob: 1.0}))
                 label, moveTo = classify(pred, x, keep_prob, jpgFile)
                 if sendmail:
                     conf['email']['body'] = label
-                    jbMail = jbMail(conf)
+                    jbMail = JbMail(conf)
                     jbMail.attachImages([moveTo])
-                    jbMail.send()
+                    print('sending email ...')
+                    # jbMail.send()
+                    jbMail.send_ssl()
             sleep(15)
             break
 
