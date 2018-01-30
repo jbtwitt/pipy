@@ -23,6 +23,7 @@ model = 'mnst'
 modelStore = ws.modelStore(model)
 conf = json.load(open(ws.getJson()))
 sendmail = conf['sendmail']
+myUrl = conf['snapshotUrl']
 # print(conf)
 # sys.exit()
 
@@ -89,7 +90,7 @@ def prod_apply(username, password, channel):
         while(True):
             jpgFile = urlSnapshot.pull()
             if jpgFile is not None:
-                # prit detail
+                # print detail
                 imgArray = jb.imgResize2Array(jpgFile, imgWidth)
                 print(y_conv.eval(feed_dict={x: [imgArray], keep_prob: 1.0}))
                 label, moveTo = classify(pred, x, keep_prob, jpgFile)
@@ -106,7 +107,7 @@ def prod_apply(username, password, channel):
 class UrlSnapshot:
     def __init__(self, store, username, password, channel=2):
         self.store = store
-        url = 'http://114.35.223.91/cgi-bin/net_jpeg.cgi?ch=' + str(channel)
+        url = myUrl + '?ch=' + str(channel)
         request = Request(url)
         credentials = ('%s:%s' % (username, password))
         encoded_credentials = base64.b64encode(credentials.encode('ascii'))
