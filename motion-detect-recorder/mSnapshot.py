@@ -6,6 +6,7 @@ from time import sleep
 from classes.MdrMail import MdrMail
 import classes.MdrUtil as MdrUtil
 import os
+import shutil
 
 def mail(mdrConf, mdRecords):
     if len(mdRecords) > 0:
@@ -65,14 +66,15 @@ def main(mdrConf):
         if 'daily' in runConf and runConf['daily']:
             rootFolder = mdrConf['snapshotRepository']
             dayFolder = datetime.datetime.now().strftime("%Y%m%d")
+            tarCmd = "cd " + rootFolder + "; tar zcf " + dayFolder + ".tar.gz " + dayFolder
             mdrConf['snapshotRepository'] = rootFolder + '/' + dayFolder
-            tarCmd = "tar zcf " + rootFolder + "/" + dayFolder + ".tar.gz " + mdrConf['snapshotRepository']
 
     while(True):
         mainSnapshot(mdrConf)
         if ('daily' in runConf and runConf['daily']) or exitCmd is None:
             if runConf['daily']:
-                os.system(tarCmd)
+                os.system(tarCmd)   # archive daily jpgs
+                shutil.rmtree(mdrConf['snapshotRepository'])    # clean jpgs
             break
         else:
             if os.path.exists(exitCmd):

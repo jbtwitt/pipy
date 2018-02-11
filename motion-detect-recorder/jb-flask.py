@@ -5,6 +5,7 @@ from flask import send_file
 import os
 import json
 from classes.MdrSnapshot import MdrSnapshot
+import glob
 
 mdrConf = json.load(open('garage-flask.json'))
 mdrSnapshot = MdrSnapshot(mdrConf)
@@ -39,6 +40,23 @@ def snapshot():
 	response.headers.add('Content-Lenght', str(os.path.getsize(jpgFile)))
 	return send_file(jpgFile, mimetype='image/jpg', cache_timeout=0, as_attachment=asAttachment, add_etags=False)
 	#return send_file(jpgFile, mimetype='image/jpg', cache_timeout=0, as_attachment=asAttachment)
+
+@app.route("/daily")
+def daily():
+	dailyConf = json.load(open('/home/pi/jb/json/daily_mdr.json'))
+	folder = dailyConf["snapshotRepository"]
+	cmd = request.args.get('cmd')
+	if cmd == "list":
+		# dailyArchives = glob.glob(folder + "/*.tar.gz")
+		dailyArchives = os.listdir(folder)
+		return json.dumps(dailyArchives)
+	elif cmd == "get":
+		file = request.args.get('file')
+		return send_file(file, mimetype='application/tar+gzip', cache_timeout=0, as_attachment=True, add_etags=False)
+	else cmd == "del":
+		file = request.args.get('file')
+		os.remove(folder + "/" + file)
+		return "Done"
 
 if __name__ == "__main__":
 	app.run(host='0.0.0.0', threaded=True)
