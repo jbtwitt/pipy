@@ -52,6 +52,7 @@ def saveSnapshotContours(mdrConf, mdRecords):
 
 
 RUN_SNAPSHOT = 'run-snapshot'
+tarCmd = ""
 def main(mdrConf):
     seconds = 1
     exitCmd = None
@@ -62,11 +63,16 @@ def main(mdrConf):
         if 'sleep' in runConf:
             seconds = runConf['sleep']
         if 'daily' in runConf and runConf['daily']:
-            mdrConf['snapshotRepository'] = mdrConf['snapshotRepository'] + '/' + timestamp.strftime("%Y%m%d")
+            rootFolder = mdrConf['snapshotRepository']
+            dayFolder = datetime.datetime.now().strftime("%Y%m%d")
+            mdrConf['snapshotRepository'] = rootFolder + '/' + dayFolder
+            tarCmd = "tar zcf " + rootFolder + "/" + dayFolder + ".tar.gz " + mdrConf['snapshotRepository']
 
     while(True):
         mainSnapshot(mdrConf)
         if ('daily' in runConf and runConf['daily']) or exitCmd is None:
+            if runConf['daily']:
+                os.system(tarCmd)
             break
         else:
             if os.path.exists(exitCmd):
