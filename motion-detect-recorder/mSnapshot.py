@@ -61,9 +61,12 @@ def main(mdrConf):
             exitCmd = runConf['exit']
         if 'sleep' in runConf:
             seconds = runConf['sleep']
+        if 'daily' in runConf and runConf['daily']:
+            mdrConf['snapshotRepository'] = mdrConf['snapshotRepository'] + '/' + timestamp.strftime("%Y%m%d")
+
     while(True):
         mainSnapshot(mdrConf)
-        if exitCmd is None:
+        if ('daily' in runConf and runConf['daily']) or exitCmd is None:
             break
         else:
             if os.path.exists(exitCmd):

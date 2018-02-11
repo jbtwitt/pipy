@@ -27,6 +27,8 @@ myUrl = conf['snapshotUrl']
 # print(conf)
 # sys.exit()
 
+trainIteration = 600
+batchSize = 15
 def learn():
     x = tf.placeholder(tf.float32, [None, imgWidth*imgHeight])
     # Define loss and optimizer
@@ -48,8 +50,8 @@ def learn():
 
     with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())
-        for i in range(250):
-            batch = trainData.nextBatch(12, imgWidth)
+        for i in range(trainIteration):
+            batch = trainData.nextBatch(batchSize, imgWidth)
             if i % 50 == 0:
                 train_accuracy = accuracy.eval(feed_dict={
                     x: batch[0], y_: batch[1], keep_prob: 1.0})
@@ -57,7 +59,7 @@ def learn():
             train_step.run(feed_dict={x: batch[0], y_: batch[1], keep_prob: 0.5})
 
         saver.save(sess, modelStore)
-        print("model saved in", modelStore)
+        print("model saved in", modelStore, trainIteration, batchSize)
 
         testBatch = testData.nextBatch(100, imgWidth)
         print('test accuracy %g' % accuracy.eval(feed_dict={
