@@ -52,8 +52,8 @@ def daily():
 		return json.dumps(dailyArchives)
 	elif cmd == "get":
 		file = request.args.get('file')
-		return send_file(file, mimetype='application/tar+gzip', cache_timeout=0, as_attachment=True, add_etags=False)
-	else cmd == "del":
+		return send_file(folder + "/" + file, mimetype='application/tar+gzip', cache_timeout=0, as_attachment=True, add_etags=False)
+	elif cmd == "del":
 		file = request.args.get('file')
 		os.remove(folder + "/" + file)
 		return "Done"
