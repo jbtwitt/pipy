@@ -23,6 +23,8 @@ modelStore = ws.modelStore(model)
 conf = json.load(open(ws.getJson()))
 sendmail = conf['sendmail']
 myUrl = conf['snapshotUrl']
+trainIteration = conf['ai']['trainIteration']
+batchSize = conf['ai']['batchSize']
 
 imgWidth = 100
 imgHeight = 76
@@ -50,8 +52,8 @@ def learn():
 
     with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())
-        for i in range(350):
-            batch = trainData.nextBatch(10, imgWidth)
+        for i in range(trainIteration):
+            batch = trainData.nextBatch(batchSize, imgWidth)
             if i % 50 == 0:
                 train_accuracy = accuracy.eval(feed_dict={
                     x: batch[0], y_: batch[1], keep_prob: 1.0})
@@ -197,9 +199,14 @@ def daily_apply():
 
         applyStore = TrainStore(ws, 'apply')
         labels = applyStore.getLabels()
+        count = {}
+        for label in labels:
+            count[label] = 0
         archives = getDailyList()
         print(archives)
         for archive in archives:
+            if ".tar.gz" not in archive:
+                continue
             file = getDailyArchive(archive)
             dailyApplyFolder = extractArchive(file)
             for label in labels:
@@ -212,6 +219,7 @@ def daily_apply():
                 imgArray = jb.imgResize2Array(jpgFile, imgWidth)
                 print(y_conv.eval(feed_dict={x: [imgArray], keep_prob: 1.0}))
                 label, moveTo = dailyClassify(pred, x, keep_prob, jpgFile, dailyApplyFolder)
+                count[label] = count[label] + 1
                 # if sendmail and label == 'visitor':
                 #     conf['email']['body'] = label
                 #     jbMail = JbMail(conf)
@@ -219,7 +227,8 @@ def daily_apply():
                 #     print('sending email ...')
                 #     # jbMail.send()
                 #     jbMail.send_ssl()
-            # delDailyArchive(archive)
+            delDailyArchive(archive)
+            print(count)
 
 if __name__ == "__main__":
     cmd = 'apply'
