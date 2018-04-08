@@ -16,7 +16,7 @@ import urllib.parse
 import tarfile
 import zipfile
 
-ws = Workspace('front-door', ['no-visitor', 'visitor'])
+ws = Workspace('front-door', ['no-visitor', 'car', 'visitor'])
 model = 'mnst'
 modelStore = ws.modelStore(model)
 
@@ -28,7 +28,7 @@ batchSize = conf['ai']['batchSize']
 
 imgWidth = 100
 imgHeight = 76
-labelSize = 2
+labelSize = 3
 
 def learn():
     x = tf.placeholder(tf.float32, [None, imgWidth*imgHeight])
@@ -229,6 +229,7 @@ def daily_apply():
                 #     jbMail.send_ssl()
             delDailyArchive(archive)
             print(count)
+            break
 
 if __name__ == "__main__":
     cmd = 'apply'
