@@ -1,7 +1,6 @@
 import re
 from urllib.request import urlopen, Request, URLError
 from datetime import datetime
-from datetime import timedelta
 import calendar
 
 InitLink = 'https://finance.yahoo.com/quote/AMZN/history?p=AMZN'
@@ -10,15 +9,14 @@ CrumbRegex = r'CrumbStore":{"crumb":"(.*?)"}'
 CookRegex = r'set-cookie: (.*?); '
 DateFormat = "%Y-%m-%d"
 class HqYhoo:
+    crumb = 'not found'
+    cookie = 'not found'
     def __init__(self):
-        self.crumb = 'not found'
-        self.cookie = 'not found'
         self.initSession()
-        print(self.crumb, self.cookie)
+        print("session init", self.crumb, self.cookie)
 
     def initSession(self):
         response = urlopen(InitLink)
-        # print(str(response.info()))
         match = re.search(CookRegex, str(response.info()))
         if match != None:
             self.cookie = match.group(1)
@@ -31,13 +29,10 @@ class HqYhoo:
         fromTime = calendar.timegm(datetime.strptime(startDate, DateFormat).timetuple())
         toTime = calendar.timegm(datetime.strptime(endDate, DateFormat).timetuple())
         hqLink = HqLink.format(ticker, fromTime, toTime, self.crumb)
-        print(hqLink)
-        r = Request(hqLink, headers={'Cookie': self.cookie})
+        request = Request(hqLink, headers={'Cookie': self.cookie})
         try:
-            response = urlopen(r)
+            response = urlopen(request)
             txt = response.read()
-            print("{} downloaded".format(ticker))
             return txt
         except URLError:
-            print("{} failed".format(ticker))
-        return ''
+            raise
