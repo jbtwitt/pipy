@@ -15,7 +15,7 @@ def main(hqConf):
     repo = CsvFolder.format(hqConf["repo"], datetime.now().strftime("%Y%m%d"))
     if not os.path.exists(repo):
         os.makedirs(repo)
-    today = datetime.now().strftime(DateFormat)
+    today = (datetime.now() + timedelta(days=1)).strftime(DateFormat)
     startDate = (datetime.now() + timedelta(days=-hqDays)).strftime(DateFormat)
     print("date range", startDate, today)
     hqRobot = HqYhoo()
