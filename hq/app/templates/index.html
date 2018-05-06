@@ -2,7 +2,13 @@
 
 {% block content %}
 
-<a href="/hqMeta">hqMeta</a>
+{% for hqMetaFile in hqMetaFiles %}
+    <a href="/hqMeta?{{hqMetaFile}}">hqMeta</a> |
+{% endfor %}
+
+<a href="/hqrobot">hqrobot</a>
+
+<br>
 <table>
 {% for ticker in tickers %}
 

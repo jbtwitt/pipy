@@ -8,11 +8,11 @@ from HqYhoo import DateFormat
 
 CsvFolder = "{}/hq{}"
 CsvFileName = "{}/{}.y.csv"
-def main(hqConf):
+def main(hqConf, day):
     tickers = hqConf["tickers"]
     hqDays = 7 * hqConf["hqDays"] / 5
     # repo = hqConf["repo"] + '/hq' + datetime.now().strftime("%Y%m%d")
-    repo = CsvFolder.format(hqConf["repo"], datetime.now().strftime("%Y%m%d"))
+    repo = CsvFolder.format(hqConf["repo"], day)
     if not os.path.exists(repo):
         os.makedirs(repo)
     today = (datetime.now() + timedelta(days=1)).strftime(DateFormat)
@@ -31,9 +31,23 @@ def main(hqConf):
             break
         sleep(hqConf["sleep"])
 
-"""
-https://query1.finance.yahoo.com/v7/finance/download/LABU?period1=1522195963&period2=1524874363&interval=1d&events=history&crumb=SvxJY.f67nr
-https://query1.finance.yahoo.com/v7/finance/download/ATHX?period1=1522196132&period2=1524874532&interval=1d&events=history&crumb=SvxJY.f67nr
-"""
+    hqMetaFileCreate(hqConf, day)
+
+from HqMeta import HqMeta
+from HqMetaFile import HqMetaFile
+def hqMetaFileCreate(hqConf, day):
+    tickers = hqConf["tickers"]
+    csvFolder = CsvFolder.format(hqConf['repo'], day)
+    hqMetas = []
+    for ticker in tickers:
+        hqFile = CsvFileName.format(csvFolder, ticker)
+        if os.path.exists(hqFile):
+            hqMeta = HqMeta(ticker, hqFile)
+            hqMetas.append(hqMeta.collect())
+    hqMetaFile = HqMetaFile(hqConf, day)
+    hqMetaFile.writeJson(hqMetas)
+
 if __name__ == '__main__':
-    main(json.load(open('hqrobot.json')))
+    day = (datetime.now() + timedelta(days=-0)).strftime("%Y%m%d")
+    print(day, 'hq date folder')
+    main(json.load(open('hqrobot.json')), day)

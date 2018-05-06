@@ -1,6 +1,8 @@
 import json
 import math
-from flask import render_template
+from flask import render_template, request
+import glob
+import urllib
 
 from app import app
 
@@ -9,19 +11,25 @@ print(hqConf)
 
 @app.route('/')
 def index():
+    hqMetaFiles = glob.glob(hqConf['repo'] + '/hqMeta*.json')
+    listFiles = hqMetaFiles[len(hqMetaFiles)-3:]
+    hqMetaFiles = []
+    for hqMetaFile in listFiles:
+        hqMetaFiles.append(urllib.parse.urlencode({'hqMetaFile': hqMetaFile}))
+
     return render_template('index.html',
                            title='HQ',
                            hqUrl=hqConf['hqUrl'],
+                           hqMetaFiles=hqMetaFiles,
                            tickers=hqConf['tickers'])
 
 @app.route('/hqMeta')
 def hqMeta():
-    hqMetas = json.load(open('../../robotRepo/hqMeta20180504.json'))
+    hqMetaFile = request.args.get('hqMetaFile')
+    hqMetas = json.load(open(hqMetaFile))
     return render_template('hqMeta.html',
                            title='HQ',
                            hqUrl=hqConf['hqUrl'],
                            hqMetas=hqMetas,
-                           convert2Percent=toPercent)
-
-def toPercent(value):
-    return round(100 * value, 2)
+                           downAlert=-0.1,
+                           round=round)

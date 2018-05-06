@@ -5,8 +5,13 @@
 <table>
 <tr>
     <td colspan="2"></td>
-    <th>5-day-diff</th>
-    <th>10-day-diff</th>
+    <th>Date</th>
+    <th>Close</th>
+    <th>Change</th>
+    <th>CL</th>
+    <th>HL</th>
+    <th colspan="2">5-day-diff</th>
+    <th colspan="2">10-day-diff</th>
 </tr>
 {% for hqMeta in hqMetas %}
 
@@ -15,17 +20,38 @@
             <a href="{{hqUrl.q.format(hqMeta.ticker, hqMeta.ticker)}}" target="_blank">{{hqMeta.ticker}}</a></td>
         <td>
             <a href="{{hqUrl.h.format(hqMeta.ticker, hqMeta.ticker)}}" target="_blank">H</a></td>
-        <td align="right">
-            {{hqMeta.nDaysDownDiff5.diffDate}} |
-            {{convert2Percent(hqMeta.nDaysDownDiff5.diff)}}%
+        <td>{{hqMeta.date}}</td>
+        <td align="right">{{round(hqMeta.close,2)}}</td>
+        <td align="right">{{round(100*hqMeta.change,2)}}%</td>
+        <td align="right">{{round(100*hqMeta.CL,2)}}%</td>
+        <td align="right">{{round(100*hqMeta.HL,2)}}%</td>
+        <!-- 5 days diff -->
+        <td>{{round(hqMeta.nDaysDownDiff5.nDaysHighest,0)}}</td>
+        <td align="right"
+            {% if hqMeta.nDaysDownDiff5.diff <= downAlert %}
+                class="alert"
+            {% endif %}
+            >
+            {{round(100*hqMeta.nDaysDownDiff5.diff,2)}}%
         </td>
-        <td align="right">
-            {{hqMeta.nDaysDownDiff10.diffDate}} |
-            {{convert2Percent(hqMeta.nDaysDownDiff10.diff)}}%
+        <!-- 10 days diff -->
+        <td align="right">{{round(hqMeta.nDaysDownDiff10.nDaysHighest,0)}}</td>
+        <td align="right"
+            {% if hqMeta.nDaysDownDiff10.diff <= downAlert %}
+                class="alert"
+            {% endif %}
+            >
+            {{round(100*hqMeta.nDaysDownDiff10.diff,2)}}%
         </td>
     </tr>
 
 {% endfor %}
 </table>
 
+<style>
+    .alert {
+        color:red;
+        font-weight: bold
+    }
+</style>
 {% endblock %}
