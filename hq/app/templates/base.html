@@ -1,8 +1,17 @@
 <html>
-  <head>
+<head>
     <title>{{ title }}</title>
-  </head>
-  <body>
-    {% block content %}{% endblock %}
-  </body>
+</head>
+<body>
+{% for hqMetaFile in hqMetaFiles %}
+    <a href="/hqMeta?{{hqMetaFile}}">hqMeta</a> |
+{% endfor %}
+
+<a href="/hqrobot">hqrobot</a>
+
+<br><br>
+
+{% block content %}{% endblock %}
+
+</body>
 </html>
