@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<a href="/hqMeta">hqMeta</a>
+<table>
+{% for ticker in tickers %}
+
+    <tr>
+        <td>
+            <a href="{{hqUrl.q.format(ticker, ticker)}}" target="_blank">{{ticker}}</a></td>
+        <td>
+            <a href="{{hqUrl.h.format(ticker, ticker)}}" target="_blank">H</a></td>
+    </tr>
+
+{% endfor %}
+</table>
+
+{% endblock %}
