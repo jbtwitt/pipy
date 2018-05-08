@@ -10,8 +10,8 @@
     <th>Change</th>
     <th>CL</th>
     <th>HL</th>
-    <th colspan="2">5-day-diff</th>
-    <th colspan="2">10-day-diff</th>
+    <th colspan="4">5-day-diff</th>
+    <th colspan="4">10-day-diff</th>
 </tr>
 {% for hqMeta in hqMetas %}
 
@@ -22,27 +22,50 @@
             <a href="{{hqUrl.h.format(hqMeta.ticker, hqMeta.ticker)}}" target="_blank">H</a></td>
         <td>{{hqMeta.date}}</td>
         <td align="right">{{round(hqMeta.close,2)}}</td>
-        <td align="right">{{round(100*hqMeta.change,2)}}%</td>
+        <td align="right"
+            {% if hqMeta.change >= upAlert %}
+                class="green"
+            {% endif %}
+            >{{round(100*hqMeta.change,2)}}%</td>
         <td align="right">{{round(100*hqMeta.CL,2)}}%</td>
         <td align="right">{{round(100*hqMeta.HL,2)}}%</td>
-        <!-- 5 days diff -->
-        <td>{{round(hqMeta.nDaysDownDiff5.nDaysHighest,0)}}</td>
+        <!-- 5 days diff down -->
+        <td>{{hqMeta.nDaysDiff_5.nDaysHighest}}</td>
         <td align="right"
-            {% if hqMeta.nDaysDownDiff5.diff <= downAlert %}
-                class="alert"
+            {% if hqMeta.nDaysDiff_5.downDiff <= downAlert %}
+                class="red"
             {% endif %}
             >
-            {{round(100*hqMeta.nDaysDownDiff5.diff,2)}}%
+            {{round(100*hqMeta.nDaysDiff_5.downDiff,2)}}%
+        </td>
+        <!-- 5 days diff up -->
+        <td>{{hqMeta.nDaysDiff_5.nDaysLowest}}</td>
+        <td align="right"
+            {% if hqMeta.nDaysDiff_5.upDiff >= upAlert %}
+                class="green"
+            {% endif %}
+            >
+            {{round(100*hqMeta.nDaysDiff_5.upDiff,2)}}%
         </td>
         <!-- 10 days diff -->
-        <td align="right">{{round(hqMeta.nDaysDownDiff10.nDaysHighest,0)}}</td>
+        <td>{{hqMeta.nDaysDiff_10.nDaysHighest}}</td>
         <td align="right"
-            {% if hqMeta.nDaysDownDiff10.diff <= downAlert %}
-                class="alert"
+            {% if hqMeta.nDaysDiff_10.downDiff <= downAlert %}
+                class="red"
             {% endif %}
             >
-            {{round(100*hqMeta.nDaysDownDiff10.diff,2)}}%
+            {{round(100*hqMeta.nDaysDiff_10.downDiff,2)}}%
         </td>
+        <!-- 10 days diff up -->
+        <td>{{hqMeta.nDaysDiff_10.nDaysLowest}}</td>
+        <td align="right"
+            {% if hqMeta.nDaysDiff_10.upDiff >= upAlert %}
+                class="green"
+            {% endif %}
+            >
+            {{round(100*hqMeta.nDaysDiff_10.upDiff,2)}}%
+        </td>
+
     </tr>
 
 {% endfor %}
@@ -51,6 +74,14 @@
 <style>
     .alert {
         color:red;
+        font-weight: bold
+    }
+    .red {
+        color:red;
+        font-weight: bold
+    }
+    .green {
+        color:green;
         font-weight: bold
     }
 </style>

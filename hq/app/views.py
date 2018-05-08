@@ -10,9 +10,11 @@ from app import app
 
 import hqrobot
 from hqrobot import CsvFolder, CsvFileName, hqrobotMain
+from HqMetaFile import JsonFile
 from HqMeta import HqMeta
 
-hqConf = json.load(open('hqrobot.json'))
+HQ_CONF = 'hqrobot.json'
+hqConf = json.load(open(HQ_CONF))
 print(hqConf)
 day = (datetime.now() + timedelta(days=-0)).strftime("%Y%m%d")
 
@@ -28,11 +30,14 @@ def getHqMetas(hqConf, day, startDayIdx=0):
     return hqMetas
 
 def getHqMetaFiles():
-    hqMetaFiles = glob.glob(hqConf['repo'] + '/hqMeta*.json')
-    listFiles = hqMetaFiles[len(hqMetaFiles)-1:]
+    # hqMetaFiles = glob.glob(hqConf['repo'] + '/hqMeta*.json')
+    # listFiles = hqMetaFiles[len(hqMetaFiles)-1:]
+    # hqMetaFiles = []
+    # for hqMetaFile in listFiles:
+    #     hqMetaFiles.append(urllib.parse.urlencode({'hqMetaFile': hqMetaFile}))
     hqMetaFiles = []
-    for hqMetaFile in listFiles:
-        hqMetaFiles.append(urllib.parse.urlencode({'hqMetaFile': hqMetaFile}))
+    hqMetaFile = JsonFile.format(hqConf['repo'], day)
+    hqMetaFiles.append(urllib.parse.urlencode({'hqMetaFile': hqMetaFile}))
     return hqMetaFiles
 
 @app.route('/')
@@ -52,11 +57,13 @@ def hqMeta():
                            hqUrl=hqConf['hqUrl'],
                            hqMetaFiles=getHqMetaFiles(),
                            hqMetas=hqMetas,
+                           upAlert=0.1,
                            downAlert=-0.1,
                            round=round)
 
 @app.route('/hqrobot')
 def hqrobot():
+    hqConf = json.load(open(HQ_CONF))
     hqrobotMain(hqConf, day)
     return redirect('/hqMeta/dayIdx?startDayIdx=0')
 
