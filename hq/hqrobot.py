@@ -8,7 +8,7 @@ from HqYhoo import DateFormat
 
 CsvFolder = "{}/hq{}"
 CsvFileName = "{}/{}.y.csv"
-def main(hqConf, day):
+def hqrobotMain(hqConf, day):
     tickers = hqConf["tickers"]
     hqDays = 7 * hqConf["hqDays"] / 5
     # repo = hqConf["repo"] + '/hq' + datetime.now().strftime("%Y%m%d")
@@ -47,7 +47,7 @@ def hqMetaFileCreate(hqConf, day):
     hqMetaFile = HqMetaFile(hqConf, day)
     hqMetaFile.writeJson(hqMetas)
 
-if __name__ == '__main__':
+if __name__ == '__hqrobot__':
     day = (datetime.now() + timedelta(days=-0)).strftime("%Y%m%d")
     print(day, 'hq date folder')
-    main(json.load(open('hqrobot.json')), day)
+    hqrobotMain(json.load(open('hqrobot.json')), day)
