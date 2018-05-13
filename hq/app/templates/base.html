@@ -1,6 +1,6 @@
 <html>
 <head>
-    <title>{{ title }}</title>
+    <title>{{ templateMeta.title }}</title>
     <style>
         .red {
             color:red;
@@ -18,11 +18,11 @@
 </head>
 <body style="font-family: Calibri,Arial,sans-serif,HelveticaNeue,Helvetica,'Courier New',Times;">
 
-| {{day}} |
+| {{templateMeta.day}} |
 
 <a href="/hqrobot">hqrobot</a> |
 
-{% for hqMetaFile in hqMetaFiles %}
+{% for hqMetaFile in templateMeta.hqMetaFiles %}
     <a href="/hqMeta?{{hqMetaFile}}">hqMeta</a> |
 {% endfor %}
 

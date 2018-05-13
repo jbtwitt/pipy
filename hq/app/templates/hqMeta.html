@@ -19,9 +19,9 @@
 
     <tr>
         <td>
-            <a href="{{hqUrl.q.format(hqMeta.ticker, hqMeta.ticker)}}" target="_blank">{{hqMeta.ticker}}</a></td>
+            <a href="{{templateMeta.hqConf.hqUrl.q.format(hqMeta.ticker, hqMeta.ticker)}}" target="_blank">{{hqMeta.ticker}}</a></td>
         <td>
-            <a href="{{hqUrl.h.format(hqMeta.ticker, hqMeta.ticker)}}" target="_blank">H</a></td>
+            <a href="{{templateMeta.hqConf.hqUrl.h.format(hqMeta.ticker, hqMeta.ticker)}}" target="_blank">H</a></td>
         <td>
             <a href="/hqCsv?ticker={{hqMeta.ticker}}" target="_blank">Csv</a></td>
 

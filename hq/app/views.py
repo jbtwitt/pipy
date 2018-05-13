@@ -15,10 +15,28 @@ from HqMeta import HqMeta
 from HqCsv import HqCsv
 
 HQ_CONF = 'hqrobot.json'
-hqConf = json.load(open(HQ_CONF))
-print(hqConf)
-dayDelta = -1
+dayDelta = -2
 day = (datetime.now() + timedelta(days=dayDelta)).strftime("%Y%m%d")
+hqConf = json.load(open(HQ_CONF))
+# print(hqConf)
+
+def getHqMetaFiles(hqConf, day):
+    # hqMetaFiles = glob.glob(hqConf['repo'] + '/hqMeta*.json')
+    # listFiles = hqMetaFiles[len(hqMetaFiles)-1:]
+    # hqMetaFiles = []
+    # for hqMetaFile in listFiles:
+    #     hqMetaFiles.append(urllib.parse.urlencode({'hqMetaFile': hqMetaFile}))
+    hqMetaFiles = []
+    hqMetaFile = JsonFile.format(hqConf['repo'], day)
+    hqMetaFiles.append(urllib.parse.urlencode({'hqMetaFile': hqMetaFile}))
+    return hqMetaFiles
+
+templateMeta = {
+        "title": 'HQ',
+        "day": day,
+        "hqConf": hqConf,
+        "hqMetaFiles": getHqMetaFiles(hqConf, day)
+    }
 
 def getHqMetas(hqConf, day, startDayIdx=0):
     tickers = hqConf["tickers"]
@@ -31,17 +49,6 @@ def getHqMetas(hqConf, day, startDayIdx=0):
             hqMetas.append(hqMeta.collect(startDayIdx))
     return hqMetas
 
-def getHqMetaFiles():
-    # hqMetaFiles = glob.glob(hqConf['repo'] + '/hqMeta*.json')
-    # listFiles = hqMetaFiles[len(hqMetaFiles)-1:]
-    # hqMetaFiles = []
-    # for hqMetaFile in listFiles:
-    #     hqMetaFiles.append(urllib.parse.urlencode({'hqMetaFile': hqMetaFile}))
-    hqMetaFiles = []
-    hqMetaFile = JsonFile.format(hqConf['repo'], day)
-    hqMetaFiles.append(urllib.parse.urlencode({'hqMetaFile': hqMetaFile}))
-    return hqMetaFiles
-
 def getHqCsv(hqConf, ticker, day):
     csvFolder = CsvFolder.format(hqConf['repo'], day)
     csvFile = CsvFileName.format(csvFolder, ticker)
@@ -51,36 +58,26 @@ def getHqCsv(hqConf, ticker, day):
 @app.route('/')
 def index():
     return render_template('index.html',
-                           title='HQ',
-                           day=day,
-                           hqUrl=hqConf['hqUrl'],
-                           hqMetaFiles=getHqMetaFiles(),
-                           tickers=hqConf['tickers'])
+                            templateMeta=templateMeta)
+
+@app.route('/hqCsv')
+def hqCsv():
+    ticker = request.args.get('ticker')
+    return render_template('hqCsv.html',
+                           templateMeta=templateMeta,
+                           hqCsv=getHqCsv(hqConf, ticker, day),
+                           upAlert=0.05,
+                           downAlert=-0.1,
+                           round=round)
 
 @app.route('/hqMeta')
 def hqMeta():
     hqMetaFile = request.args.get('hqMetaFile')
     hqMetas = json.load(open(hqMetaFile))
     return render_template('hqMeta.html',
-                           title='HQ',
-                           day=day,
-                           hqUrl=hqConf['hqUrl'],
-                           hqMetaFiles=getHqMetaFiles(),
+                           templateMeta=templateMeta,
                            hqMetas=hqMetas,
                            upAlert=0.1,
-                           downAlert=-0.1,
-                           round=round)
-
-@app.route('/hqCsv')
-def hqCsv():
-    ticker = request.args.get('ticker')
-    return render_template('hqCsv.html',
-                           title='HQ',
-                           day=day,
-                           hqUrl=hqConf['hqUrl'],
-                           hqMetaFiles=getHqMetaFiles(),
-                           hqCsv=getHqCsv(hqConf, ticker, day),
-                           upAlert=0.05,
                            downAlert=-0.1,
                            round=round)
 
@@ -95,10 +92,7 @@ def hqrobot():
 def hqMetaStartDayIdx():
     startDayIdx = int(request.args.get('startDayIdx'))
     return render_template('hqMeta.html',
-                           title='HQ',
-                           day=day,
-                           hqUrl=hqConf['hqUrl'],
-                           hqMetaFiles=getHqMetaFiles(),
+                           templateMeta=templateMeta,
                            hqMetas=getHqMetas(hqConf, day, startDayIdx),
                            upAlert=0.1,
                            downAlert=-0.1,

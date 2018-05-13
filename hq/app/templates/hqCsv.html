@@ -2,8 +2,8 @@
 
 {% block content %}
 
-| <a href="{{hqUrl.q.format(hqCsv.ticker, hqCsv.ticker)}}" target="_blank">{{hqCsv.ticker}}</a>
-| <a href="{{hqUrl.h.format(hqCsv.ticker, hqCsv.ticker)}}" target="_blank">H</a>
+| <a href="{{templateMeta.hqConf.hqUrl.q.format(hqCsv.ticker, hqCsv.ticker)}}" target="_blank">{{hqCsv.ticker}}</a>
+| <a href="{{templateMeta.hqConf.hqUrl.h.format(hqCsv.ticker, hqCsv.ticker)}}" target="_blank">H</a>
 
 <table>
     <tr>
@@ -13,6 +13,11 @@
         <th>HL</th>
         <th>CL</th>
         <th>OL</th>
+        <th>Volume</th>
+        <th>VolChange</th>
+        <th>Open</th>
+        <th>High</th>
+        <th>Low</th>
     </tr>
 {% for idx in hqCsv.df.index %}
     <tr>
@@ -41,6 +46,18 @@
                 class="red"
             {% endif %}
         >{{round(100*hqCsv.df.OL[idx],2)}}%</td>
+        <td>{{hqCsv.df.Volume[idx]}}</td>
+        <td
+            {% if hqCsv.df.VolChange[idx] > 0.5 %}
+                class="green"
+            {% endif %}
+            {% if hqCsv.df.VolChange[idx] < -0.5 %}
+                class="red"
+            {% endif %}
+        >{{round(100*hqCsv.df.VolChange[idx],2)}}%</td>
+        <td>{{round(hqCsv.df.Open[idx],2)}}</td>
+        <td>{{round(hqCsv.df.High[idx],2)}}</td>
+        <td>{{round(hqCsv.df.Low[idx],2)}}</td>
     </tr>
 {% endfor %}
 </table>

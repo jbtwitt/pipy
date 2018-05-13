@@ -3,13 +3,13 @@
 {% block content %}
 
 <table>
-{% for ticker in tickers %}
+{% for ticker in templateMeta.hqConf.tickers %}
 
     <tr>
         <td>
-            <a href="{{hqUrl.q.format(ticker, ticker)}}" target="_blank">{{ticker}}</a></td>
+            <a href="{{templateMeta.hqConf.hqUrl.q.format(ticker, ticker)}}" target="_blank">{{ticker}}</a></td>
         <td>
-            <a href="{{hqUrl.h.format(ticker, ticker)}}" target="_blank">H</a></td>
+            <a href="{{templateMeta.hqConf.hqUrl.h.format(ticker, ticker)}}" target="_blank">H</a></td>
         <td>
             <a href="/hqCsv?ticker={{ticker}}" target="_blank">Csv</a></td>
     </tr>

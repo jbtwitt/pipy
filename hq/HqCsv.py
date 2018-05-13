@@ -5,7 +5,9 @@ class HqCsv:
         self._ticker = _ticker
         csv = pd.read_csv(csvFile, index_col=[0], parse_dates=False)
         csv['PrevClose'] = csv.Close.shift(1)
+        csv['PrevVolume'] = csv.Volume.shift(1)
         csv['Change'] = (csv.Close - csv.PrevClose)/csv.PrevClose
+        csv['VolChange'] = (csv.Volume - csv.PrevVolume)/csv.PrevVolume
         csv['HL'] = (csv.High - csv.Low)/csv.Low
         csv['CL'] = (csv.Close - csv.Low)/csv.Low
         csv['OL'] = (csv.Open - csv.Low)/csv.Low
