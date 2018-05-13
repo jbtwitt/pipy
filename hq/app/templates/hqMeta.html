@@ -4,14 +4,16 @@
 
 <table>
 <tr>
-    <td colspan="2"></td>
+    <td colspan="3"></td>
     <th>Date</th>
     <th>Close</th>
     <th>Change</th>
     <th>CL</th>
     <th>HL</th>
-    <th colspan="4">5-day-diff</th>
-    <th colspan="4">10-day-diff</th>
+    <!-- <th colspan="4">5-day-diff</th> -->
+    {% for nDaysDiff in hqMetas[0].nDaysDiffs %}
+        <th colspan="2">{{nDaysDiff.nDays}} days diff</th>
+    {% endfor %}
 </tr>
 {% for hqMeta in hqMetas %}
 
@@ -20,69 +22,45 @@
             <a href="{{hqUrl.q.format(hqMeta.ticker, hqMeta.ticker)}}" target="_blank">{{hqMeta.ticker}}</a></td>
         <td>
             <a href="{{hqUrl.h.format(hqMeta.ticker, hqMeta.ticker)}}" target="_blank">H</a></td>
-        <td>{{hqMeta.date}}</td>
+        <td>
+            <a href="/hqCsv?ticker={{hqMeta.ticker}}" target="_blank">Csv</a></td>
+
+        <td>{{hqMeta.date[5:]}}</td>
         <td align="right">{{round(hqMeta.close,2)}}</td>
         <td align="right"
             {% if hqMeta.change >= upAlert %}
                 class="green"
             {% endif %}
+            {% if hqMeta.change <= downAlert %}
+                class="red"
+            {% endif %}
             >{{round(100*hqMeta.change,2)}}%</td>
         <td align="right">{{round(100*hqMeta.CL,2)}}%</td>
         <td align="right">{{round(100*hqMeta.HL,2)}}%</td>
-        <!-- 5 days diff down -->
-        <td>{{hqMeta.nDaysDiff_5.nDaysHighest}}</td>
+        {% for nDaysDiff in hqMeta.nDaysDiffs %}
+        <!-- down -->
+        <!-- <td>{{nDaysDiff.nDaysHighest}}</td> -->
         <td align="right"
-            {% if hqMeta.nDaysDiff_5.downDiff <= downAlert %}
+            {% if nDaysDiff.downDiff <= downAlert %}
                 class="red"
             {% endif %}
             >
-            {{round(100*hqMeta.nDaysDiff_5.downDiff,2)}}%
+            <span title="nDays ago: {{nDaysDiff.nDaysHighest}}">{{round(100*nDaysDiff.downDiff,2)}}%</span>
         </td>
-        <!-- 5 days diff up -->
-        <td>{{hqMeta.nDaysDiff_5.nDaysLowest}}</td>
+        <!-- up -->
+        <!-- <td>{{nDaysDiff.nDaysLowest}}</td> -->
         <td align="right"
-            {% if hqMeta.nDaysDiff_5.upDiff >= upAlert %}
+            {% if nDaysDiff.upDiff >= upAlert %}
                 class="green"
             {% endif %}
             >
-            {{round(100*hqMeta.nDaysDiff_5.upDiff,2)}}%
+            <span title="nDays ago: {{nDaysDiff.nDaysLowest}}">{{round(100*nDaysDiff.upDiff,2)}}%</span>
         </td>
-        <!-- 10 days diff -->
-        <td>{{hqMeta.nDaysDiff_10.nDaysHighest}}</td>
-        <td align="right"
-            {% if hqMeta.nDaysDiff_10.downDiff <= downAlert %}
-                class="red"
-            {% endif %}
-            >
-            {{round(100*hqMeta.nDaysDiff_10.downDiff,2)}}%
-        </td>
-        <!-- 10 days diff up -->
-        <td>{{hqMeta.nDaysDiff_10.nDaysLowest}}</td>
-        <td align="right"
-            {% if hqMeta.nDaysDiff_10.upDiff >= upAlert %}
-                class="green"
-            {% endif %}
-            >
-            {{round(100*hqMeta.nDaysDiff_10.upDiff,2)}}%
-        </td>
-
+        {% endfor %}
+        
     </tr>
 
 {% endfor %}
 </table>
 
-<style>
-    .alert {
-        color:red;
-        font-weight: bold
-    }
-    .red {
-        color:red;
-        font-weight: bold
-    }
-    .green {
-        color:green;
-        font-weight: bold
-    }
-</style>
 {% endblock %}

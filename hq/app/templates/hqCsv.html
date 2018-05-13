@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{{ hqCsv.ticker }}
+
+<table>
+    <tr>
+        <th>Date</th>
+        <th>Close</th>
+        <th>Change</th>
+        <th>HL</th>
+    </tr>
+{% for idx in hqCsv.df.index %}
+    <tr>
+        <td>{{idx}}</td>
+        <td>{{hqCsv.df.Close[idx]}}</td>
+        <td>{{round(100*(hqCsv.df.Close[idx]-hqCsv.df.PrevClose[idx])/hqCsv.df.PrevClose[idx],2)}}%</td>
+        <td
+            {% if hqCsv.df.HL[idx] >= upAlert %}
+                class="red"
+            {% endif %}
+        >{{round(100*hqCsv.df.HL[idx],2)}}%</td>
+    </tr>
+{% endfor %}
+</table>
+
+<style>
+    td {
+        text-align: right;
+    }
+</style>
+{% endblock %}
