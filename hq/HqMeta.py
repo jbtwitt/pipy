@@ -5,30 +5,40 @@ import os
 from datetime import datetime
 
 class HqMeta:
-    def __init__(self, ticker, hqFile):
-        csv = pd.read_csv(hqFile, index_col=[0], parse_dates=False)
+    def __init__(self, ticker, hqCsvFile):
+        csv = pd.read_csv(hqCsvFile, index_col=[0], parse_dates=False)
         self.csv = self.addCols(csv)
         self.ticker = ticker
-        self.hqFile = hqFile
+        self.hqCsvFile = hqCsvFile
         # hqMeta = self.collect()
 
     def collect(self, startDayIdx=0):
         self.startDayIdx = startDayIdx
-        hqMeta = {'ticker':self.ticker, 'hqFile':self.hqFile}
+        hqMeta = {'ticker':self.ticker, 'hqCsvFile':self.hqCsvFile}
         hqMeta['date'] = self.lastDate
         hqMeta['close'] = self.lastClose
         hqMeta['change'] = self.nDaysChange(1)
         hqMeta['HL'] = self.HL
         hqMeta['CL'] = self.CL
 
+        nDaysHLs = []
+        for nDays in [30, 60, 120, 180]:
+            nDaysHLs.append(self.nDaysHL(nDays))
+        hqMeta['nDaysHLs'] = nDaysHLs
+
         hqMeta['nDaysStraight'] = self.nDaysStraight()
 
         nDaysDiffs = []
-        for days in [5, 10, 20]:
-            nDaysDiffs.append(self.nDaysDiff(days))
+        for nDays in [5, 10, 20]:
+            nDaysDiffs.append(self.nDaysDiff(nDays))
         hqMeta['nDaysDiffs'] = nDaysDiffs
 
         return hqMeta
+
+    def nDaysHL(self, nDays):
+        df = self.csv[0:nDays].Close.sort_values(ascending=False)
+        # df4 = hqCsv.df[0:4].sort_values(by='Close', ascending=True)
+        return {"nDays": nDays, "HighDate": df.index[0], "LowDate": df.index[len(df.index)-1]}
 
     def nDaysStraight(self):
         downDays = 0
@@ -73,9 +83,6 @@ class HqMeta:
 
     def addCols(self, csv):
         csv['PrevClose'] = csv.Close.shift(1)
-        # csv['Change'] = (csv.Close - csv.PrevClose) / csv.PrevClose
-        # csv['HL'] = (csv.High - csv.Low) / csv.PrevClose
-        # csv['CL'] = (csv.Close - csv.Low) / csv.PrevClose
         csv = csv.reindex(index=csv.index[::-1])   # reverse date order
         csv['No'] = range(len(csv.index))
         return csv

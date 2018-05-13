@@ -23,4 +23,26 @@ class HqCsv:
 
     @property
     def rows(self):
-        return self.dataFrame.loc
+        return self.dataFrame.iloc
+
+if __name__ == "__main__":
+    import json
+    from datetime import datetime, timedelta
+    from hqrobot import CsvFolder, CsvFileName
+    ticker = 'ATHX'
+    day = (datetime.now() + timedelta(days=-2)).strftime("%Y%m%d")
+    hqConf = json.load(open('hqrobot.json'))
+    csvFolder = CsvFolder.format(hqConf['repo'], day)
+    csvFile = CsvFileName.format(csvFolder, ticker)
+    hqCsv = HqCsv(ticker, csvFile)
+
+    idx0 = hqCsv.df.index[0]
+    print(idx0)
+    df4 = hqCsv.df[0:4].Close.sort_values(ascending=False)
+    # df4 = hqCsv.df[0:4].sort_values(by='Close', ascending=True)
+    df4['No'] = range(len(df4.index))
+    print(df4)
+    print(df4.loc[idx0])
+    # for row in hqCsv.rows:
+    #     print(row.index)
+    #     break

@@ -57,6 +57,11 @@
             <span title="nDays ago: {{nDaysDiff.nDaysLowest}}">{{round(100*nDaysDiff.upDiff,2)}}%</span>
         </td>
         {% endfor %}
+        <td>
+        {% for nDaysHL in hqMeta.nDaysHLs %}
+            | {{nDaysHL.nDays}} | {{nDaysHL.LowDate}} | {{nDaysHL.HighDate}}
+        {% endfor %}
+        </td>
         
     </tr>
 
