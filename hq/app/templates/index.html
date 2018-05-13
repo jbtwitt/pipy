@@ -10,6 +10,8 @@
             <a href="{{hqUrl.q.format(ticker, ticker)}}" target="_blank">{{ticker}}</a></td>
         <td>
             <a href="{{hqUrl.h.format(ticker, ticker)}}" target="_blank">H</a></td>
+        <td>
+            <a href="/hqCsv?ticker={{ticker}}" target="_blank">Csv</a></td>
     </tr>
 
 {% endfor %}

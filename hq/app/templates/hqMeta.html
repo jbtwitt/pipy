@@ -28,10 +28,10 @@
         <td>{{hqMeta.date[5:]}}</td>
         <td align="right">{{round(hqMeta.close,2)}}</td>
         <td align="right"
-            {% if hqMeta.change >= upAlert %}
+            {% if hqMeta.change > 0 %}
                 class="green"
             {% endif %}
-            {% if hqMeta.change <= downAlert %}
+            {% if hqMeta.change < 0 %}
                 class="red"
             {% endif %}
             >{{round(100*hqMeta.change,2)}}%</td>

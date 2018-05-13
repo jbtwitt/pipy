@@ -80,7 +80,7 @@ def hqCsv():
                            hqUrl=hqConf['hqUrl'],
                            hqMetaFiles=getHqMetaFiles(),
                            hqCsv=getHqCsv(hqConf, ticker, day),
-                           upAlert=0.1,
+                           upAlert=0.05,
                            downAlert=-0.1,
                            round=round)
 
