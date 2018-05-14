@@ -36,7 +36,7 @@ class HqMeta:
         return hqMeta
 
     def nDaysHL(self, nDays):
-        df = self.csv[0:nDays].Close.sort_values(ascending=False)
+        df = self.csv[self.startDayIdx:self.startDayIdx + nDays].Close.sort_values(ascending=False)
         # df4 = hqCsv.df[0:4].sort_values(by='Close', ascending=True)
         return {"nDays": nDays, "HighDate": df.index[0], "LowDate": df.index[len(df.index)-1]}
 

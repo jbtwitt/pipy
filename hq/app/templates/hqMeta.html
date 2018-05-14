@@ -4,7 +4,7 @@
 
 <table>
 <tr>
-    <td colspan="3"></td>
+    <td colspan="4"></td>
     <th>Date</th>
     <th>Close</th>
     <th>Change</th>
@@ -14,6 +14,9 @@
     {% for nDaysDiff in hqMetas[0].nDaysDiffs %}
         <th colspan="2">{{nDaysDiff.nDays}} days diff</th>
     {% endfor %}
+    {% for nDaysHL in hqMetas[0].nDaysHLs %}
+        <th>{{nDaysHL.nDays}}Days HL</th>
+    {% endfor %}
 </tr>
 {% for hqMeta in hqMetas %}
 
@@ -22,6 +25,8 @@
             <a href="{{templateMeta.hqConf.hqUrl.q.format(hqMeta.ticker, hqMeta.ticker)}}" target="_blank">{{hqMeta.ticker}}</a></td>
         <td>
             <a href="{{templateMeta.hqConf.hqUrl.h.format(hqMeta.ticker, hqMeta.ticker)}}" target="_blank">H</a></td>
+        <td>
+            <a href="{{templateMeta.hqConf.hqUrl.c.format(ticker)}}" target="_blank">C</a></td>
         <td>
             <a href="/hqCsv?ticker={{hqMeta.ticker}}" target="_blank">Csv</a></td>
 
@@ -57,11 +62,17 @@
             <span title="nDays ago: {{nDaysDiff.nDaysLowest}}">{{round(100*nDaysDiff.upDiff,2)}}%</span>
         </td>
         {% endfor %}
-        <td>
         {% for nDaysHL in hqMeta.nDaysHLs %}
-            | {{nDaysHL.nDays}} | {{nDaysHL.LowDate}} | {{nDaysHL.HighDate}}
+            <td>
+                {% if nDaysHL.LowDate == hqMeta.date %}
+                    <span class="red">*Low*</span>
+                {% endif %}
+                {% if nDaysHL.HighDate == hqMeta.date %}
+                    <span class="green">*High*</span>
+                {% endif %}
+                <!-- {{nDaysHL.nDays}} | {{nDaysHL.LowDate}} | {{nDaysHL.HighDate}} -->
+            </td>
         {% endfor %}
-        </td>
         
     </tr>
 

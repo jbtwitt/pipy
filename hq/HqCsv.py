@@ -11,7 +11,9 @@ class HqCsv:
         csv['HL'] = (csv.High - csv.Low)/csv.Low
         csv['CL'] = (csv.Close - csv.Low)/csv.Low
         csv['OL'] = (csv.Open - csv.Low)/csv.Low
-        self.dataFrame = csv.reindex(index=csv.index[::-1])   # reverse date order
+        df = csv.reindex(index=csv.index[::-1])   # reverse date order
+        df['No'] = range(len(df.index))
+        self.dataFrame = df
 
     @property
     def ticker(self):
