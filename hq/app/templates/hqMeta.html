@@ -10,12 +10,13 @@
     <th>Change</th>
     <th>CL</th>
     <th>HL</th>
-    <!-- <th colspan="4">5-day-diff</th> -->
-    {% for nDaysDiff in hqMetas[0].nDaysDiffs %}
-        <th colspan="2">{{nDaysDiff.nDays}} days diff</th>
-    {% endfor %}
+    <th>VolChange</th>
+    <th colspan="2">Straight</th>
+    <!-- {% for nDaysDiff in hqMetas[0].nDaysDiffs %}
+        <th colspan="2">{{nDaysDiff.nDays}} Diff</th>
+    {% endfor %} -->
     {% for nDaysHL in hqMetas[0].nDaysHLs %}
-        <th>{{nDaysHL.nDays}}Days HL</th>
+        <th>{{nDaysHL.nDays}} HL</th>
     {% endfor %}
 </tr>
 {% for hqMeta in hqMetas %}
@@ -42,9 +43,19 @@
             >{{round(100*hqMeta.change,2)}}%</td>
         <td align="right">{{round(100*hqMeta.CL,2)}}%</td>
         <td align="right">{{round(100*hqMeta.HL,2)}}%</td>
-        {% for nDaysDiff in hqMeta.nDaysDiffs %}
-        <!-- down -->
-        <!-- <td>{{nDaysDiff.nDaysHighest}}</td> -->
+        <td align="right">{{round(100*hqMeta.volChange,2)}}%</td>
+        <!-- Straight -->
+        <td class="red">
+            {% if hqMeta.nDaysStraight.downDays > 0 %}
+            {{hqMeta.nDaysStraight.downDays}}|{{round(100*hqMeta.nDaysStraight.downDiff,2)}}%
+            {% endif %}
+        </td>
+        <td class="green">
+            {% if hqMeta.nDaysStraight.upDays > 0 %}
+            {{hqMeta.nDaysStraight.upDays}}|{{round(100*hqMeta.nDaysStraight.upDiff,2)}}%
+            {% endif %}
+        </td>
+        <!-- {% for nDaysDiff in hqMeta.nDaysDiffs %}
         <td align="right"
             {% if nDaysDiff.downDiff <= downAlert %}
                 class="red"
@@ -52,8 +63,6 @@
             >
             <span title="nDays ago: {{nDaysDiff.nDaysHighest}}">{{round(100*nDaysDiff.downDiff,2)}}%</span>
         </td>
-        <!-- up -->
-        <!-- <td>{{nDaysDiff.nDaysLowest}}</td> -->
         <td align="right"
             {% if nDaysDiff.upDiff >= upAlert %}
                 class="green"
@@ -61,16 +70,27 @@
             >
             <span title="nDays ago: {{nDaysDiff.nDaysLowest}}">{{round(100*nDaysDiff.upDiff,2)}}%</span>
         </td>
-        {% endfor %}
+        {% endfor %} -->
         {% for nDaysHL in hqMeta.nDaysHLs %}
             <td>
                 {% if nDaysHL.LowDate == hqMeta.date %}
-                    <span class="red">*Low*</span>
+                    <span class="red">cL</span>
                 {% endif %}
                 {% if nDaysHL.HighDate == hqMeta.date %}
-                    <span class="green">*High*</span>
+                    <span class="green">cH</span>
                 {% endif %}
-                <!-- {{nDaysHL.nDays}} | {{nDaysHL.LowDate}} | {{nDaysHL.HighDate}} -->
+                {% if nDaysHL.vLowDate == hqMeta.date %}
+                    <span class="red">vL</span>
+                {% endif %}
+                {% if nDaysHL.vHighDate == hqMeta.date %}
+                    <span class="green">vH</span>
+                {% endif %}
+                {% if nDaysHL.hlLowDate == hqMeta.date %}
+                    <span class="red">hlL</span>
+                {% endif %}
+                {% if nDaysHL.hlHighDate == hqMeta.date %}
+                    <span class="green">hlH</span>
+                {% endif %}
             </td>
         {% endfor %}
         

@@ -15,7 +15,7 @@ from HqMeta import HqMeta
 from HqCsv import HqCsv
 
 HQ_CONF = 'hqrobot.json'
-dayDelta = -2
+dayDelta = -0
 day = (datetime.now() + timedelta(days=dayDelta)).strftime("%Y%m%d")
 hqConf = json.load(open(HQ_CONF))
 # print(hqConf)

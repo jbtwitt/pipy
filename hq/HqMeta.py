@@ -20,9 +20,11 @@ class HqMeta:
         hqMeta['change'] = self.nDaysChange(1)
         hqMeta['HL'] = self.HL
         hqMeta['CL'] = self.CL
+        hqMeta['volChange'] = self.volChange
 
+        days = [5, 10, 20, 30, 60, 120, 180]
         nDaysHLs = []
-        for nDays in [30, 60, 120, 180]:
+        for nDays in days:
             nDaysHLs.append(self.nDaysHL(nDays))
         hqMeta['nDaysHLs'] = nDaysHLs
 
@@ -36,9 +38,19 @@ class HqMeta:
         return hqMeta
 
     def nDaysHL(self, nDays):
+        # Close HL
         df = self.csv[self.startDayIdx:self.startDayIdx + nDays].Close.sort_values(ascending=False)
         # df4 = hqCsv.df[0:4].sort_values(by='Close', ascending=True)
-        return {"nDays": nDays, "HighDate": df.index[0], "LowDate": df.index[len(df.index)-1]}
+        returnValue = {"nDays": nDays, "HighDate": df.index[0], "LowDate": df.index[len(df.index)-1]}
+        # Volume HL
+        df = self.csv[self.startDayIdx:self.startDayIdx + nDays].Volume.sort_values(ascending=False)
+        returnValue["vHighDate"] = df.index[0]
+        returnValue["vLowDate"] = df.index[len(df.index)-1]
+        # HL HL
+        df = self.csv[self.startDayIdx:self.startDayIdx + nDays].HL.sort_values(ascending=False)
+        returnValue["hlHighDate"] = df.index[0]
+        returnValue["hlLowDate"] = df.index[len(df.index)-1]
+        return returnValue
 
     def nDaysStraight(self):
         downDays = 0
@@ -83,8 +95,10 @@ class HqMeta:
 
     def addCols(self, csv):
         csv['PrevClose'] = csv.Close.shift(1)
+        csv['PrevVolume'] = csv.Volume.shift(1)
         csv = csv.reindex(index=csv.index[::-1])   # reverse date order
         csv['No'] = range(len(csv.index))
+        csv['HL'] = (csv.High - csv.Low)/csv.Low
         return csv
 
     @property
@@ -98,10 +112,14 @@ class HqMeta:
 
     @property
     def HL(self):
-        row = self.csv.iloc[self.startDayIdx]
-        return (row.High - row.Low) / row.Low   # row.PrevClose
+        return self.csv.HL[self.startDayIdx]
 
     @property
     def CL(self):
         row = self.csv.iloc[self.startDayIdx]
         return (row.Close - row.Low) / row.Low  # row.PrevClose
+
+    @property
+    def volChange(self):
+        row = self.csv.iloc[self.startDayIdx]
+        return (row.Volume - row.PrevVolume) / row.PrevVolume
