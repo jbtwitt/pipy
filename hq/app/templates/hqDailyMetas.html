@@ -2,9 +2,14 @@
 
 {% block content %}
 
+| <a href="{{templateMeta.hqConf.hqUrl.q.format(hqMetas[0].ticker, hqMetas[0].ticker)}}" target="_blank">{{hqMetas[0].ticker}}</a>
+| <a href="{{templateMeta.hqConf.hqUrl.h.format(hqMetas[0].ticker, hqMetas[0].ticker)}}" target="_blank">H</a>
+| <a href="{{templateMeta.hqConf.hqUrl.c.format(hqMetas[0].ticker)}}" target="_blank">C</a>
+| <a href="/hqCsv?ticker={{hqMetas[0].ticker}}" target="_blank">Csv</a>
+
 <table>
 <tr>
-    <td colspan="5"></td>
+    <!-- <td colspan="4"></td> -->
     <th>Date</th>
     <th>Close</th>
     <th>Change</th>
@@ -22,16 +27,14 @@
 {% for hqMeta in hqMetas %}
 
     <tr>
-        <td>
+        <!-- <td>
             <a href="{{templateMeta.hqConf.hqUrl.q.format(hqMeta.ticker, hqMeta.ticker)}}" target="_blank">{{hqMeta.ticker}}</a></td>
         <td>
             <a href="{{templateMeta.hqConf.hqUrl.h.format(hqMeta.ticker, hqMeta.ticker)}}" target="_blank">H</a></td>
         <td>
             <a href="{{templateMeta.hqConf.hqUrl.c.format(ticker)}}" target="_blank">C</a></td>
         <td>
-            <a href="/hqCsv?ticker={{hqMeta.ticker}}" target="_blank">Csv</a></td>
-        <td>
-            <a href="/hqDailyMetas?ticker={{hqMeta.ticker}}" target="_blank">HDM</a></td>
+            <a href="/hqCsv?ticker={{hqMeta.ticker}}" target="_blank">Csv</a></td> -->
 
         <td>{{hqMeta.date[5:]}}</td>
         <td align="right">{{round(hqMeta.close,2)}}</td>

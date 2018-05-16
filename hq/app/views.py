@@ -49,6 +49,15 @@ def getHqMetas(hqConf, day, startDayIdx=0):
             hqMetas.append(hqMeta.collect(startDayIdx))
     return hqMetas
 
+def getHqDailyMetas(hqConf, day, ticker, nDays=50):
+    csvFolder = CsvFolder.format(hqConf['repo'], day)
+    csvFile = CsvFileName.format(csvFolder, ticker)
+    hqMeta = HqMeta(ticker, csvFile)
+    hqMetas = []
+    for dayIdx in range(nDays):
+        hqMetas.append(hqMeta.collect(dayIdx))
+    return hqMetas
+
 def getHqCsv(hqConf, ticker, day):
     csvFolder = CsvFolder.format(hqConf['repo'], day)
     csvFile = CsvFileName.format(csvFolder, ticker)
@@ -57,15 +66,28 @@ def getHqCsv(hqConf, ticker, day):
 
 @app.route('/')
 def index():
+    templateMeta['title'] = 'HQ'
     return render_template('index.html',
                             templateMeta=templateMeta)
 
 @app.route('/hqCsv')
 def hqCsv():
     ticker = request.args.get('ticker')
+    templateMeta['title'] = ticker + ' HqCsv'
     return render_template('hqCsv.html',
                            templateMeta=templateMeta,
                            hqCsv=getHqCsv(hqConf, ticker, day),
+                           upAlert=0.05,
+                           downAlert=-0.1,
+                           round=round)
+
+@app.route('/hqDailyMetas')
+def hqDailyMetas():
+    ticker = request.args.get('ticker')
+    templateMeta['title'] = ticker + ' HqDailyMeta'
+    return render_template('hqDailyMetas.html',
+                           templateMeta=templateMeta,
+                           hqMetas=getHqDailyMetas(hqConf, day, ticker, 100),
                            upAlert=0.05,
                            downAlert=-0.1,
                            round=round)
@@ -74,6 +96,7 @@ def hqCsv():
 def hqMeta():
     hqMetaFile = request.args.get('hqMetaFile')
     hqMetas = json.load(open(hqMetaFile))
+    templateMeta['title'] = 'HQ Meta'
     return render_template('hqMeta.html',
                            templateMeta=templateMeta,
                            hqMetas=hqMetas,
@@ -91,6 +114,7 @@ def hqrobot():
 @app.route('/hqMeta/dayIdx')
 def hqMetaStartDayIdx():
     startDayIdx = int(request.args.get('startDayIdx'))
+    templateMeta['title'] = 'HQ Meta'
     return render_template('hqMeta.html',
                            templateMeta=templateMeta,
                            hqMetas=getHqMetas(hqConf, day, startDayIdx),
