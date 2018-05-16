@@ -53,16 +53,14 @@ class HqMeta:
         return returnValue
 
     def nDaysStraight(self):
-        downDays = 0
         for i in range(self.startDayIdx, len(self.csv.index)):
             if self.csv.Close[i] > self.csv.PrevClose[i]:
                 break
-            downDays = downDays + 1
-        upDays = 0
+        downDays = i - self.startDayIdx
         for i in range(self.startDayIdx, len(self.csv.index)):
             if self.csv.Close[i] < self.csv.PrevClose[i]:
                 break
-            upDays = upDays + 1
+        upDays = i - self.startDayIdx
         return {
             'upDays': upDays, 
             'upDiff': self.nDaysChange(upDays),

@@ -84,7 +84,7 @@ def hqCsv():
 @app.route('/hqDailyMetas')
 def hqDailyMetas():
     ticker = request.args.get('ticker')
-    templateMeta['title'] = ticker + ' HqDailyMeta'
+    templateMeta['title'] = ticker + ' HDM'
     return render_template('hqDailyMetas.html',
                            templateMeta=templateMeta,
                            hqMetas=getHqDailyMetas(hqConf, day, ticker, 100),
