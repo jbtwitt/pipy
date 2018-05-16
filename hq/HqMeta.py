@@ -62,10 +62,8 @@ class HqMeta:
                 break
         upDays = i - self.startDayIdx
         return {
-            'upDays': upDays, 
-            'upDiff': self.nDaysChange(upDays),
-            'downDays': downDays, 
-            'downDiff': self.nDaysChange(downDays)
+            'upDays': upDays, 'upDiff': self.nDaysChange(upDays),
+            'downDays': downDays, 'downDiff': self.nDaysChange(downDays)
         }
 
     def nDaysChange(self, nDays):
