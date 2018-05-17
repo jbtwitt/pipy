@@ -121,9 +121,10 @@ def hqMetaStartDayIdx():
 
 @app.route('/hqrobot')
 def hqrobot():
-    day = (datetime.now() + timedelta(days=dayDelta)).strftime("%Y%m%d")
+    templateMeta['day'] = (datetime.now() + timedelta(days=dayDelta)).strftime("%Y%m%d")
     hqConf = json.load(open(HQ_CONF))
-    hqrobotMain(hqConf, day)
+    hqrobotMain(hqConf, templateMeta['day'])
+    templateMeta['hqConf'] = hqConf
     return redirect('/hqMeta/dayIdx?startDayIdx=0')
 
 @app.route('/hqSetDay')
