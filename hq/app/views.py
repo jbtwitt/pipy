@@ -18,11 +18,12 @@ HQ_CONF = 'hqrobot.json'
 hqConf = json.load(open(HQ_CONF))
 # print(hqConf)
 dayDelta = -0
-# day = (datetime.now() + timedelta(days=dayDelta)).strftime("%Y%m%d")
-days = [datetime.now().strftime("%Y%m%d"),
-        (datetime.now() + timedelta(days=-1)).strftime("%Y%m%d"),
-        (datetime.now() + timedelta(days=-2)).strftime("%Y%m%d")]
-day = days[0]
+def getDays():
+    return [(datetime.now() + timedelta(days=dayDelta)).strftime("%Y%m%d"),
+            (datetime.now() + timedelta(days=dayDelta-1)).strftime("%Y%m%d"),
+            (datetime.now() + timedelta(days=dayDelta-2)).strftime("%Y%m%d")]
+
+days = getDays()
 
 def getHqMetaFiles(hqConf, day):
     # hqMetaFiles = glob.glob(hqConf['repo'] + '/hqMeta*.json')
@@ -36,10 +37,10 @@ def getHqMetaFiles(hqConf, day):
     return hqMetaFiles
 
 templateMeta = {
-        "day": day,
+        "day": days[0],
         "days": days,
         "hqConf": hqConf,
-        "hqMetaFiles": getHqMetaFiles(hqConf, day)
+        "hqMetaFiles": getHqMetaFiles(hqConf, days[0])
     }
 
 def getHqMetas(hqConf, day, startDayIdx=0):
@@ -80,7 +81,7 @@ def hqCsv():
     return render_template('hqCsv.html',
                            title='{} HqCsv'.format(ticker),
                            templateMeta=templateMeta,
-                           hqCsv=getHqCsv(hqConf, ticker, templateMeta['day']),
+                           hqCsv=getHqCsv(templateMeta['hqConf'], ticker, templateMeta['day']),
                            upAlert=0.05,
                            downAlert=-0.1,
                            round=round)
@@ -91,7 +92,7 @@ def hqDailyMetas():
     return render_template('hqDailyMetas.html',
                            title='{} HDM'.format(ticker),
                            templateMeta=templateMeta,
-                           hqMetas=getHqDailyMetas(hqConf, templateMeta['day'], ticker, 100),
+                           hqMetas=getHqDailyMetas(templateMeta['hqConf'], templateMeta['day'], ticker, 100),
                            upAlert=0.05,
                            downAlert=-0.1,
                            round=round)
@@ -114,14 +115,16 @@ def hqMetaStartDayIdx():
     return render_template('hqMeta.html',
                            title='HQ Meta',
                            templateMeta=templateMeta,
-                           hqMetas=getHqMetas(hqConf, templateMeta['day'], startDayIdx),
+                           hqMetas=getHqMetas(templateMeta['hqConf'], templateMeta['day'], startDayIdx),
                            upAlert=0.1,
                            downAlert=-0.1,
                            round=round)
 
 @app.route('/hqrobot')
 def hqrobot():
-    templateMeta['day'] = (datetime.now() + timedelta(days=dayDelta)).strftime("%Y%m%d")
+    days = getDays()
+    templateMeta['days'] = days
+    templateMeta['day'] = days[0]
     hqConf = json.load(open(HQ_CONF))
     hqrobotMain(hqConf, templateMeta['day'])
     templateMeta['hqConf'] = hqConf
@@ -131,5 +134,9 @@ def hqrobot():
 def hqSetDay():
     day = request.args.get('day')
     templateMeta['day'] = day
-    templateMeta["hqMetaFiles"] = getHqMetaFiles(hqConf, day)
+    templateMeta["hqMetaFiles"] = getHqMetaFiles(templateMeta['hqConf'], day)
     return redirect('/')
+
+@app.route('/hqConf')
+def hqConf():
+    return open(HQ_CONF).read()
