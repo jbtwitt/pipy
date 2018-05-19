@@ -3,11 +3,13 @@ import json
 import math
 import os
 from datetime import datetime
+from HqCsv import HqCsv
 
 class HqMeta:
     def __init__(self, ticker, hqCsvFile):
-        csv = pd.read_csv(hqCsvFile, index_col=[0], parse_dates=False)
-        self.csv = self.addCols(csv)
+        # csv = pd.read_csv(hqCsvFile, index_col=[0], parse_dates=False)
+        # self.csv = self.addCols(csv)
+        self.csv = HqCsv(ticker, hqCsvFile).df
         self.ticker = ticker
         self.hqCsvFile = hqCsvFile
         # hqMeta = self.collect()
@@ -21,7 +23,7 @@ class HqMeta:
         hqMeta['HL'] = self.HL
         hqMeta['CL'] = self.CL
         hqMeta['LP'] = self.LP
-        hqMeta['volChange'] = self.volChange
+        hqMeta['VolChange'] = self.VolChange
 
         days = [5, 10, 20, 30, 60, 120, 180]
         nDaysHLs = []
@@ -39,18 +41,23 @@ class HqMeta:
         return hqMeta
 
     def nDaysHL(self, nDays):
+        nDaysCsv = self.csv[self.startDayIdx:self.startDayIdx + nDays]
         # Close HL
-        df = self.csv[self.startDayIdx:self.startDayIdx + nDays].Close.sort_values(ascending=False)
+        df = nDaysCsv.Close.sort_values(ascending=False)
         # df4 = hqCsv.df[0:4].sort_values(by='Close', ascending=True)
         returnValue = {"nDays": nDays, "HighDate": df.index[0], "LowDate": df.index[len(df.index)-1]}
         # Volume HL
-        df = self.csv[self.startDayIdx:self.startDayIdx + nDays].Volume.sort_values(ascending=False)
+        df = nDaysCsv.Volume.sort_values(ascending=False)
         returnValue["vHighDate"] = df.index[0]
         returnValue["vLowDate"] = df.index[len(df.index)-1]
         # HL HL
-        df = self.csv[self.startDayIdx:self.startDayIdx + nDays].HL.sort_values(ascending=False)
+        df = nDaysCsv.HL.sort_values(ascending=False)
         returnValue["hlHighDate"] = df.index[0]
         returnValue["hlLowDate"] = df.index[len(df.index)-1]
+        # LP HL
+        # df = nDaysCsv.LP.sort_values(ascending=False)
+        # returnValue["lpHighDate"] = df.index[0]
+        # returnValue["lpLowDate"] = df.index[len(df.index)-1]
         return returnValue
 
     def nDaysStraight(self):
@@ -90,13 +97,13 @@ class HqMeta:
             'upDiff': (close0-nDaysLowest.Close)/nDaysLowest.Close,
         }
 
-    def addCols(self, csv):
-        csv['PrevClose'] = csv.Close.shift(1)
-        csv['PrevVolume'] = csv.Volume.shift(1)
-        csv = csv.reindex(index=csv.index[::-1])   # reverse date order
-        csv['No'] = range(len(csv.index))
-        csv['HL'] = (csv.High - csv.Low)/csv.PrevClose
-        return csv
+    # def addCols(self, csv):
+    #     csv['PrevClose'] = csv.Close.shift(1)
+    #     csv['PrevVolume'] = csv.Volume.shift(1)
+    #     csv = csv.reindex(index=csv.index[::-1])   # reverse date order
+    #     csv['No'] = range(len(csv.index))
+    #     csv['HL'] = (csv.High - csv.Low)/csv.PrevClose
+    #     return csv
 
     @property
     def lastDate(self):
@@ -118,10 +125,10 @@ class HqMeta:
 
     @property
     def LP(self):
-        row = self.csv.iloc[self.startDayIdx]
-        return (row.Low - row.PrevClose)/row.PrevClose
+        return self.csv.LP[self.startDayIdx]
+        # row = self.csv.iloc[self.startDayIdx]
+        # return (row.Low - row.PrevClose)/row.PrevClose
 
     @property
-    def volChange(self):
-        row = self.csv.iloc[self.startDayIdx]
-        return (row.Volume - row.PrevVolume) / row.PrevVolume
+    def VolChange(self):
+        return self.csv.VolChange[self.startDayIdx]

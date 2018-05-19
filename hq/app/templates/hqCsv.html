@@ -12,10 +12,10 @@
         <th>No</th>
         <th>Date</th>
         <th>Close</th>
-        <th>Change</th>
+        <th>CP</th>
         <th>LP</th>
+        <th>OP</th>
         <th>HL</th>
-        <th>OL</th>
         <th>Volume</th>
         <th>VolChange</th>
         <th>Open</th>
@@ -28,28 +28,28 @@
         <td>{{idx}}</td>
         <td>{{round(hqCsv.df.Close[idx],2)}}</td>
         <td
-            {% if hqCsv.df.Change[idx] > 0.0 %}
+            {% if hqCsv.df.CP[idx] > 0.0 %}
                 class="green"
             {% endif %}
-            {% if hqCsv.df.Change[idx] < 0.0 %}
+            {% if hqCsv.df.CP[idx] < 0.0 %}
                 class="red"
             {% endif %}
-        >{{round(100*hqCsv.df.Change[idx],2)}}%</td>
+        >{{round(100*hqCsv.df.CP[idx],2)}}%</td>
         <td
-            {% if hqCsv.df.CL[idx] >= upAlert %}
+            {% if hqCsv.df.LP[idx] >= upAlert %}
                 class="green"
             {% endif %}
         >{{round(100*hqCsv.df.LP[idx],2)}}%</td>
+        <td
+            {% if hqCsv.df.OP[idx] >= upAlert %}
+                class="red"
+            {% endif %}
+        >{{round(100*hqCsv.df.OP[idx],2)}}%</td>
         <td
             {% if hqCsv.df.HL[idx] >= upAlert %}
                 class="red"
             {% endif %}
         >{{round(100*hqCsv.df.HL[idx],2)}}%</td>
-        <td
-            {% if hqCsv.df.OL[idx] >= upAlert %}
-                class="red"
-            {% endif %}
-        >{{round(100*hqCsv.df.OL[idx],2)}}%</td>
         <td>{{hqCsv.df.Volume[idx]}}</td>
         <td
             {% if hqCsv.df.VolChange[idx] > 0.5 %}
