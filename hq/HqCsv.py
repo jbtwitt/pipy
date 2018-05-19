@@ -8,9 +8,10 @@ class HqCsv:
         csv['PrevVolume'] = csv.Volume.shift(1)
         csv['Change'] = (csv.Close - csv.PrevClose)/csv.PrevClose
         csv['VolChange'] = (csv.Volume - csv.PrevVolume)/csv.PrevVolume
-        csv['HL'] = (csv.High - csv.Low)/csv.Low
+        csv['HL'] = (csv.High - csv.Low)/csv.PrevClose
         csv['CL'] = (csv.Close - csv.Low)/csv.Low
         csv['OL'] = (csv.Open - csv.Low)/csv.Low
+        csv['LP'] = (csv.Low - csv.PrevClose)/csv.PrevClose
         df = csv.reindex(index=csv.index[::-1])   # reverse date order
         df['No'] = range(len(df.index))
         self.dataFrame = df

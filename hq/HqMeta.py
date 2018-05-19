@@ -20,6 +20,7 @@ class HqMeta:
         hqMeta['change'] = self.nDaysChange(1)
         hqMeta['HL'] = self.HL
         hqMeta['CL'] = self.CL
+        hqMeta['LP'] = self.LP
         hqMeta['volChange'] = self.volChange
 
         days = [5, 10, 20, 30, 60, 120, 180]
@@ -94,7 +95,7 @@ class HqMeta:
         csv['PrevVolume'] = csv.Volume.shift(1)
         csv = csv.reindex(index=csv.index[::-1])   # reverse date order
         csv['No'] = range(len(csv.index))
-        csv['HL'] = (csv.High - csv.Low)/csv.Low
+        csv['HL'] = (csv.High - csv.Low)/csv.PrevClose
         return csv
 
     @property
@@ -114,6 +115,11 @@ class HqMeta:
     def CL(self):
         row = self.csv.iloc[self.startDayIdx]
         return (row.Close - row.Low) / row.Low  # row.PrevClose
+
+    @property
+    def LP(self):
+        row = self.csv.iloc[self.startDayIdx]
+        return (row.Low - row.PrevClose)/row.PrevClose
 
     @property
     def volChange(self):

@@ -13,8 +13,8 @@
         <th>Date</th>
         <th>Close</th>
         <th>Change</th>
+        <th>LP</th>
         <th>HL</th>
-        <th>CL</th>
         <th>OL</th>
         <th>Volume</th>
         <th>VolChange</th>
@@ -36,15 +36,15 @@
             {% endif %}
         >{{round(100*hqCsv.df.Change[idx],2)}}%</td>
         <td
+            {% if hqCsv.df.CL[idx] >= upAlert %}
+                class="green"
+            {% endif %}
+        >{{round(100*hqCsv.df.LP[idx],2)}}%</td>
+        <td
             {% if hqCsv.df.HL[idx] >= upAlert %}
                 class="red"
             {% endif %}
         >{{round(100*hqCsv.df.HL[idx],2)}}%</td>
-        <td
-            {% if hqCsv.df.CL[idx] >= upAlert %}
-                class="green"
-            {% endif %}
-        >{{round(100*hqCsv.df.CL[idx],2)}}%</td>
         <td
             {% if hqCsv.df.OL[idx] >= upAlert %}
                 class="red"
