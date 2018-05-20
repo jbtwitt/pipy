@@ -7,8 +7,6 @@ from HqCsv import HqCsv
 
 class HqMeta:
     def __init__(self, ticker, hqCsvFile):
-        # csv = pd.read_csv(hqCsvFile, index_col=[0], parse_dates=False)
-        # self.csv = self.addCols(csv)
         self.csv = HqCsv(ticker, hqCsvFile).df
         self.ticker = ticker
         self.hqCsvFile = hqCsvFile
@@ -42,23 +40,25 @@ class HqMeta:
 
     def nDaysHL(self, nDays):
         nDaysCsv = self.csv[self.startDayIdx:self.startDayIdx + nDays]
+        ret = {"nDays": nDays}
         # Close HL
         df = nDaysCsv.Close.sort_values(ascending=False)
-        # df4 = hqCsv.df[0:4].sort_values(by='Close', ascending=True)
-        returnValue = {"nDays": nDays, "HighDate": df.index[0], "LowDate": df.index[len(df.index)-1]}
+        ret["cpHighDate"] = df.index[0]
+        ret["cpLowDate"] = df.index[len(df.index)-1]
+        ret["cpDiff"] = (nDaysCsv.loc[ret['cpHighDate']].Close - nDaysCsv.loc[ret['cpLowDate']].Close)/nDaysCsv.loc[ret['cpLowDate']].Close
         # Volume HL
         df = nDaysCsv.Volume.sort_values(ascending=False)
-        returnValue["vHighDate"] = df.index[0]
-        returnValue["vLowDate"] = df.index[len(df.index)-1]
+        ret["vHighDate"] = df.index[0]
+        ret["vLowDate"] = df.index[len(df.index)-1]
         # HL HL
         df = nDaysCsv.HL.sort_values(ascending=False)
-        returnValue["hlHighDate"] = df.index[0]
-        returnValue["hlLowDate"] = df.index[len(df.index)-1]
+        ret["hlHighDate"] = df.index[0]
+        ret["hlLowDate"] = df.index[len(df.index)-1]
         # LP HL
         # df = nDaysCsv.LP.sort_values(ascending=False)
-        # returnValue["lpHighDate"] = df.index[0]
-        # returnValue["lpLowDate"] = df.index[len(df.index)-1]
-        return returnValue
+        # ret["lpHighDate"] = df.index[0]
+        # ret["lpLowDate"] = df.index[len(df.index)-1]
+        return ret
 
     def nDaysStraight(self):
         for i in range(self.startDayIdx, len(self.csv.index)):

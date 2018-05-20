@@ -75,12 +75,14 @@
         {% endfor %} -->
         {% for nDaysHL in hqMeta.nDaysHLs %}
             <td>
-                {% if nDaysHL.LowDate == hqMeta.date %}
-                    <span class="red">cL</span>
+                <span title="{{round(100*nDaysHL.cpDiff,2)}}%"
+                {% if nDaysHL.cpLowDate == hqMeta.date %}
+                    class="red">cL
                 {% endif %}
-                {% if nDaysHL.HighDate == hqMeta.date %}
-                    <span class="green">cH</span>
+                {% if nDaysHL.cpHighDate == hqMeta.date %}
+                    class="green">cH
                 {% endif %}
+                </span>
                 {% if nDaysHL.vLowDate == hqMeta.date %}
                     <span class="red">vL</span>
                 {% endif %}
