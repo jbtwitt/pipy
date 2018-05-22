@@ -52,6 +52,8 @@ def getHqMetas(hqConf, day, startDayIdx=0):
         if os.path.exists(hqFile):
             hqMeta = HqMeta(ticker, hqFile)
             hqMetas.append(hqMeta.collect(startDayIdx))
+    # hqMetas = sorted(hqMetas, key=lambda x: x['LP'])
+    hqMetas = sorted(hqMetas, key=lambda x: (x['change']-x['LP']), reverse=True)
     return hqMetas
 
 def getHqDailyMetas(hqConf, day, ticker, nDays=50):
@@ -101,6 +103,7 @@ def hqDailyMetas():
 def hqMeta():
     hqMetaFile = request.args.get('hqMetaFile')
     hqMetas = json.load(open(hqMetaFile))
+    hqMetas = sorted(hqMetas, key=lambda x: (x['change']-x['LP']), reverse=True)
     return render_template('hqMeta.html',
                            title='HQ Meta',
                            templateMeta=templateMeta,
