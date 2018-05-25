@@ -103,7 +103,7 @@ def hqDailyMetas():
 def hqMeta():
     hqMetaFile = request.args.get('hqMetaFile')
     hqMetas = json.load(open(hqMetaFile))
-    hqMetas = sorted(hqMetas, key=lambda x: (x['change']-x['LP']), reverse=True)
+    # hqMetas = sorted(hqMetas, key=lambda x: (x['change']-x['LP']), reverse=True)
     return render_template('hqMeta.html',
                            title='HQ Meta',
                            templateMeta=templateMeta,
@@ -131,6 +131,7 @@ def hqrobot():
     hqConf = json.load(open(HQ_CONF))
     hqrobotMain(hqConf, templateMeta['day'])
     templateMeta['hqConf'] = hqConf
+    templateMeta['hqMetaFiles'] = getHqMetaFiles(hqConf, days[0])
     return redirect('/hqMeta/dayIdx?startDayIdx=0')
 
 @app.route('/hqSetDay')
