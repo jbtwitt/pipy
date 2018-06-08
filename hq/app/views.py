@@ -134,6 +134,15 @@ def hqrobot():
     templateMeta['hqMetaFiles'] = getHqMetaFiles(hqConf, days[0])
     return redirect('/hqMeta/dayIdx?startDayIdx=0')
 
+@app.route('/hqrobot/ticker')
+def hqrobotTicker():
+    ticker = request.args.get('ticker')
+    days = getDays()
+    hq1Conf = json.load(open(HQ_CONF))
+    hq1Conf["tickers"] = [ticker]
+    hqrobotMain(hq1Conf, days[0])
+    return redirect('/hqDailyMetas?ticker='+ticker)
+
 @app.route('/hqSetDay')
 def hqSetDay():
     day = request.args.get('day')

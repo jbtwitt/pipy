@@ -3,7 +3,8 @@ from urllib.request import urlopen, Request, URLError
 from datetime import datetime
 import calendar
 
-InitLink = 'https://finance.yahoo.com/quote/AMZN/history?p=AMZN'
+# InitLink = 'https://finance.yahoo.com/quote/AMZN/history?p=AMZN'
+InitLink = 'https://finance.yahoo.com/quote/AMZN?p=AMZN'
 HqLink = 'https://query1.finance.yahoo.com/v7/finance/download/{}?period1={}&period2={}&interval=1d&events=history&crumb={}'
 CrumbRegex = r'CrumbStore":{"crumb":"(.*?)"}'
 CookRegex = r'set-cookie: (.*?); '

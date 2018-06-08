@@ -46,7 +46,7 @@
             {% endif %}
         >{{round(100*hqCsv.df.OP[idx],2)}}%</td>
         <td
-            {% if hqCsv.df.HL[idx] >= upAlert %}
+            {% if hqCsv.df.HL[idx] > 0.05 %}
                 class="red"
             {% endif %}
         >{{round(100*hqCsv.df.HL[idx],2)}}%</td>
