@@ -8,8 +8,8 @@ from HqYhoo import DateFormat
 
 CsvFolder = "{}/hq{}"
 CsvFileName = "{}/{}.y.csv"
-def hqrobotMain(hqConf, day):
-    tickers = hqConf["tickers"]
+def hqrobotMain(hqConf, day, tickerList="tickers"):
+    tickers = hqConf[tickerList]
     hqDays = 7 * hqConf["hqDays"] / 5
     # repo = hqConf["repo"] + '/hq' + datetime.now().strftime("%Y%m%d")
     repo = CsvFolder.format(hqConf["repo"], day)

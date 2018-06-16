@@ -20,7 +20,9 @@
 
 <a href="/">HQ</a> | <a href="/hqConf">HqConf</a> | {{ templateMeta.day }} |
 
-<a href="/hqrobot">hqrobot</a> |
+hqrobot:
+<a href="/hqrobot?list=tickers">tickers</a>
+<a href="/hqrobot?list=etf">etf</a> |
 
 {% for hqMetaFile in templateMeta.hqMetaFiles %}
     <a href="/hqMeta?{{hqMetaFile}}">hqMeta</a> |
