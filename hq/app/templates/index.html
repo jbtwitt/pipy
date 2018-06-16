@@ -3,8 +3,12 @@
 {% block content %}
 
 <table>
-{% for ticker in templateMeta.hqConf.tickers %}
-
+    <tr>
+{% for tickerList in ['tickers', 'etf'] %}
+<th valign="top">
+<a href="/hqMeta/dayIdx?startDayIdx=0&list={{tickerList}}">{{tickerList}}</a>
+<table>
+{% for ticker in templateMeta.hqConf[tickerList] %}
     <tr>
         <td>
             <a href="{{templateMeta.hqConf.hqUrl.q.format(ticker, ticker)}}" target="_blank">{{ticker}}</a></td>
@@ -17,8 +21,11 @@
         <td>
             <a href="/hqDailyMetas?ticker={{ticker}}" target="_blank">HDM</a></td>
     </tr>
-
 {% endfor %}
+</table>
+</th>
+{% endfor %}
+</tr>
 </table>
 
 {% endblock %}

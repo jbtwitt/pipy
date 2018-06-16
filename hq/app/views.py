@@ -16,7 +16,6 @@ from HqCsv import HqCsv
 
 HQ_CONF = 'hqrobot.json'
 hqConf = json.load(open(HQ_CONF))
-tickerList = "tickers"
 # print(hqConf)
 dayDelta = -0
 def getDays():
@@ -41,10 +40,11 @@ templateMeta = {
         "day": days[0],
         "days": days,
         "hqConf": hqConf,
+        "tickerList": "tickers",
         "hqMetaFiles": getHqMetaFiles(hqConf, days[0])
     }
 
-def getHqMetas(hqConf, day, startDayIdx=0):
+def getHqMetas(hqConf, day, tickerList, startDayIdx=0):
     tickers = hqConf[tickerList]
     csvFolder = CsvFolder.format(hqConf['repo'], day)
     hqMetas = []
@@ -115,11 +115,13 @@ def hqMeta():
 
 @app.route('/hqMeta/dayIdx')
 def hqMetaStartDayIdx():
+    tickerList = request.args.get('list')
+    templateMeta["tickerList"] = tickerList
     startDayIdx = int(request.args.get('startDayIdx'))
     return render_template('hqMeta.html',
                            title='HQ Meta',
                            templateMeta=templateMeta,
-                           hqMetas=getHqMetas(templateMeta['hqConf'], templateMeta['day'], startDayIdx),
+                           hqMetas=getHqMetas(templateMeta['hqConf'], templateMeta['day'], tickerList, startDayIdx),
                            upAlert=0.1,
                            downAlert=-0.1,
                            round=round)
@@ -134,7 +136,8 @@ def hqrobot():
     hqrobotMain(hqConf, templateMeta['day'], tickerList)
     templateMeta['hqConf'] = hqConf
     templateMeta['hqMetaFiles'] = getHqMetaFiles(hqConf, days[0])
-    return redirect('/hqMeta/dayIdx?startDayIdx=0')
+    templateMeta['tickerList'] = tickerList
+    return redirect('/hqMeta/dayIdx?startDayIdx=0&list='+tickerList)
 
 @app.route('/hqrobot/ticker')
 def hqrobotTicker():

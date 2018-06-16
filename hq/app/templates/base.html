@@ -53,7 +53,7 @@ Ticker: <input type="text" id="ticker" onchange="getTicker(this.value)" size="3"
 <script>
     function redirect(startDayIdx) {
         // day = document.getElementById('day').value;
-        window.location="/hqMeta/dayIdx?startDayIdx=" + startDayIdx;
+        window.location="/hqMeta/dayIdx?list={{templateMeta.tickerList}}&startDayIdx=" + startDayIdx;
     }
     function setDay(day) {
         window.location = "/hqSetDay?day=" + day
