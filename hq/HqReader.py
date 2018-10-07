@@ -1,7 +1,8 @@
 import pandas as pd
 import numpy as np
 
-CsvFileNameFormat = "/gitrepo/robotRepo/hq{}/{}.y.csv"
+CsvFileNameFormat="/gitrepo/robotRepo/hq{}/{}.y.csv"
+VOLUME_REDUCER=1000.0
 def readRawData(ticker, day):
     csvFile=CsvFileNameFormat.format(day, ticker)
     df = pd.read_csv(csvFile, index_col=[0], parse_dates=False)
@@ -9,7 +10,7 @@ def readRawData(ticker, day):
     df['PrevClose'] = df.Close.shift(1)
     df['PrevVolume'] = df.Volume.shift(1)
 
-    df['VolChange'] = (df.Volume - df.PrevVolume)/df.PrevVolume
+    df['VolChange'] = (df.Volume - df.PrevVolume)/df.PrevVolume/VOLUME_REDUCER
     df['OP'] = (df.Open - df.PrevClose) /df.PrevClose
     df['HP'] = (df.High - df.PrevClose)/df.PrevClose
     df['LP'] = (df.Low - df.PrevClose)  /df.PrevClose
@@ -18,33 +19,42 @@ def readRawData(ticker, day):
     df['HL'] = df.HP - df.LP
     # print(df[0:4])
     print(df.iloc[1:5,8:])
+    # print(df.iloc[1:5,12]) # = df[1:5].CP
     # npArray=df.iloc[1:,8:].values
     # return np.rot90(npArray, )
     # df=df.iloc[1:,8:]
     # df = df.T #rotate 90 degree
     # print(df.shape)
     # print(df)
-    return df.iloc[1:,8:].values
+    input_raw_data=df.iloc[1:,8:].values
+    # target_raw_data=df.iloc[1:,12]
+    target_raw_data=df[1:].CP
+    return  input_raw_data, target_raw_data
 
 class HqReader:
     def __init__(self,ticker,day):
         self.ticker=ticker
         self.day=day
-        rawData=readRawData(ticker, day)
-        rows, n_input = rawData.shape
-        print(rawData.shape, rows, n_input)
-        # print(rawData)
+        input_raw_data, target_raw_data=readRawData(ticker, day)
+        print('input_raw_data shape',input_raw_data.shape)
+        print('target_raw_data shape', target_raw_data.shape)
+        rows, n_input = input_raw_data.shape
+        # print(input_raw_data.shape, rows, n_input)
+        self.input_raw_data=input_raw_data.reshape((1,rows,n_input))
+        self.target_raw_data=target_raw_data
+        print(self.input_reshape(batch_size=2,time_steps=3,n_input=n_input))
+        print(self.target_reshape(batch_size=2,n_input=2))
         '''
         Input & Target
         '''
+        """
         self.n_input=6
         self.time_steps=3
-        x=rawData.reshape((1,rows,n_input))
+        x=input_raw_data.reshape((1,rows,n_input))
         print(x.shape)
         # print(x)
-        print(x[0,0:self.time_steps].shape)
         inputSize=2
-        batchInput=np.empty((inputSize,self.time_steps,n_input))#,dtype=float)
+        batchInput=np.empty((inputSize,self.time_steps,n_input))
         # batchInput=np.array()
         for i in range(inputSize):
             # np.append(batchInput,x[0,i:self.time_steps+i])
@@ -53,6 +63,19 @@ class HqReader:
         print(batchInput.shape)
         # print(batchInput[-1])
         print(batchInput)
+        """
+
+    def input_reshape(self,batch_size,time_steps,n_input):
+        x=np.empty((batch_size,time_steps,n_input))
+        for i in range(batch_size):
+            x[i]=self.input_raw_data[0,i:time_steps+i]
+        return x
+
+    def target_reshape(self,batch_size,n_input):
+        y=np.empty((batch_size,n_input))
+        for i in range(batch_size):
+            y[i]=[self.target_raw_data[i],self.target_raw_data[i+1]]
+        return y
 
 if __name__ == "__main__":
     day='20181003'
