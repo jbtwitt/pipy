@@ -18,7 +18,7 @@ def readRawData(ticker, day):
     # df['HL'] = (df.High - df.Low)/df.PrevClose
     df['HL'] = df.HP - df.LP
     # print(df[0:4])
-    print(df.iloc[1:5,8:])
+    print(df.iloc[1:15,8:])
     # print(df.iloc[1:5,12]) # = df[1:5].CP
     # npArray=df.iloc[1:,8:].values
     # return np.rot90(npArray, )
@@ -38,12 +38,12 @@ class HqReader:
         input_raw_data, target_raw_data=readRawData(ticker, day)
         print('input_raw_data shape',input_raw_data.shape)
         print('target_raw_data shape', target_raw_data.shape)
-        rows, n_input = input_raw_data.shape
-        # print(input_raw_data.shape, rows, n_input)
-        self.input_raw_data=input_raw_data.reshape((1,rows,n_input))
+        self.rows, self.n_input = input_raw_data.shape
+        # reshape the csv raw data by 90 rotate
+        self.input_raw_data=input_raw_data.reshape((1,self.rows,self.n_input))
         self.target_raw_data=target_raw_data
-        print(self.input_reshape(batch_size=2,time_steps=3,n_input=n_input))
-        print(self.target_reshape(batch_size=2,n_input=2))
+        # print(self.input_reshape(batch_size=2,time_steps=3,n_input=self.n_input))
+        # print(self.target_reshape(batch_size=2,n_input=2))
         '''
         Input & Target
         '''
@@ -65,19 +65,30 @@ class HqReader:
         print(batchInput)
         """
 
+    def split_data(self,train_size,time_steps,n_classes):
+        x=self.input_reshape(train_size,time_steps,self.n_input)
+        y=self.target_reshape(n_classes)
+        return x, y[time_steps:time_steps+train_size]
+
     def input_reshape(self,batch_size,time_steps,n_input):
         x=np.empty((batch_size,time_steps,n_input))
         for i in range(batch_size):
             x[i]=self.input_raw_data[0,i:time_steps+i]
         return x
 
-    def target_reshape(self,batch_size,n_input):
-        y=np.empty((batch_size,n_input))
+    def target_reshape(self,n_classes):
+        batch_size=self.rows-n_classes
+        y=np.empty((batch_size,n_classes))
         for i in range(batch_size):
-            y[i]=[self.target_raw_data[i],self.target_raw_data[i+1]]
+            y[i]=self.target_raw_data[i:i+n_classes]
         return y
 
 if __name__ == "__main__":
     day='20181003'
     ticker='LABU'
-    hqReader = HqReader(ticker, day)
+    hqReader=HqReader(ticker, day)
+    train_x,train_y=hqReader.split_data(train_size=100,time_steps=time_steps,n_classes=n_classes)
+    print(train_x.shape)
+    print(train_y.shape)
+    # print(train_x[0])
+    # print(train_y[0])
