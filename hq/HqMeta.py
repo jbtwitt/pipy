@@ -23,6 +23,12 @@ class HqMeta:
         hqMeta['LP'] = self.LP
         hqMeta['VolChange'] = self.VolChange
 
+        hqMeta['H'] = self.H
+        hqMeta['L'] = self.L
+        hqMeta['O'] = self.O
+        hqMeta['C'] = self.lastClose
+        hqMeta['RowNo'] = self.RowNo
+
         days = [5, 10, 20, 30, 60, 120, 180, 240]
         nDaysHLs = []
         for nDays in days:
@@ -45,6 +51,7 @@ class HqMeta:
         df = nDaysCsv.Close.sort_values(ascending=False)
         ret["cpHighDate"] = df.index[0]
         ret["cpLowDate"] = df.index[len(df.index)-1]
+        ret['cpLowDateRowNo'] = nDaysCsv.loc[ret['cpLowDate']].No
         ret["cpDiff"] = (nDaysCsv.loc[ret['cpHighDate']].Close - nDaysCsv.loc[ret['cpLowDate']].Close)/nDaysCsv.loc[ret['cpLowDate']].Close
         # Volume HL
         df = nDaysCsv.Volume.sort_values(ascending=False)
@@ -115,6 +122,18 @@ class HqMeta:
         return self.csv.Close[self.startDayIdx]
 
     @property
+    def O(self):
+        return self.csv.Open[self.startDayIdx]
+
+    @property
+    def H(self):
+        return self.csv.High[self.startDayIdx]
+
+    @property
+    def L(self):
+        return self.csv.Low[self.startDayIdx]
+
+    @property
     def HL(self):
         return self.csv.HL[self.startDayIdx]
 
@@ -132,3 +151,7 @@ class HqMeta:
     @property
     def VolChange(self):
         return self.csv.VolChange[self.startDayIdx]
+
+    @property
+    def RowNo(self):
+        return self.csv.No[self.startDayIdx]
