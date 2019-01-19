@@ -27,7 +27,7 @@ class HqMeta:
         hqMeta['L'] = self.L
         hqMeta['O'] = self.O
         hqMeta['C'] = self.lastClose
-        hqMeta['RowNo'] = self.RowNo
+        hqMeta['RowNo'] = 0.0+self.RowNo
 
         days = [5, 10, 20, 30, 60, 120, 180, 240]
         nDaysHLs = []

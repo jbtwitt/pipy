@@ -6,7 +6,6 @@ import os
 from HqYhoo import HqYhoo
 from HqYhoo import DateFormat
 from HqMeta import HqMeta
-from HqAlert import HqAlert
 
 CsvFolder = "{}/hq{}"
 CsvFileName = "{}/{}.y.csv"
@@ -27,8 +26,7 @@ def hqScanMain(hqConf, day, tickerList="tickers", startDayIdx=0):
             # break
 
 HqAlertType0 = 'bullish engulfing'
-HqAlertType1 = 'nDaysLow >= 60 days within 10 days and bullish engulfing'
-HqAlertType2 = 'nDaysLow between 5 and 30 days within 10 days and bullish engulfing'
+HqAlertType1 = 'nDaysLow within 10 days and bullish engulfing'
 def FilterGevo20181225(hqDailyMetas, dayIdx=0):
     bullishAlerts = []
     for i in range(dayIdx,dayIdx+1):
@@ -40,19 +38,17 @@ def FilterGevo20181225(hqDailyMetas, dayIdx=0):
         if bullishEngulfing:
             # bullishAlerts.append({'type': 'bullish engulfing'})
             bullishAlerts.append({'type': HqAlertType0})
+            nDays = 0
             for nDaysHL in currMeta['nDaysHLs']:
-                if nDaysHL['nDays'] >= 60 and (nDaysHL['cpLowDateRowNo'] - currMeta['RowNo']) <= 10.0:  #in 10 days
+                if (nDaysHL['cpLowDateRowNo'] - currMeta['RowNo']) <= 10.0:  #in 10 days
+                    nDays = nDaysHL['nDays']
+
+                # if nDaysHL['nDays'] >= 60 and (nDaysHL['cpLowDateRowNo'] - currMeta['RowNo']) <= 10.0:  #in 10 days
                     # print('nDaysLow >= 180 Alert:', currMeta['ticker'],
                     #     currMeta['date'], currMeta['H'], currMeta['L'], currMeta['RowNo'])
                     # bullishAlerts.append({'type': 'nDaysLow >= 60 days within 10 days and bullish engulfing'})
-                    bullishAlerts.append({'type': HqAlertType1})
-                    break
-            for nDaysHL in currMeta['nDaysHLs']:
-                flag = ((nDaysHL['nDays'] >= 5 and nDaysHL['nDays'] <= 30)
-                        and (nDaysHL['cpLowDateRowNo'] - currMeta['RowNo']) <= 10.0)  #in 10 days
-                if flag:
-                    bullishAlerts.append({'type': HqAlertType2})
-                    break
+            if nDays > 0:
+                bullishAlerts.append({'type': HqAlertType1, 'nDays': nDays})
     return {'bullish': bullishAlerts}
 
 def FilterGevo20190102(hqDailyMetas):
