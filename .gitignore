@@ -1,4 +1,5 @@
 #
 /motion-detect-recorder/classes/*.pyc
 /**/__pycache__
+/**/*.pyc
 .vscode

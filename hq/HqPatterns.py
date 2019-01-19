@@ -7,11 +7,11 @@ class HqPatterns:
         self._bullishEngulfings = []
         self._bearishEngulfings = []
 
-    def addBullishEngulfing(self, ticker, stickOC, nDaysLows=None):
+    def addBullishEngulfing(self, ticker, stickOC, nDaysHL=None):
         self._bullishEngulfings.append({
             'ticker': ticker,
             'stickOC': stickOC,
-            'nDaysLows': nDaysLows})
+            'nDaysHL': nDaysHL})
 
     @property
     def bearishEngulfings(self):

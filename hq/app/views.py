@@ -81,12 +81,14 @@ def index():
 
 @app.route('/hqScan')
 def hqScan():
-    csvFolder = CsvFolder.format(templateMeta['hqConf']['repo'], templateMeta['day'])
-    tickers = templateMeta['hqConf']['tickers']
+    _hqConf = templateMeta['hqConf']
+    csvFolder = CsvFolder.format(_hqConf['repo'], templateMeta['day'])
+    tickers = _hqConf['tickers'] + _hqConf['etf']
     return render_template('hqScan.html',
                             title='HQ Scan',
                             templateMeta=templateMeta,
-                            hqPatterns = hqStartScan(tickers, csvFolder, startDayIdx=0))
+                            hqPatterns = hqStartScan(tickers, csvFolder, startDayIdx=0),
+                            round=round)
 
 @app.route('/hqCsv')
 def hqCsv():
