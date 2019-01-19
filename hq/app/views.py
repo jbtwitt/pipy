@@ -126,6 +126,12 @@ def hqMetaStartDayIdx():
                            downAlert=-0.1,
                            round=round)
 
+"""
+hqrobot download list
+
+:param list: list key name
+:returns: redirect to /hqMeta
+"""
 @app.route('/hqrobot')
 def hqrobot():
     tickerList = request.args.get('list')
@@ -148,6 +154,10 @@ def hqrobotTicker():
     hqrobotMain(hq1Conf, days[0])
     return redirect('/hqDailyMetas?ticker='+ticker)
 
+"""
+Set different day
+
+"""
 @app.route('/hqSetDay')
 def hqSetDay():
     day = request.args.get('day')
@@ -155,6 +165,14 @@ def hqSetDay():
     templateMeta["hqMetaFiles"] = getHqMetaFiles(templateMeta['hqConf'], day)
     return redirect('/')
 
+"""
+Display conf json
+
+:param param1: this is a first param
+:param param2: this is a second param
+:returns: this is a description of what is returned
+:raises keyError: raises an exception
+"""
 @app.route('/hqConf')
 def hqConf():
     return open(HQ_CONF).read()

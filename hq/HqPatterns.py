@@ -1,6 +1,9 @@
+HqAlertType0 = 'bullish engulfing'
+HqAlertType1 = 'nDaysLow within 10 days and bullish engulfing'
+
 class HqPatterns:
-    def __init__(self, date):
-        self._date = date
+    def __init__(self):
+        # self._date = date
         self._bullishEngulfings = []
         self._bearishEngulfings = []
 
