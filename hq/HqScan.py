@@ -6,28 +6,31 @@ import os
 from HqYhoo import HqYhoo
 from HqYhoo import DateFormat
 from HqMeta import HqMeta
+from HqPatterns import HqPatterns
 
 CsvFolder = "{}/hq{}"
 CsvFileName = "{}/{}.y.csv"
 
 def hqScanMain(hqConf, day, tickerList="tickers", startDayIdx=0):
-    # print(hqConf)
-    tickers = hqConf[tickerList]
+    hqPatterns = HqPatterns(day)
     csvFolder = CsvFolder.format(hqConf['repo'], day)
+    tickers = hqConf[tickerList]
     for ticker in tickers:
         # ticker = 'GEVO'
         hqFile = CsvFileName.format(csvFolder, ticker)
         if os.path.exists(hqFile):
             hqDailyMetas = getHqDailyMetas(ticker, hqFile, 30)
             # print(len(hqDailyMetas))
-            alerts = FilterGevo20181225(hqDailyMetas, startDayIdx)
+            alerts = matchPatterns(hqPatterns, hqDailyMetas, startDayIdx)
             if len(alerts['bullish']) > 0:
                 print(ticker, alerts['bullish'])
             # break
+    print(hqPatterns.bullishEngulfings)
 
 HqAlertType0 = 'bullish engulfing'
 HqAlertType1 = 'nDaysLow within 10 days and bullish engulfing'
-def FilterGevo20181225(hqDailyMetas, dayIdx=0):
+# HqPattern_BullishEngulfing
+def matchPatterns(hqPatterns, hqDailyMetas, dayIdx=0):
     bullishAlerts = []
     for i in range(dayIdx,dayIdx+1):
         currMeta = hqDailyMetas[i]
@@ -36,12 +39,14 @@ def FilterGevo20181225(hqDailyMetas, dayIdx=0):
                         and (currMeta['H'] >= prevMeta['H'] and currMeta['L'] <= prevMeta['L']) #HL engulf
                         and (currMeta['O'] < prevMeta['C'] and currMeta['C'] > prevMeta['O']))  #OC engulf
         if bullishEngulfing:
-            # bullishAlerts.append({'type': 'bullish engulfing'})
+            stickOC = (currMeta['C'] - currMeta['O']) / prevMeta['C']
             bullishAlerts.append({'type': HqAlertType0})
             nDays = 0
             for nDaysHL in currMeta['nDaysHLs']:
                 if (nDaysHL['cpLowDateRowNo'] - currMeta['RowNo']) <= 10.0:  #in 10 days
                     nDays = nDaysHL['nDays']
+                    nDaysLow = (nDaysHL['cpLowDateRowNo'] - currMeta['RowNo'])
+                    nDaysLow = nDaysHL['cpLowDate']
 
                 # if nDaysHL['nDays'] >= 60 and (nDaysHL['cpLowDateRowNo'] - currMeta['RowNo']) <= 10.0:  #in 10 days
                     # print('nDaysLow >= 180 Alert:', currMeta['ticker'],
@@ -49,12 +54,10 @@ def FilterGevo20181225(hqDailyMetas, dayIdx=0):
                     # bullishAlerts.append({'type': 'nDaysLow >= 60 days within 10 days and bullish engulfing'})
             if nDays > 0:
                 bullishAlerts.append({'type': HqAlertType1, 'nDays': nDays})
+                hqPatterns.addBullishEngulfing(currMeta['ticker'], stickOC, nDaysLow)
+            else:
+                hqPatterns.addBullishEngulfing(currMeta['ticker'], stickOC)
     return {'bullish': bullishAlerts}
-
-def FilterGevo20190102(hqDailyMetas):
-    for hqMeta in hqDailyMetas:
-        print(hqMeta['date'], hqMeta['close'])
-        print(hqMeta['nDaysStraight'], hqMeta['nDaysStraight']['upDays'])
 
 def getHqDailyMetas(ticker, csvFile, nDays=50):
     # csvFolder = CsvFolder.format(hqConf['repo'], day)
@@ -90,7 +93,7 @@ def hqDownload(hqConf, day, tickerList="tickers"):
 
 if __name__ == '__main__':
     day = (datetime.now() + timedelta(days=-0)).strftime("%Y%m%d")
-    # day = '20190117'
+    day = '20190117'
     hqConf = json.load(open('hqrobot.json'))
     repo = CsvFolder.format(hqConf["repo"], day)
     if not os.path.exists(repo):
@@ -99,4 +102,4 @@ if __name__ == '__main__':
         hqDownload(hqConf, day, 'etf')
     print(day, 'hq date folder')
     hqScanMain(hqConf, day)
-    hqScanMain(hqConf, day, 'etf')
+    # hqScanMain(hqConf, day, 'etf')

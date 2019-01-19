@@ -8,6 +8,15 @@ from HqYhoo import DateFormat
 
 CsvFolder = "{}/hq{}"
 CsvFileName = "{}/{}.y.csv"
+
+"""
+robot download hq data and store in csv format
+
+:param hqConf: hq conf json
+:param day: folder name for the day
+:param tickerList: key name of ticker list
+:returns:
+"""
 def hqrobotMain(hqConf, day, tickerList="tickers"):
     tickers = hqConf[tickerList]
     hqDays = 7 * hqConf["hqDays"] / 5
