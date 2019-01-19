@@ -13,6 +13,7 @@ from hqrobot import CsvFolder, CsvFileName, hqrobotMain
 from HqMetaFile import JsonFile
 from HqMeta import HqMeta
 from HqCsv import HqCsv
+from HqScan import hqStartScan
 
 HQ_CONF = 'hqrobot.json'
 hqConf = json.load(open(HQ_CONF))
@@ -77,6 +78,15 @@ def index():
     return render_template('index.html',
                             title='HQ',
                             templateMeta=templateMeta)
+
+@app.route('/hqScan')
+def hqScan():
+    csvFolder = CsvFolder.format(templateMeta['hqConf']['repo'], templateMeta['day'])
+    tickers = templateMeta['hqConf']['tickers']
+    return render_template('hqScan.html',
+                            title='HQ Scan',
+                            templateMeta=templateMeta,
+                            hqPatterns = hqStartScan(tickers, csvFolder, startDayIdx=0))
 
 @app.route('/hqCsv')
 def hqCsv():

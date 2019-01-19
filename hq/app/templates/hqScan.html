@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<table>
+<tr>
+<td>Bullish Engulfing</td>
+</tr>
+<tr>
+<td>
+<table>
+{% for pattern in hqPatterns.bullishEngulfings %}
+    <tr>
+        <td>
+            <a href="{{templateMeta.hqConf.hqUrl.q.format(pattern['ticker'], pattern['ticker'])}}" target="_blank">{{pattern['ticker']}}</a></td>
+        <td>
+            <a href="{{templateMeta.hqConf.hqUrl.h.format(pattern['ticker'], pattern['ticker'])}}" target="_blank">H</a></td>
+        <td>
+            <a href="{{templateMeta.hqConf.hqUrl.c.format(pattern['ticker'])}}" target="_blank">C</a></td>
+        <td>
+            <a href="/hqCsv?ticker={{pattern['ticker']}}" target="_blank">Csv</a></td>
+        <td>
+            <a href="/hqDailyMetas?ticker={{pattern['ticker']}}" target="_blank">HDM</a></td>
+    </tr>
+{% endfor %}
+</table>
+</td>
+</tr>
+</table>
+
+{% endblock %}
