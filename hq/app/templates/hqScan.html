@@ -32,14 +32,15 @@ Scan Date: {{templateMeta['day']}}
 {% endfor %}
 </table>
 
-<div>Moring Star ({{len(hqPatterns.morningStars)}})</div>
+<div>Patterns ({{len(hqPatterns.patterns)}})</div>
 <table>
 <tr>
 <td colspan="4"></td>
+<td>Pattern</td>
 <td>stickOC</td>
 <td>nDaysLowDate</td>
 </tr>
-{% for pattern in hqPatterns.morningStars %}
+{% for pattern in hqPatterns.patterns %}
 <tr>
     <td>
         <a href="{{templateMeta.hqConf.hqUrl.q.format(pattern['ticker'], pattern['ticker'])}}" target="_blank">{{pattern['ticker']}}</a></td>
@@ -49,6 +50,9 @@ Scan Date: {{templateMeta['day']}}
         <a href="/hqCsv?ticker={{pattern['ticker']}}" target="_blank">Csv</a></td>
     <td>
         <a href="/hqDailyMetas?ticker={{pattern['ticker']}}" target="_blank">HDM</a></td>
+    <td>
+        {{pattern['pattern']}}
+    </td>
     <td align="right">
         {{round(100*pattern['stickOC'],2)}}%
     <td>
