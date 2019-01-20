@@ -4,13 +4,11 @@
 Scan Date: {{templateMeta['day']}}
 <table>
 <tr>
-<td>Bullish Engulfing</td>
-</tr>
-<tr>
 <td>
+<div>Bullish Engulfing ({{len(hqPatterns.bullishEngulfings)}})</div>
 <table>
 <tr>
-<td colspan="5"></td>
+<td colspan="4"></td>
 <td>stickOC</td>
 <td>nDaysLowDate</td>
 </tr>
@@ -18,8 +16,6 @@ Scan Date: {{templateMeta['day']}}
 <tr>
     <td>
         <a href="{{templateMeta.hqConf.hqUrl.q.format(pattern['ticker'], pattern['ticker'])}}" target="_blank">{{pattern['ticker']}}</a></td>
-    <td>
-        <a href="{{templateMeta.hqConf.hqUrl.h.format(pattern['ticker'], pattern['ticker'])}}" target="_blank">H</a></td>
     <td>
         <a href="{{templateMeta.hqConf.hqUrl.c.format(pattern['ticker'])}}" target="_blank">C</a></td>
     <td>
@@ -29,6 +25,32 @@ Scan Date: {{templateMeta['day']}}
     <td align="right">
         {{round(100*pattern['stickOC'],2)}}%
     </td>
+    <td>
+        {{pattern['nDaysHL']['cpLowDate']}}|{{pattern['nDaysHL']['nDays']}}|
+        {{pattern['nDaysHL']['cpLowDateRowNo']}}</td>
+</tr>
+{% endfor %}
+</table>
+
+<div>Moring Star ({{len(hqPatterns.morningStars)}})</div>
+<table>
+<tr>
+<td colspan="4"></td>
+<td>stickOC</td>
+<td>nDaysLowDate</td>
+</tr>
+{% for pattern in hqPatterns.morningStars %}
+<tr>
+    <td>
+        <a href="{{templateMeta.hqConf.hqUrl.q.format(pattern['ticker'], pattern['ticker'])}}" target="_blank">{{pattern['ticker']}}</a></td>
+    <td>
+        <a href="{{templateMeta.hqConf.hqUrl.c.format(pattern['ticker'])}}" target="_blank">C</a></td>
+    <td>
+        <a href="/hqCsv?ticker={{pattern['ticker']}}" target="_blank">Csv</a></td>
+    <td>
+        <a href="/hqDailyMetas?ticker={{pattern['ticker']}}" target="_blank">HDM</a></td>
+    <td align="right">
+        {{round(100*pattern['stickOC'],2)}}%
     <td>
         {{pattern['nDaysHL']['cpLowDate']}}|{{pattern['nDaysHL']['nDays']}}|
         {{pattern['nDaysHL']['cpLowDateRowNo']}}</td>

@@ -15,7 +15,8 @@ def hqScanMain(hqConf, day, tickerList="tickers", startDayIdx=0):
     csvFolder = CsvFolder.format(hqConf['repo'], day)
     # tickers = hqConf[tickerList]
     hqPatterns = hqStartScan(hqConf[tickerList], csvFolder, startDayIdx)
-    print(hqPatterns.bullishEngulfings)
+    print('bullish engulfing', hqPatterns.bullishEngulfings)
+    print('morning star', hqPatterns.morningStars)
 
 def hqStartScan(tickers, csvFolder, startDayIdx=0, nDays=5):
     hqPatterns = HqPatterns()
@@ -32,20 +33,34 @@ def hqStartScan(tickers, csvFolder, startDayIdx=0, nDays=5):
 def matchPatterns(hqPatterns, hqDailyMetas, dayIdx=0, nDaysRange=5):
     currMeta = hqDailyMetas[dayIdx]
     prevMeta = hqDailyMetas[dayIdx + 1]
+    ticker = currMeta['ticker']
+    # bullish engulfing
     bullishEngulfing = ((currMeta['C'] >= currMeta['O'] and prevMeta['C'] < prevMeta['O'])  #curr green; prev red
                     and (currMeta['H'] >= prevMeta['H'] and currMeta['L'] <= prevMeta['L']) #HL engulf
                     and (currMeta['O'] < prevMeta['C'] and currMeta['C'] > prevMeta['O']))  #OC engulf
     if bullishEngulfing:
         stickOC = (currMeta['C'] - currMeta['O']) / prevMeta['C']
-        _nDaysHL = None
         for nDaysHL in reversed(currMeta['nDaysHLs']):
             if (nDaysHL['cpLowDateRowNo'] - currMeta['RowNo']) <= nDaysRange:  #within days
-                _nDaysHL = nDaysHL
+                hqPatterns.addBullishEngulfing(ticker, stickOC, nDaysHL)
+                # bullishEngulfing = True
+                # _nDaysHL = nDaysHL
                 break
-        if _nDaysHL != None:
-            hqPatterns.addBullishEngulfing(currMeta['ticker'], stickOC, _nDaysHL)
-        else:
-            hqPatterns.addBullishEngulfing(currMeta['ticker'], stickOC)
+    # morning star
+    prev2Meta = hqDailyMetas[dayIdx + 2]
+    morningStar = ((currMeta['O'] > prevMeta['C'] and currMeta['C'] > currMeta['O'])
+                    and currMeta['HL'] > prevMeta['HL']
+                    and prevMeta['O'] < prev2Meta['C']
+                    and prev2Meta['HL'] > prevMeta['HL']
+                    and prev2Meta['C'] < prev2Meta['O']
+                    and (prev2Meta['O'] - prev2Meta['C']) > prevMeta['HL']
+                    and (currMeta['C'] > prev2Meta['O'] or (currMeta['H'] - currMeta['C'])/prevMeta['C'] < 0.01))
+    if morningStar:
+        stickOC = (currMeta['C'] - currMeta['O']) / prevMeta['C']
+        for nDaysHL in reversed(prev2Meta['nDaysHLs']):
+            if (nDaysHL['cpLowDateRowNo'] - currMeta['RowNo']) == 2:
+                hqPatterns.addMorningStar(ticker, stickOC, nDaysHL)
+                break
 
 def getHqDailyMetas(ticker, csvFile, nDays=50):
     hqMeta = HqMeta(ticker, csvFile)

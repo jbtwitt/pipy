@@ -88,6 +88,7 @@ def hqScan():
                             title='HQ Scan',
                             templateMeta=templateMeta,
                             hqPatterns = hqStartScan(tickers, csvFolder, startDayIdx=0),
+                            len=len,
                             round=round)
 
 @app.route('/hqCsv')

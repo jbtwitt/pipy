@@ -6,9 +6,16 @@ class HqPatterns:
         # self._date = date
         self._bullishEngulfings = []
         self._bearishEngulfings = []
+        self._morningStar = []
 
     def addBullishEngulfing(self, ticker, stickOC, nDaysHL=None):
         self._bullishEngulfings.append({
+            'ticker': ticker,
+            'stickOC': stickOC,
+            'nDaysHL': nDaysHL})
+
+    def addMorningStar(self, ticker, stickOC, nDaysHL=None):
+        self._morningStar.append({
             'ticker': ticker,
             'stickOC': stickOC,
             'nDaysHL': nDaysHL})
@@ -20,6 +27,10 @@ class HqPatterns:
     @property
     def bullishEngulfings(self):
         return self._bullishEngulfings
+
+    @property
+    def morningStars(self):
+        return self._morningStar
 
 if __name__ == '__main__':
     hqPatterns = HqPatterns(20190102)
