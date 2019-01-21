@@ -14,6 +14,7 @@ class HqMeta:
 
     def collect(self, startDayIdx=0):
         self.startDayIdx = startDayIdx
+        self.row = self.csv.iloc[startDayIdx]
         hqMeta = {'ticker':self.ticker, 'hqCsvFile':self.hqCsvFile}
         hqMeta['date'] = self.lastDate
         hqMeta['close'] = self.lastClose
@@ -121,39 +122,39 @@ class HqMeta:
 
     @property
     def lastClose(self):
-        return self.csv.Close[self.startDayIdx]
+        return self.row.Close
 
     @property
     def O(self):
-        return self.csv.Open[self.startDayIdx]
+        return self.row.Open
 
     @property
     def H(self):
-        return self.csv.High[self.startDayIdx]
+        return self.row.High
 
     @property
     def L(self):
-        return self.csv.Low[self.startDayIdx]
+        return self.row.Low
 
     @property
     def HL(self):
-        return self.csv.HL[self.startDayIdx]
+        return self.row.HL
 
     @property
     def CL(self):
-        row = self.csv.iloc[self.startDayIdx]
-        return (row.Close - row.Low) / row.Low  # row.PrevClose
+        # row = self.csv.iloc[self.startDayIdx]
+        return (self.row.Close - self.row.Low) / self.row.Low  # row.PrevClose
 
     @property
     def LP(self):
-        return self.csv.LP[self.startDayIdx]
+        return self.row.LP
         # row = self.csv.iloc[self.startDayIdx]
         # return (row.Low - row.PrevClose)/row.PrevClose
 
     @property
     def VolChange(self):
-        return self.csv.VolChange[self.startDayIdx]
+        return self.row.VolChange
 
     @property
     def RowNo(self):
-        return self.csv.No[self.startDayIdx]
+        return self.row.No

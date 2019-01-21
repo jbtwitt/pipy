@@ -2,67 +2,37 @@
 
 {% block content %}
 Scan Date: {{templateMeta['day']}}
-<table>
-<tr>
-<td>
-<div>Bullish Engulfing ({{len(hqPatterns.bullishEngulfings)}})</div>
-<table>
-<tr>
-<td colspan="4"></td>
-<td>stickOC</td>
-<td>nDaysLowDate</td>
-</tr>
-{% for pattern in hqPatterns.bullishEngulfings %}
-<tr>
-    <td>
-        <a href="{{templateMeta.hqConf.hqUrl.q.format(pattern['ticker'], pattern['ticker'])}}" target="_blank">{{pattern['ticker']}}</a></td>
-    <td>
-        <a href="{{templateMeta.hqConf.hqUrl.c.format(pattern['ticker'])}}" target="_blank">C</a></td>
-    <td>
-        <a href="/hqCsv?ticker={{pattern['ticker']}}" target="_blank">Csv</a></td>
-    <td>
-        <a href="/hqDailyMetas?ticker={{pattern['ticker']}}" target="_blank">HDM</a></td>
-    <td align="right">
-        {{round(100*pattern['stickOC'],2)}}%
-    </td>
-    <td>
-        {{pattern['nDaysHL']['cpLowDate']}}|{{pattern['nDaysHL']['nDays']}}|
-        {{pattern['nDaysHL']['cpLowDateRowNo']}}</td>
-</tr>
-{% endfor %}
-</table>
 
 <div>Patterns ({{len(hqPatterns.patterns)}})</div>
 <table>
 <tr>
-<td colspan="4"></td>
-<td>Pattern</td>
-<td>stickOC</td>
-<td>nDaysLowDate</td>
+    <td></td>
+    <td></td>
+    <td>Pattern</td>
+    <td>C</td><td>CL</td><td>HL</td>
+    <td>nDays</td>
+    <td>LowDate</td>
+    <td>HighDate</td>
+    <td>cpDiff</td>
 </tr>
 {% for pattern in hqPatterns.patterns %}
 <tr>
     <td>
         <a href="{{templateMeta.hqConf.hqUrl.q.format(pattern['ticker'], pattern['ticker'])}}" target="_blank">{{pattern['ticker']}}</a></td>
     <td>
-        <a href="{{templateMeta.hqConf.hqUrl.c.format(pattern['ticker'])}}" target="_blank">C</a></td>
-    <td>
-        <a href="/hqCsv?ticker={{pattern['ticker']}}" target="_blank">Csv</a></td>
-    <td>
+        <a href="{{templateMeta.hqConf.hqUrl.c.format(pattern['ticker'])}}" target="_blank">C</a>
         <a href="/hqDailyMetas?ticker={{pattern['ticker']}}" target="_blank">HDM</a></td>
-    <td>
-        {{pattern['pattern']}}
-    </td>
-    <td align="right">
-        {{round(100*pattern['stickOC'],2)}}%
-    <td>
-        {{pattern['nDaysHL']['cpLowDate']}}|{{pattern['nDaysHL']['nDays']}}|
+    <td>{{pattern['pattern']}}</td>
+    <td align="right">{{pattern['hqMeta']['C']}}</td>
+    <td align="right">{{round(100*pattern['hqMeta']['CL'],2)}}%</td>
+    <td align="right">{{round(100*pattern['hqMeta']['HL'],2)}}%</td>
+    <td>{{pattern['nDaysHL']['nDays']}}|
         {{pattern['nDaysHL']['cpLowDateRowNo']}}</td>
+    <td>{{pattern['nDaysHL']['cpLowDate']}}</td>
+    <td>{{pattern['nDaysHL']['cpHighDate']}}</td>
+    <td>{{round(100*pattern['nDaysHL']['cpDiff'],2)}}%</td>
 </tr>
 {% endfor %}
-</table>
-</td>
-</tr>
 </table>
 
 {% endblock %}

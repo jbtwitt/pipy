@@ -6,8 +6,11 @@ class Pattern(Enum):
     NDaysCloseLow = -1           #possible trend reversed
     NDaysCloseHigh = 1           #possible trend reversed
     # NDaysVolumeHigh = 2
-    BullishEngulfing = 11    #bull
-    MorningStar = 12         #bull
+    # bull
+    BullishEngulfing = 11
+    MorningStar = 12
+    ThreeLineStrike = 13
+    # bear
     Hammer = 13
     BearishEngulfing = -11
 
@@ -17,27 +20,16 @@ class HqPatterns:
         self._patterns = []
         self._bullishEngulfings = []
 
-    def addPattern(self, ticker, date, pattern, stickOC, nDaysHL=None):
-        self._patterns.append({
-            'ticker': ticker,
-            'date': date,
+    def addPattern(self, ticker, hqMeta, pattern, nDaysHL=None):
+        obj = {'ticker': ticker,
+            'hqMeta': hqMeta,
             'pattern': pattern.name,
-            'stickOC': stickOC,
-            'nDaysHL': nDaysHL})
-
-    def addBullishEngulfing(self, ticker, stickOC, nDaysHL=None):
-        self._bullishEngulfings.append({
-            'ticker': ticker,
-            'stickOC': stickOC,
-            'nDaysHL': nDaysHL})
+            'nDaysHL': nDaysHL}
+        self._patterns.append(obj)
 
     @property
     def patterns(self):
         return self._patterns
-
-    @property
-    def bullishEngulfings(self):
-        return self._bullishEngulfings
 
 if __name__ == '__main__':
     hqPatterns = HqPatterns()

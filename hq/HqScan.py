@@ -36,7 +36,7 @@ def hqTickerScanMain(hqConf, day, ticker, startDayIdx=0):
     hqPatterns = hqTickerScan(ticker, csvFolder, startDayIdx, 60)
     # print(hqPatterns.patterns)
     for pattern in hqPatterns.patterns:
-        print(pattern['date'], pattern['pattern'], pattern['nDaysHL']['nDays'])
+        print(ticker, pattern['hqMeta']['date'], pattern['pattern'], pattern['nDaysHL']['nDays'], pattern['nDaysHL'])
 
 def hqTickerScan(ticker, csvFolder, startDayIdx=0, nDays=20):
     hqPatterns = HqPatterns()
@@ -50,13 +50,15 @@ def hqTickerScan(ticker, csvFolder, startDayIdx=0, nDays=20):
 def matchPatterns(hqPatterns, hqDailyMetas, dayIdx=0, nDaysRange=5):
     currMeta = hqDailyMetas[dayIdx]
     prevMeta = hqDailyMetas[dayIdx + 1]
+    prev2Meta = hqDailyMetas[dayIdx + 2]
+    prev3Meta = hqDailyMetas[dayIdx + 3]
     ticker = currMeta['ticker']
     # nDaysVolumeHigh
     # for i in range[30]:
     #     meta = hqDailyMetas[i]
     #     for nDaysHL in reversedmeta['nDaysHLs']:
     #         if (nDaysHL['vHighDateRowNo'] - currMeta['RowNo'])
-    stickOC = (currMeta['C'] - currMeta['O']) / prevMeta['C']
+    # stickOC = (currMeta['C'] - currMeta['O']) / prevMeta['C']
     """
     # nDaysCloseLow:
     for nDaysHL in reversed(currMeta['nDaysHLs']):
@@ -76,11 +78,9 @@ def matchPatterns(hqPatterns, hqDailyMetas, dayIdx=0, nDaysRange=5):
     if bullishEngulfing:
         for nDaysHL in reversed(currMeta['nDaysHLs']):
             if (nDaysHL['cpLowDateRowNo'] - currMeta['RowNo']) <= nDaysRange:  #within days
-                # hqPatterns.addBullishEngulfing(ticker, stickOC, nDaysHL)
-                hqPatterns.addPattern(ticker, currMeta['date'], Pattern.BullishEngulfing, stickOC, nDaysHL)
+                hqPatterns.addPattern(ticker, currMeta, Pattern.BullishEngulfing, nDaysHL)
                 break
     # morning star
-    prev2Meta = hqDailyMetas[dayIdx + 2]
     morningStar = ((currMeta['O'] > prevMeta['C'] and currMeta['C'] > currMeta['O'])
                     and currMeta['HL'] > prevMeta['HL']
                     and prevMeta['O'] < prev2Meta['C']
@@ -89,10 +89,9 @@ def matchPatterns(hqPatterns, hqDailyMetas, dayIdx=0, nDaysRange=5):
                     and (prev2Meta['O'] - prev2Meta['C']) > prevMeta['HL']
                     and (currMeta['C'] > prev2Meta['O'] or (currMeta['H'] - currMeta['C'])/prevMeta['C'] < 0.01))
     if morningStar:
-        stickOC = (currMeta['C'] - currMeta['O']) / prevMeta['C']
         for nDaysHL in reversed(prev2Meta['nDaysHLs']):
             if (nDaysHL['cpLowDateRowNo'] - currMeta['RowNo']) == 2:
-                hqPatterns.addPattern(ticker, currMeta['date'], Pattern.MorningStar, stickOC, nDaysHL)
+                hqPatterns.addPattern(ticker, currMeta, Pattern.MorningStar, nDaysHL)
                 break
     # bearish engulfing
     bearishEngulfing = ((currMeta['C'] < currMeta['O'] and prevMeta['C'] > prevMeta['O'])  #curr red; prev green
@@ -101,7 +100,7 @@ def matchPatterns(hqPatterns, hqDailyMetas, dayIdx=0, nDaysRange=5):
     if bearishEngulfing:
         for nDaysHL in reversed(currMeta['nDaysHLs']):
             if (nDaysHL['cpHighDateRowNo'] - currMeta['RowNo']) <= nDaysRange:  #within days
-                hqPatterns.addPattern(ticker, currMeta['date'], Pattern.BearishEngulfing, stickOC, nDaysHL)
+                hqPatterns.addPattern(ticker, currMeta, Pattern.BearishEngulfing, nDaysHL)
                 break
 
 def getHqDailyMetas(ticker, csvFile, nDays=50):
@@ -146,4 +145,6 @@ if __name__ == '__main__':
     print(day, 'hq date folder')
     # hqScanMain(hqConf, day, 'tickers', startDayIdx=0)
     # hqScanMain(hqConf, day, 'etf')
-    hqTickerScanMain(hqConf, day, 'GEVO', 12)
+    for t in ['LABU', 'WATT', 'GEVO', 'FIT']:
+        hqTickerScanMain(hqConf, day, t, 12)
+        break
