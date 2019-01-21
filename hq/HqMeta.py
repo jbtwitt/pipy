@@ -50,12 +50,14 @@ class HqMeta:
         # Close HL
         df = nDaysCsv.Close.sort_values(ascending=False)
         ret["cpHighDate"] = df.index[0]
+        ret['cpHighDateRowNo'] = nDaysCsv.loc[df.index[0]].No
         ret["cpLowDate"] = df.index[len(df.index)-1]
         ret['cpLowDateRowNo'] = nDaysCsv.loc[ret['cpLowDate']].No
         ret["cpDiff"] = (nDaysCsv.loc[ret['cpHighDate']].Close - nDaysCsv.loc[ret['cpLowDate']].Close)/nDaysCsv.loc[ret['cpLowDate']].Close
         # Volume HL
         df = nDaysCsv.Volume.sort_values(ascending=False)
         ret["vHighDate"] = df.index[0]
+        ret['vHighDateRowNo'] = nDaysCsv.loc[ret['vHighDate']].No
         ret["vLowDate"] = df.index[len(df.index)-1]
         # HL HL
         df = nDaysCsv.HL.sort_values(ascending=False)
