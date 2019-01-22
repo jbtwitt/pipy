@@ -96,7 +96,7 @@ def hqPrice():
     return render_template('hqPrice.html',
                            title='{} Price'.format(ticker),
                            templateMeta=templateMeta,
-                           hqMetas=getHqDailyMetas(templateMeta['hqConf'], templateMeta['day'], ticker, 2),
+                           hqMetas=getHqDailyMetas(templateMeta['hqConf'], templateMeta['day'], ticker, 10),
                            maxPercent=15,
                            reversed=reversed,
                            round=round)

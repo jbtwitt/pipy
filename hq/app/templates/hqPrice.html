@@ -15,7 +15,7 @@
     <th>Change</th>
     <th>HL</th>
     {% for p in range(maxPercent+1) %}
-        <th>{{ p }} %</th>
+        <th>{{ p }}%</th>
     {% endfor %}
 </tr>
 
@@ -45,7 +45,8 @@
     {% endfor %}
 </tr>
 
-<!--
+<tr><td><br></td></tr>
+
 {% for hqMeta in hqMetas %}
 
     <tr>
@@ -60,22 +61,10 @@
             {% endif %}
             >{{round(100*hqMeta.change,2)}}%</td>
         <td align="right">{{round(100*hqMeta.HL,2)}}%</td>
-        {% for percent in range(maxPercent+1) %}
-        <td>
-            <span class="green">{{round(hqMeta.close*(100+percent)/100, 2)}}</span></td>
-        {% endfor %}
-    </tr>
-
-    <tr>
-        <th colspan="4"></th>
-        {% for percent in reversed(range(-maxPercent,1)) %}
-        <td>
-            <span class="red">{{round(hqMeta.close*(100+percent)/100, 2)}}</span></td>
-        {% endfor %}
     </tr>
 
 {% endfor %}
--->
+
 </table>
 
 {% endblock %}
