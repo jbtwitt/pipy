@@ -13,6 +13,7 @@ class Pattern(Enum):
     # bear
     Hammer = 13
     BearishEngulfing = -11
+    EveningStar = -12
 
 class HqPatterns:
     def __init__(self):

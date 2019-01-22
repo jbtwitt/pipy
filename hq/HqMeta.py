@@ -19,6 +19,7 @@ class HqMeta:
         hqMeta['date'] = self.lastDate
         hqMeta['close'] = self.lastClose
         hqMeta['change'] = self.nDaysChange(1)
+        hqMeta['prevClose'] = self.row.PrevClose
         hqMeta['HL'] = self.HL
         hqMeta['CL'] = self.CL
         hqMeta['LP'] = self.LP
@@ -143,13 +144,11 @@ class HqMeta:
     @property
     def CL(self):
         # row = self.csv.iloc[self.startDayIdx]
-        return (self.row.Close - self.row.Low) / self.row.Low  # row.PrevClose
+        return (self.row.Close - self.row.Low) / self.row.PrevClose
 
     @property
     def LP(self):
         return self.row.LP
-        # row = self.csv.iloc[self.startDayIdx]
-        # return (row.Low - row.PrevClose)/row.PrevClose
 
     @property
     def VolChange(self):

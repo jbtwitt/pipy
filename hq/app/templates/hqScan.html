@@ -1,15 +1,14 @@
 {% extends "base.html" %}
 
 {% block content %}
-Scan Date: {{templateMeta['day']}}
 
-<div>Patterns ({{len(hqPatterns.patterns)}})</div>
+<div>Date: {{templateMeta['day']}} ({{len(hqPatterns.patterns)}})</div>
 <table>
 <tr>
     <td></td>
     <td></td>
     <td>Pattern</td>
-    <td>C</td><td>CL</td><td>HL</td>
+    <td>C</td><td>Change</td><td>CL</td><td>HL</td>
     <td>nDays</td>
     <td>LowDate</td>
     <td>HighDate</td>
@@ -24,6 +23,7 @@ Scan Date: {{templateMeta['day']}}
         <a href="/hqDailyMetas?ticker={{pattern['ticker']}}" target="_blank">HDM</a></td>
     <td>{{pattern['pattern']}}</td>
     <td align="right">{{pattern['hqMeta']['C']}}</td>
+    <td align="right">{{round(100*pattern['hqMeta']['change'],2)}}%</td>
     <td align="right">{{round(100*pattern['hqMeta']['CL'],2)}}%</td>
     <td align="right">{{round(100*pattern['hqMeta']['HL'],2)}}%</td>
     <td>{{pattern['nDaysHL']['nDays']}}|
