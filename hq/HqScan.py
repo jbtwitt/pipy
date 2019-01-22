@@ -63,12 +63,12 @@ def matchPatterns(hqPatterns, hqDailyMetas, dayIdx=0, nDaysRange=5):
     # nDaysCloseLow:
     for nDaysHL in reversed(currMeta['nDaysHLs']):
         if (nDaysHL['cpLowDateRowNo'] - currMeta['RowNo']) == 1:
-            hqPatterns.addPattern(ticker, currMeta['date'], Pattern.NDaysCloseLow, stickOC, nDaysHL)
+            hqPatterns.addPattern(ticker, currMeta, Pattern.NDaysCloseLow, nDaysHL)
             break
     # nDaysCloseHigh:
     for nDaysHL in reversed(currMeta['nDaysHLs']):
         if (nDaysHL['cpHighDateRowNo'] - currMeta['RowNo']) == 1:
-            hqPatterns.addPattern(ticker, currMeta['date'], Pattern.NDaysCloseHigh, stickOC, nDaysHL)
+            hqPatterns.addPattern(ticker, currMeta, Pattern.NDaysCloseHigh, nDaysHL)
             break
     """
     # bullish engulfing

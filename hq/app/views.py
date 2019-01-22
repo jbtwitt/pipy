@@ -90,6 +90,16 @@ def hqScan():
                             hqPatterns = hqStartScan(tickers, csvFolder, startDayIdx=0),
                             len=len,
                             round=round)
+@app.route('/hqPrice')
+def hqPrice():
+    ticker = request.args.get('ticker')
+    return render_template('hqPrice.html',
+                           title='{} Price'.format(ticker),
+                           templateMeta=templateMeta,
+                           hqMetas=getHqDailyMetas(templateMeta['hqConf'], templateMeta['day'], ticker, 2),
+                           maxPercent=15,
+                           reversed=reversed,
+                           round=round)
 
 @app.route('/hqCsv')
 def hqCsv():

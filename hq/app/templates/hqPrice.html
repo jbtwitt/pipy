@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+| <a href="{{templateMeta.hqConf.hqUrl.q.format(hqMetas[0].ticker, hqMetas[0].ticker)}}" target="_blank">{{hqMetas[0].ticker}}</a>
+| <a href="{{templateMeta.hqConf.hqUrl.h.format(hqMetas[0].ticker, hqMetas[0].ticker)}}" target="_blank">H</a>
+| <a href="{{templateMeta.hqConf.hqUrl.c.format(hqMetas[0].ticker)}}" target="_blank">C</a>
+| <a href="/hqCsv?ticker={{hqMetas[0].ticker}}" target="_blank">Csv</a>
+| <a href="/hqDailyMetas?ticker={{hqMetas[0].ticker}}" target="_blank">HDM</a>
+
+<table>
+<tr>
+    <th>Date</th>
+    <th>Close</th>
+    <th>Change</th>
+    <th>HL</th>
+    {% for p in range(maxPercent+1) %}
+        <th>{{ p }} %</th>
+    {% endfor %}
+</tr>
+
+<tr>
+    <td>{{hqMetas[1].date[5:]}}</td>
+    <td align="right">{{round(hqMetas[1].close,2)}}</td>
+    <td align="right"
+        {% if hqMetas[1].change > 0 %}
+            class="green"
+        {% endif %}
+        {% if hqMetas[1].change < 0 %}
+            class="red"
+        {% endif %}
+        >{{round(100*hqMetas[1].change,2)}}%</td>
+    <td align="right">{{round(100*hqMetas[1].HL,2)}}%</td>
+    {% for percent in range(maxPercent+1) %}
+    <td>
+        <span class="green">{{round(hqMetas[1].close*(100+percent)/100, 2)}}</span></td>
+    {% endfor %}
+</tr>
+
+<tr>
+    <th colspan="4"></th>
+    {% for percent in reversed(range(-maxPercent,1)) %}
+    <td>
+        <span class="red">{{round(hqMetas[1].close*(100+percent)/100, 2)}}</span></td>
+    {% endfor %}
+</tr>
+
+<!--
+{% for hqMeta in hqMetas %}
+
+    <tr>
+        <td>{{hqMeta.date[5:]}}</td>
+        <td align="right">{{round(hqMeta.close,2)}}</td>
+        <td align="right"
+            {% if hqMeta.change > 0 %}
+                class="green"
+            {% endif %}
+            {% if hqMeta.change < 0 %}
+                class="red"
+            {% endif %}
+            >{{round(100*hqMeta.change,2)}}%</td>
+        <td align="right">{{round(100*hqMeta.HL,2)}}%</td>
+        {% for percent in range(maxPercent+1) %}
+        <td>
+            <span class="green">{{round(hqMeta.close*(100+percent)/100, 2)}}</span></td>
+        {% endfor %}
+    </tr>
+
+    <tr>
+        <th colspan="4"></th>
+        {% for percent in reversed(range(-maxPercent,1)) %}
+        <td>
+            <span class="red">{{round(hqMeta.close*(100+percent)/100, 2)}}</span></td>
+        {% endfor %}
+    </tr>
+
+{% endfor %}
+-->
+</table>
+
+{% endblock %}
