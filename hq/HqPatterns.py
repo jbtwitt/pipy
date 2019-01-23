@@ -6,6 +6,8 @@ class Pattern(Enum):
     NDaysCloseLow = -1           #possible bear trend reversed
     NDaysCloseHigh = 1           #possible bull trend reversed
     # NDaysVolumeHigh = 2
+    BullishNews = 2     # open > 10%
+    BearishNews = -2    # open < 10%
     # bull
     BullishEngulfing = 11
     MorningStar = 12

@@ -36,7 +36,7 @@ def hqTickerScanMain(hqConf, day, ticker, startDayIdx=0):
     hqPatterns = hqTickerScan(ticker, csvFolder, startDayIdx, 50)
     # print(hqPatterns.patterns)
     for pattern in hqPatterns.patterns:
-        print(ticker, pattern['hqMeta']['date'], pattern['pattern'][0], pattern['nDaysHL']['nDays'], pattern['nDaysHL'])
+        print(ticker, pattern['hqMeta']['date'], pattern['pattern'][0])
         # print(pattern['hqMeta']['nDaysStraight'])
 
 def hqTickerScan(ticker, csvFolder, startDayIdx=0, nDays=10):
@@ -75,6 +75,17 @@ def matchPatterns(hqPatterns, hqDailyMetas, dayIdx=0, nDaysRange=5):
             hqPatterns.addPattern(ticker, currMeta, Pattern.NDaysCloseHigh, nDaysHL)
             break
     """
+    # bullish news
+    for i in range(dayIdx, dayIdx+3):
+        meta = hqDailyMetas[i]
+        op = (meta['O'] - meta['prevClose'])/meta['prevClose']
+        if (op > 0.1):
+            hqPatterns.addPattern(ticker, meta, Pattern.BullishNews, meta['nDaysHLs'][0])
+            break
+    # bearish news
+        if (op < -0.1):
+            hqPatterns.addPattern(ticker, meta, Pattern.BearishNews, meta['nDaysHLs'][0])
+            break
     # bullish engulfing
     match = ((currMeta['C'] > currMeta['O'] and prevMeta['C'] < prevMeta['O'])  #curr green; prev red
                     and (currMeta['H'] >= prevMeta['H'] and currMeta['L'] <= prevMeta['L']) #HL engulf
@@ -169,6 +180,6 @@ if __name__ == '__main__':
     print(day, 'hq date folder')
     tickers = hqConf['etf']
     # hqScanMain(hqConf, day, tickers, startDayIdx=0)
-    for t in ['GEVO']:
-        hqTickerScanMain(hqConf, day, t, 12)
-        break
+    for t in ['BLNK', 'STML', 'WATT']:
+        hqTickerScanMain(hqConf, day, t, 0)
+        # break

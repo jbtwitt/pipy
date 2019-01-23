@@ -13,7 +13,7 @@ from hqrobot import CsvFolder, CsvFileName, hqrobotMain
 from HqMetaFile import JsonFile
 from HqMeta import HqMeta
 from HqCsv import HqCsv
-from HqScan import hqStartScan
+from HqScan import hqStartScan, hqTickerScan
 
 HQ_CONF = 'hqrobot.json'
 hqConf = json.load(open(HQ_CONF))
@@ -90,6 +90,20 @@ def hqScan():
                             hqPatterns = hqStartScan(tickers, csvFolder, startDayIdx=0),
                             len=len,
                             round=round)
+
+@app.route('/hqPatternHistory')
+def hqPatternHistory():
+    _hqConf = templateMeta['hqConf']
+    csvFolder = CsvFolder.format(_hqConf['repo'], templateMeta['day'])
+    ticker = request.args.get('ticker')
+    return render_template('hqPatternHistory.html',
+                            title='{} Pattern History'.format(ticker),
+                            templateMeta=templateMeta,
+                            ticker=ticker,
+                            hqPatterns = hqTickerScan(ticker, csvFolder, 0, 50),
+                            len=len,
+                            round=round)
+
 @app.route('/hqPrice')
 def hqPrice():
     ticker = request.args.get('ticker')

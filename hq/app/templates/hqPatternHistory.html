@@ -1,11 +1,15 @@
 {% extends "base.html" %}
 
 {% block content %}
+Date: {{templateMeta['day']}}
+<br>
+<a href="{{templateMeta.hqConf.hqUrl.q.format(ticker, ticker)}}" target="_blank">{{ticker}}</a>
+| <a href="{{templateMeta.hqConf.hqUrl.c.format(ticker)}}" target="_blank">C</a>
+| <a href="/hqDailyMetas?ticker={{ticker}}" target="_blank">HDM</a>
+| <a href="/hqPrice?ticker={{ticker}}" target="_blank">P</a>
 
-<div>Date: {{templateMeta['day']}}</div>
 <table>
 <tr>
-    <td></td>
     <td></td>
     <td>Pattern ({{len(hqPatterns.patterns)}})</td>
     <td>C</td><td>Change</td><td>CL</td><td>HL</td>
@@ -16,13 +20,7 @@
 </tr>
 {% for pattern in hqPatterns.patterns %}
 <tr>
-    <td>
-        <a href="{{templateMeta.hqConf.hqUrl.q.format(pattern['ticker'], pattern['ticker'])}}" target="_blank">{{pattern['ticker']}}</a></td>
-    <td>
-        <a href="{{templateMeta.hqConf.hqUrl.c.format(pattern['ticker'])}}" target="_blank">C</a>
-        <a href="/hqDailyMetas?ticker={{pattern['ticker']}}" target="_blank">HDM</a>
-        <a href="/hqPrice?ticker={{pattern['ticker']}}" target="_blank">P</a>
-        <a href="/hqPatternHistory?ticker={{pattern['ticker']}}" target="_blank">PaH</a></td>
+    <td>{{pattern['hqMeta']['date']}}</td>
     <td
         {% if pattern['pattern'][1] < 0 %}
             class="red2"
