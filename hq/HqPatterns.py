@@ -3,15 +3,15 @@ HqAlertType0 = 'bullish engulfing'
 HqAlertType1 = 'nDaysLow within 10 days and bullish engulfing'
 
 class Pattern(Enum):
-    NDaysCloseLow = -1           #possible trend reversed
-    NDaysCloseHigh = 1           #possible trend reversed
+    NDaysCloseLow = -1           #possible bear trend reversed
+    NDaysCloseHigh = 1           #possible bull trend reversed
     # NDaysVolumeHigh = 2
     # bull
     BullishEngulfing = 11
     MorningStar = 12
     ThreeLineStrike = 13
     # bear
-    Hammer = 13
+    Hammer = -13
     BearishEngulfing = -11
     EveningStar = -12
 
@@ -24,7 +24,7 @@ class HqPatterns:
     def addPattern(self, ticker, hqMeta, pattern, nDaysHL=None):
         obj = {'ticker': ticker,
             'hqMeta': hqMeta,
-            'pattern': pattern.name,
+            'pattern': [pattern.name, pattern.value],
             'nDaysHL': nDaysHL}
         self._patterns.append(obj)
 

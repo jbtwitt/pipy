@@ -7,17 +7,17 @@ from HqYhoo import HqYhoo
 from HqYhoo import DateFormat
 from HqMeta import HqMeta
 from HqPatterns import HqPatterns, Pattern
+from hqrobot import hqMetaFileCreate
 
 CsvFolder = "{}/hq{}"
 CsvFileName = "{}/{}.y.csv"
 
-def hqScanMain(hqConf, day, tickerList="tickers", startDayIdx=0):
+def hqScanMain(hqConf, day, tickers, startDayIdx=0):
     csvFolder = CsvFolder.format(hqConf['repo'], day)
     # tickers = hqConf[tickerList]
-    hqPatterns = hqStartScan(hqConf[tickerList], csvFolder, startDayIdx)
-    print('bullish engulfing', hqPatterns.bullishEngulfings)
-    print('morning star', hqPatterns.morningStars)
-    print(hqPatterns.patterns)
+    hqPatterns = hqStartScan(tickers, csvFolder, startDayIdx)
+    for pattern in hqPatterns.patterns:
+        print(pattern['ticker'], pattern['pattern'])
 
 def hqStartScan(tickers, csvFolder, startDayIdx=0, nDays=5):
     hqPatterns = HqPatterns()
@@ -36,7 +36,8 @@ def hqTickerScanMain(hqConf, day, ticker, startDayIdx=0):
     hqPatterns = hqTickerScan(ticker, csvFolder, startDayIdx, 50)
     # print(hqPatterns.patterns)
     for pattern in hqPatterns.patterns:
-        print(ticker, pattern['hqMeta']['date'], pattern['pattern'], pattern['nDaysHL']['nDays'], pattern['nDaysHL'])
+        print(ticker, pattern['hqMeta']['date'], pattern['pattern'][0], pattern['nDaysHL']['nDays'], pattern['nDaysHL'])
+        # print(pattern['hqMeta']['nDaysStraight'])
 
 def hqTickerScan(ticker, csvFolder, startDayIdx=0, nDays=10):
     hqPatterns = HqPatterns()
@@ -58,14 +59,17 @@ def matchPatterns(hqPatterns, hqDailyMetas, dayIdx=0, nDaysRange=5):
     #     meta = hqDailyMetas[i]
     #     for nDaysHL in reversedmeta['nDaysHLs']:
     #         if (nDaysHL['vHighDateRowNo'] - currMeta['RowNo'])
-    # stickOC = (currMeta['C'] - currMeta['O']) / prevMeta['C']
+
     """
-    # nDaysCloseLow:
-    for nDaysHL in reversed(currMeta['nDaysHLs']):
-        if (nDaysHL['cpLowDateRowNo'] - currMeta['RowNo']) == 1:
-            hqPatterns.addPattern(ticker, currMeta, Pattern.NDaysCloseLow, nDaysHL)
-            break
-    # nDaysCloseHigh:
+    # possible reversed bear:
+    match = ((currMeta['L'] <= prevMeta['L'] and currMeta['C'] > prevMeta['C'])
+            and prevMeta['nDaysStraight']['downDays'] >= 3)
+    if match:
+        for nDaysHL in reversed(prevMeta['nDaysHLs']):
+            if (nDaysHL['cpLowDateRowNo'] == prevMeta['RowNo']):
+                hqPatterns.addPattern(ticker, currMeta, Pattern.NDaysCloseLow, nDaysHL)
+                break
+    # possible reversed bull:
     for nDaysHL in reversed(currMeta['nDaysHLs']):
         if (nDaysHL['cpHighDateRowNo'] - currMeta['RowNo']) == 1:
             hqPatterns.addPattern(ticker, currMeta, Pattern.NDaysCloseHigh, nDaysHL)
@@ -82,7 +86,7 @@ def matchPatterns(hqPatterns, hqDailyMetas, dayIdx=0, nDaysRange=5):
                 break
     # morning star
     match = ((currMeta['O'] > prevMeta['C'] and currMeta['C'] > currMeta['O'])
-                    and currMeta['HL'] > prevMeta['HL']
+                    and (currMeta['HL'] > prevMeta['HL'] or currMeta['change'] > prevMeta['HL'])
                     and prevMeta['O'] < prev2Meta['C']
                     and prev2Meta['HL'] > prevMeta['HL']
                     and prev2Meta['C'] < prev2Meta['O']
@@ -112,7 +116,7 @@ def matchPatterns(hqPatterns, hqDailyMetas, dayIdx=0, nDaysRange=5):
                 break
     # Evening Star
     match = ((currMeta['O'] < prevMeta['C'] and currMeta['C'] < currMeta['O'])
-            and currMeta['HL'] > prevMeta['HL']
+            and (currMeta['HL'] > prevMeta['HL'] or -currMeta['change'] > prevMeta['HL'])
             and prevMeta['O'] > prev2Meta['C']
             and prev2Meta['HL'] > prevMeta['HL']
             and prev2Meta['C'] > prev2Meta['O']
@@ -152,6 +156,7 @@ def hqDownload(hqConf, day):
             print("{} failed".format(ticker))
             break
         sleep(hqConf["sleep"])
+    hqMetaFileCreate(hqConf, day)
 
 if __name__ == '__main__':
     day = (datetime.now() + timedelta(days=-0)).strftime("%Y%m%d")
@@ -162,8 +167,8 @@ if __name__ == '__main__':
         print('downloading ...', repo)
         hqDownload(hqConf, day)
     print(day, 'hq date folder')
-    # hqScanMain(hqConf, day, 'tickers', startDayIdx=0)
-    # hqScanMain(hqConf, day, 'etf')
-    for t in ['LABU', 'WATT', 'GEVO']:
+    tickers = hqConf['etf']
+    # hqScanMain(hqConf, day, tickers, startDayIdx=0)
+    for t in ['GEVO']:
         hqTickerScanMain(hqConf, day, t, 12)
         break

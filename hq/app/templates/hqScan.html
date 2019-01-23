@@ -20,9 +20,16 @@
         <a href="{{templateMeta.hqConf.hqUrl.q.format(pattern['ticker'], pattern['ticker'])}}" target="_blank">{{pattern['ticker']}}</a></td>
     <td>
         <a href="{{templateMeta.hqConf.hqUrl.c.format(pattern['ticker'])}}" target="_blank">C</a>
-        <a href="/hqDailyMetas?ticker={{pattern['ticker']}}" target="_blank">HDM</a></td>
-    <td>{{pattern['pattern']}}</td>
-    <td align="right">{{pattern['hqMeta']['C']}}</td>
+        <a href="/hqDailyMetas?ticker={{pattern['ticker']}}" target="_blank">HDM</a>
+        <a href="/hqPrice?ticker={{pattern['ticker']}}" target="_blank">P</a></td>
+    <td
+        {% if pattern['pattern'][1] < 0 %}
+            class="red2"
+        {% else %}
+            class="green2"
+        {% endif %}
+    >{{pattern['pattern'][0]}}</td>
+    <td align="right">{{round(pattern['hqMeta']['C'],2)}}</td>
     <td align="right">{{round(100*pattern['hqMeta']['change'],2)}}%</td>
     <td align="right">{{round(100*pattern['hqMeta']['CL'],2)}}%</td>
     <td align="right">{{round(100*pattern['hqMeta']['HL'],2)}}%</td>
@@ -30,7 +37,7 @@
         {{pattern['nDaysHL']['cpLowDateRowNo']}}</td>
     <td>{{pattern['nDaysHL']['cpLowDate']}}</td>
     <td>{{pattern['nDaysHL']['cpHighDate']}}</td>
-    <td>{{round(100*pattern['nDaysHL']['cpDiff'],2)}}%</td>
+    <td align="right">{{round(100*pattern['nDaysHL']['cpDiff'],2)}}%</td>
 </tr>
 {% endfor %}
 </table>
