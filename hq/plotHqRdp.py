@@ -1,53 +1,57 @@
+import os
 import numpy as np
+import json
 import matplotlib.pyplot as plt
+from HqYhoo import HqYhoo, DateFormat
+from datetime import datetime, timedelta
 from rdp import rdp
-from HqGoog import HqGoog
-from HqYhoo import HqYhoo
-from HqYhoo import DateFormat
-from datetime import datetime
-from datetime import timedelta
 
+#
 # rdp: Ramer-Douglas-Peucker Algorithm
+#
+CONF_FILE = 'hqrobot.json'
+csvFileName = "{0}/{1}.y.csv"
 
-today = (datetime.now() + timedelta(days=1)).strftime(DateFormat)
-csvFileName = "/gitrepo/robotRepo/hq20190926/{0}.y.csv"
+def getDayFolder():
+    hqConf = json.load(open(CONF_FILE))
+    csvRepo = hqConf['repo'] + '/'
+    files = [f for f in os.listdir(csvRepo) if os.path.isdir(csvRepo + f)]
+    print(files[-1])    # last one of the array is the most recent folder
+    return csvRepo + files[-1]
+ 
 def csvInput(ticker):
-    csvFile = open(csvFileName.format(ticker), "r")
+    csvFile = open(csvFileName.format(getDayFolder(), ticker), "r")
     txt = csvFile.read()
     csvFile.close()
     return txt
 
-def download(hqDays):
+today = (datetime.now() + timedelta(days=1)).strftime(DateFormat)
+def download(ticker, hqDays):
     hqStartDate = (datetime.now() + timedelta(days=-hqDays)).strftime(DateFormat)
     print(ticker, ": date range", hqStartDate, today)
     hqRobot = HqYhoo()
     csv = hqRobot.hqGet(ticker, hqStartDate, today)
-    return csv
+    return csv.decode("utf-8")
 
-def plot(ticker, hqDays=70):
-    # hqGoog = HqGoog(ticker, hqDays)
-    # closeHist = hqGoog.hqClose()
-    # dayIdxs = range(len(closeHist))
-
+def csv2Array(csv):
     hq = []
-    csv = csvInput(ticker)
-    # print(csv)
-    # lines = csv.decode("utf-8").replace(",-", ",0").split("\n")  # replace missing number
     lines = csv.replace(",-", ",0").split("\n")  # replace missing number
     for idx, line in enumerate(lines[1:]):  # skip header row
         if len(line) == 0:
             break
         cols = line.split(',')
         hq.append(cols[1:]) # skip date column
-        # if idx > hqDays:
-        #     break
+    return hq
+
+def plot(ticker, hqDays=70):
+    csv = csvInput(ticker)
+    hq = csv2Array(csv)
     offset = len(hq) - hqDays
     hq = np.array(hq[offset:])
     # print(hq)
     closeHist = hq[:, 3].astype(np.float)   # close history
     # print(closeHist)
     dayIdxs = range(len(closeHist))
-    # return
 
     '''
     hq chart
@@ -66,18 +70,18 @@ def plot(ticker, hqDays=70):
 
     epsilon = delta / 8
     rdpPoints = np.array(rdp(to2dim.tolist(), epsilon))
+    print(rdpPoints)
     ax.plot(rdpPoints[:, 0], rdpPoints[:, 1], 'ko', markersize=5, label="(epsilon:%.2f~%.2f%%)" % (epsilon, epsilon*100/closeHist[0]))
 
-    epsilon = delta / 5
-    rdpPoints = np.array(rdp(to2dim.tolist(), epsilon))
-    print(rdpPoints)
-    ax.plot(rdpPoints[:, 0], rdpPoints[:, 1], 'ro', markersize=2, label="(epsilon:%.2f~%.2f%%)" % (epsilon, epsilon*100/closeHist[0]))
+    # epsilon = delta / 5
+    # rdpPoints = np.array(rdp(to2dim.tolist(), epsilon))
+    # print(rdpPoints)
+    # ax.plot(rdpPoints[:, 0], rdpPoints[:, 1], 'ro', markersize=2, label="(epsilon:%.2f~%.2f%%)" % (epsilon, epsilon*100/closeHist[0]))
 
     fig.suptitle("%s %s %.2f" % (today, ticker, closeHist[0]))
     plt.legend(loc='best')
     plt.show()
 
-# tickers = ['WATT', 'ATHX', 'SVA', 'ERX', 'AMZN', 'LABU']
 import argparse
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -87,4 +91,4 @@ if __name__ == "__main__":
     # print(vars(args)[''])
     print(args.tickers)
     for ticker in args.tickers:
-        plot(ticker, hqDays=90)
+        plot(ticker, hqDays=92)
