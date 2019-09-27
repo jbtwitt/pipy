@@ -4,10 +4,10 @@ from datetime import datetime
 import calendar
 
 # InitLink = 'https://finance.yahoo.com/quote/AMZN/history?p=AMZN'
-InitLink = 'https://finance.yahoo.com/quote/AMZN?p=AMZN'
+InitLink = 'https://finance.yahoo.com/quote/AMZN?p=AMZN&.tsrc=fin-srch'
 HqLink = 'https://query1.finance.yahoo.com/v7/finance/download/{}?period1={}&period2={}&interval=1d&events=history&crumb={}'
 CrumbRegex = r'CrumbStore":{"crumb":"(.*?)"}'
-CookRegex = r'set-cookie: (.*?); '
+CookRegex = r'Set-Cookie: (.*?); '
 DateFormat = "%Y-%m-%d"
 class HqYhoo:
     crumb = 'not found'
@@ -18,6 +18,8 @@ class HqYhoo:
 
     def initSession(self):
         response = urlopen(InitLink)
+        # debug session info
+        # print(str(response.info()))
         match = re.search(CookRegex, str(response.info()))
         if match != None:
             self.cookie = match.group(1)
@@ -37,3 +39,14 @@ class HqYhoo:
             return txt
         except URLError:
             raise
+
+if __name__ == '__main__':
+    from datetime import timedelta
+    ticker = 'NUGT'
+    today = (datetime.now() + timedelta(days=1)).strftime(DateFormat)
+    hqDays = 20
+    hqStartDate = (datetime.now() + timedelta(days=-hqDays)).strftime(DateFormat)
+    print(ticker, ": date range", hqStartDate, today)
+    hqRobot = HqYhoo()
+    csv = hqRobot.hqGet(ticker, hqStartDate, today)
+    print(csv)
