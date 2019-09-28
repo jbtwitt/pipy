@@ -43,9 +43,10 @@ def csv2Array(csv):
         hq.append(cols[1:]) # skip date column
     return hq
 
-def plot(ticker, hqDays=70):
+def plot(ticker, hqDays=90):
     csv = csvInput(ticker)
     hq = csv2Array(csv)
+    print('csv rows', len(hq))
     offset = len(hq) - hqDays
     hq = np.array(hq[offset:])
     # print(hq)
@@ -68,18 +69,20 @@ def plot(ticker, hqDays=70):
     to2dim = np.vstack((dayIdxs, closeHist)).T
     delta = max(closeHist) - min(closeHist)
 
-    epsilon = delta / 8
-    rdpPoints = np.array(rdp(to2dim.tolist(), epsilon))
-    print(rdpPoints)
-    ax.plot(rdpPoints[:, 0], rdpPoints[:, 1], 'ko', markersize=5, label="(epsilon:%.2f~%.2f%%)" % (epsilon, epsilon*100/closeHist[0]))
-
-    # epsilon = delta / 5
+    # epsilon = delta / 8
     # rdpPoints = np.array(rdp(to2dim.tolist(), epsilon))
     # print(rdpPoints)
-    # ax.plot(rdpPoints[:, 0], rdpPoints[:, 1], 'ro', markersize=2, label="(epsilon:%.2f~%.2f%%)" % (epsilon, epsilon*100/closeHist[0]))
+    # ax.plot(rdpPoints[:, 0], rdpPoints[:, 1], 'ro', markersize=10, label="(epsilon:%.2f~%.2f%%)" % (epsilon, epsilon*100/closeHist[0]))
 
-    fig.suptitle("%s %s %.2f" % (today, ticker, closeHist[0]))
+    epsilon = delta / 2
+    rdpPoints = np.array(rdp(to2dim.tolist(), epsilon))
+    ax.plot(rdpPoints[:, 0], rdpPoints[:, 1], 'ko', markersize=5, label="(epsilon:%.2f~%.2f%%)" % (epsilon, epsilon*100/closeHist[0]))
+
+    fig.suptitle("%s %s %d days" % (today, ticker, hqDays))
     plt.legend(loc='best')
+
+    print(rdpPoints)
+    print(rdpPoints.shape)
     plt.show()
 
 import argparse
