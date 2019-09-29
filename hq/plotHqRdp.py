@@ -54,8 +54,19 @@ def plot(ticker, hqDays=90):
     # print(closeHist)
     dayIdxs = range(len(closeHist))
 
+    """
+    RDP markers
+    """
+    to2dim = np.vstack((dayIdxs, closeHist)).T
+    delta = max(closeHist) - min(closeHist)
+    epsilon = delta / 4
+    rdpPoints = np.array(rdp(to2dim.tolist(), epsilon))
+    print(rdpPoints)
+
     '''
     hq chart
+    ro: red, yo: yellow
+    ko: black, bo: blue
     '''
     fig = plt.figure()
     ax = fig.add_subplot(111)
@@ -63,20 +74,11 @@ def plot(ticker, hqDays=90):
     # ax.plot(range(len(closeCol)), list(reversed(closeCol)), 'g')    # green
     # ax.plot(range(len(closeCol)), closeCol, 'ko', markersize = 5, label='turning points')   # black
 
-    """
-    RDP markers
-    """
-    to2dim = np.vstack((dayIdxs, closeHist)).T
-    delta = max(closeHist) - min(closeHist)
-
-    # epsilon = delta / 8
-    # rdpPoints = np.array(rdp(to2dim.tolist(), epsilon))
-    # print(rdpPoints)
-    # ax.plot(rdpPoints[:, 0], rdpPoints[:, 1], 'ro', markersize=10, label="(epsilon:%.2f~%.2f%%)" % (epsilon, epsilon*100/closeHist[0]))
+    ax.plot(rdpPoints[:, 0], rdpPoints[:, 1], 'ro', markersize=8, label="(epsilon:%.2f)" % (epsilon))
 
     epsilon = delta / 2
     rdpPoints = np.array(rdp(to2dim.tolist(), epsilon))
-    ax.plot(rdpPoints[:, 0], rdpPoints[:, 1], 'ko', markersize=5, label="(epsilon:%.2f~%.2f%%)" % (epsilon, epsilon*100/closeHist[0]))
+    ax.plot(rdpPoints[:, 0], rdpPoints[:, 1], 'ko', markersize=4, label="(epsilon:%.2f)" % (epsilon))
 
     fig.suptitle("%s %s %d days" % (today, ticker, hqDays))
     plt.legend(loc='best')
