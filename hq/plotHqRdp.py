@@ -18,12 +18,6 @@ def getDayFolder():
     files = [f for f in os.listdir(csvRepo) if os.path.isdir(csvRepo + f)]
     print(files[-1])    # last one of the array is the most recent folder
     return csvRepo + files[-1]
- 
-def csvInput(ticker):
-    csvFile = open(csvFileName.format(getDayFolder(), ticker), "r")
-    txt = csvFile.read()
-    csvFile.close()
-    return txt
 
 today = (datetime.now() + timedelta(days=1)).strftime(DateFormat)
 def download(ticker, hqDays):
@@ -43,12 +37,18 @@ def csv2Array(csv):
         hq.append(cols[1:]) # skip date column
     return hq
 
+def csvInput(ticker):
+    csvFile = open(csvFileName.format(getDayFolder(), ticker), "r")
+    txt = csvFile.read()
+    csvFile.close()
+    return csv2Array(txt)
+
 def plot(ticker, hqDays=90):
-    csv = csvInput(ticker)
-    hq = csv2Array(csv)
-    print('csv rows', len(hq))
-    offset = len(hq) - hqDays
-    hq = np.array(hq[offset:])
+    hq = csvInput(ticker)
+
+    shift_left = 0  # this shifts the window (size of hqDays) to left
+    offset = len(hq) - hqDays - shift_left
+    hq = np.array(hq[offset: offset + hqDays])
     # print(hq)
     closeHist = hq[:, 3].astype(np.float)   # close history
     # print(closeHist)
@@ -60,6 +60,7 @@ def plot(ticker, hqDays=90):
     to2dim = np.vstack((dayIdxs, closeHist)).T
     delta = max(closeHist) - min(closeHist)
     epsilon = delta / 4
+    # epsilon = min(closeHist) * 0.1  # determine epsilon
     rdpPoints = np.array(rdp(to2dim.tolist(), epsilon))
     print(rdpPoints)
 
@@ -74,7 +75,7 @@ def plot(ticker, hqDays=90):
     # ax.plot(range(len(closeCol)), list(reversed(closeCol)), 'g')    # green
     # ax.plot(range(len(closeCol)), closeCol, 'ko', markersize = 5, label='turning points')   # black
 
-    ax.plot(rdpPoints[:, 0], rdpPoints[:, 1], 'ro', markersize=8, label="(epsilon:%.2f)" % (epsilon))
+    ax.plot(rdpPoints[:, 0], rdpPoints[:, 1], 'ro', markersize=7, label="(epsilon:%.2f)" % (epsilon))
 
     epsilon = delta / 2
     rdpPoints = np.array(rdp(to2dim.tolist(), epsilon))
