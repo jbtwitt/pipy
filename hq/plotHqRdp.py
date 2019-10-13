@@ -43,24 +43,29 @@ def csvInput(ticker, hqRepo):
     csvFile.close()
     return csv2Array(txt)
 
-def grouper(rdpPoints, delta=0.02):
-    sortArr = sorted(rdpPoints, key=lambda item: item[1])
-    print('----------------------')
+def grouper(rdpList, delta=0.01):
+    sortArr = sorted(rdpList, key=lambda item: item[1])
     # sortArr = np.sort(arr, axis=0)
     # sortArr = np.sort(rdpPoints[:, 1])
     # print(sortArr)
     prev = None
     group = []
+    avgList = []
     for item in sortArr:
-        if not prev or (item[1] - prev[1])/prev[1] <= delta:
+        if not prev or (item[1] - prev[1]) / prev[1] <= delta:
             group.append(item)
         else:
+            if len(group) > 1:
+                avgList.append(np.average(group, axis=0)[1])
             print(sorted(group, key=lambda item: item[0]))
+            # print(np.average(group, axis=0)[1])
             group = [item]
         prev = item
     if group:
+        if len(group) > 1:
+            avgList.append(np.average(group, axis=0)[1])
         print(group)
-    print('----------------------')
+    return avgList
 
 def plot(ticker, hqDays=90):
     hqRepo = getDayFolder()
@@ -80,10 +85,6 @@ def plot(ticker, hqDays=90):
     """
     to2dim = np.vstack((dayIdxs, closeHist)).T
     delta = max(closeHist) - min(closeHist)
-    epsilon = delta / 4
-    # epsilon = min(closeHist) * 0.1  # determine epsilon
-    rdpPoints = np.array(rdp(to2dim.tolist(), epsilon))
-    print(rdpPoints)
 
     '''
     hq chart
@@ -96,23 +97,30 @@ def plot(ticker, hqDays=90):
     # ax.plot(range(len(closeCol)), list(reversed(closeCol)), 'g')    # green
     # ax.plot(range(len(closeCol)), closeCol, 'ko', markersize = 5, label='turning points')   # black
 
-    ax.plot(rdpPoints[:, 0], rdpPoints[:, 1], 'ro', markersize=7, label="(epsilon:%.1f%%)" % (100*epsilon/latestClose))
+    # epsilon = delta / 4
+    # # epsilon = min(closeHist) * 0.1  # determine epsilon
+    # rdpPoints = np.array(rdp(to2dim.tolist(), epsilon))
+    # # print(rdpPoints)
+    # ax.plot(rdpPoints[:, 0], rdpPoints[:, 1], 'ro', markersize=7, label="(epsilon:%.1f%%)" % (100*epsilon/latestClose))
 
     # epsilon = delta / 2
     epsilon = latestClose * .1
-    rdpPoints = np.array(rdp(to2dim.tolist(), epsilon))
+    rdpList = rdp(to2dim.tolist(), epsilon)
+    rdpPoints = np.array(rdpList)
     ax.plot(rdpPoints[:, 0], rdpPoints[:, 1], 'ko', markersize=4, label="(epsilon:%.1f%%)" % (100*epsilon/latestClose))
 
     # group
-    rdpList = rdp(to2dim.tolist(), epsilon)
     # print(sorted(rdpList, key=lambda item: item[1]))
-    grouper(rdpList)
+    groupAvgList = grouper(rdpList)
+    # print(groupAvgList)
+    for avg in groupAvgList:
+        ax.plot((0, len(closeHist)), (avg, avg), 'r', label="%.2f" % avg)
     # return
 
     fig.suptitle("%s %s %d days" % (hqRepo, ticker, hqDays))
     plt.legend(loc='best')
 
-    print(rdpPoints)
+    # print(rdpPoints)
     # print(rdpPoints.shape)
     plt.show()
 
