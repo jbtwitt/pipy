@@ -19,8 +19,8 @@ def getDayFolder():
     print(files[-1])    # last one of the array is the most recent folder
     return csvRepo + files[-1]
 
-today = (datetime.now() + timedelta(days=1)).strftime(DateFormat)
 def download(ticker, hqDays):
+    today = (datetime.now() + timedelta(days=1)).strftime(DateFormat)
     hqStartDate = (datetime.now() + timedelta(days=-hqDays)).strftime(DateFormat)
     print(ticker, ": date range", hqStartDate, today)
     hqRobot = HqYhoo()
@@ -37,14 +37,34 @@ def csv2Array(csv):
         hq.append(cols[1:]) # skip date column
     return hq
 
-def csvInput(ticker):
-    csvFile = open(csvFileName.format(getDayFolder(), ticker), "r")
+def csvInput(ticker, hqRepo):
+    csvFile = open(csvFileName.format(hqRepo, ticker), "r")
     txt = csvFile.read()
     csvFile.close()
     return csv2Array(txt)
 
+def grouper(rdpPoints, delta=0.02):
+    sortArr = sorted(rdpPoints, key=lambda item: item[1])
+    print('----------------------')
+    # sortArr = np.sort(arr, axis=0)
+    # sortArr = np.sort(rdpPoints[:, 1])
+    # print(sortArr)
+    prev = None
+    group = []
+    for item in sortArr:
+        if not prev or (item[1] - prev[1])/prev[1] <= delta:
+            group.append(item)
+        else:
+            print(sorted(group, key=lambda item: item[0]))
+            group = [item]
+        prev = item
+    if group:
+        print(group)
+    print('----------------------')
+
 def plot(ticker, hqDays=90):
-    hq = csvInput(ticker)
+    hqRepo = getDayFolder()
+    hq = csvInput(ticker, hqRepo)
 
     shift_left = 0  # this shifts the window (size of hqDays) to left
     offset = len(hq) - hqDays - shift_left
@@ -52,6 +72,7 @@ def plot(ticker, hqDays=90):
     # print(hq)
     closeHist = hq[:, 3].astype(np.float)   # close history
     # print(closeHist)
+    latestClose = closeHist[-1]
     dayIdxs = range(len(closeHist))
 
     """
@@ -75,21 +96,30 @@ def plot(ticker, hqDays=90):
     # ax.plot(range(len(closeCol)), list(reversed(closeCol)), 'g')    # green
     # ax.plot(range(len(closeCol)), closeCol, 'ko', markersize = 5, label='turning points')   # black
 
-    ax.plot(rdpPoints[:, 0], rdpPoints[:, 1], 'ro', markersize=7, label="(epsilon:%.2f)" % (epsilon))
+    ax.plot(rdpPoints[:, 0], rdpPoints[:, 1], 'ro', markersize=7, label="(epsilon:%.1f%%)" % (100*epsilon/latestClose))
 
-    epsilon = delta / 2
+    # epsilon = delta / 2
+    epsilon = latestClose * .1
     rdpPoints = np.array(rdp(to2dim.tolist(), epsilon))
-    ax.plot(rdpPoints[:, 0], rdpPoints[:, 1], 'ko', markersize=4, label="(epsilon:%.2f)" % (epsilon))
+    ax.plot(rdpPoints[:, 0], rdpPoints[:, 1], 'ko', markersize=4, label="(epsilon:%.1f%%)" % (100*epsilon/latestClose))
 
-    fig.suptitle("%s %s %d days" % (today, ticker, hqDays))
+    # group
+    rdpList = rdp(to2dim.tolist(), epsilon)
+    # print(sorted(rdpList, key=lambda item: item[1]))
+    grouper(rdpList)
+    # return
+
+    fig.suptitle("%s %s %d days" % (hqRepo, ticker, hqDays))
     plt.legend(loc='best')
 
     print(rdpPoints)
-    print(rdpPoints.shape)
+    # print(rdpPoints.shape)
     plt.show()
 
 import argparse
 if __name__ == "__main__":
+    # numbers = [123, 124, 128, 160, 167, 213, 215, 230, 245, 255, 257, 400, 401, 402, 430]
+    # print(dict(enumerate(grouper(numbers), 1)))
     parser = argparse.ArgumentParser()
     parser.add_argument('tickers', metavar='tickers', type=str, nargs='+', help='ticker list')
     # parser.add_argument('-ticker', help='ticker')
@@ -97,4 +127,4 @@ if __name__ == "__main__":
     # print(vars(args)[''])
     print(args.tickers)
     for ticker in args.tickers:
-        plot(ticker, hqDays=92)
+        plot(ticker.upper(), hqDays=192)
