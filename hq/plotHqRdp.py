@@ -44,14 +44,14 @@ def csvInput(ticker, hqRepo):
     return csv2Array(txt)
 
 def grouper(rdpList, delta=0.01):
-    sortArr = sorted(rdpList, key=lambda item: item[1])
+    sortedList = sorted(rdpList, key=lambda item: item[1])
     # sortArr = np.sort(arr, axis=0)
     # sortArr = np.sort(rdpPoints[:, 1])
     # print(sortArr)
-    prev = None
+    prev = []   #None
     group = []
     avgList = []
-    for item in sortArr:
+    for item in sortedList:
         if not prev or (item[1] - prev[1]) / prev[1] <= delta:
             group.append(item)
         else:
@@ -67,25 +67,97 @@ def grouper(rdpList, delta=0.01):
         print(group)
     return avgList
 
-def plot(ticker, hqDays=90):
-    hqRepo = getDayFolder()
-    hq = csvInput(ticker, hqRepo)
+class HqDetail:
+    def __init__(self, ticker):
+        self.ticker = ticker
+        self.init()
 
-    shift_left = 0  # this shifts the window (size of hqDays) to left
-    offset = len(hq) - hqDays - shift_left
-    hq = np.array(hq[offset: offset + hqDays])
-    # print(hq)
-    closeHist = hq[:, 3].astype(np.float)   # close history
-    # print(closeHist)
-    latestClose = closeHist[-1]
-    dayIdxs = range(len(closeHist))
+    def init(self, hqDays=192):
+        hqRepo = getDayFolder()
+        hq = csvInput(ticker, hqRepo)
+        print(len(hq))
+        shift_left = 0  # this shifts the window (size of hqDays) to left
+        offset = len(hq) - hqDays - shift_left
+        hq = np.array(hq[offset: offset + hqDays])
+        # print(hq)
+        self.volHist = hq[:, 5].astype(np.int)   # volume history
+        self.closeHist = hq[:, 3].astype(np.float)   # close history
+        # dayIdxs = range(len(closeHist))
+        # to2dim = np.vstack((dayIdxs, self.CHist)).T
+        # epsilon = self.lastC * .1
+        # rdpList = rdp(to2dim.tolist(), epsilon)
+        """
+        RDP points
+        """
+        self._epsilon = self.lastC * .1
+        self.hqRdp = rdp(np.vstack((range(len(self.CHist)), self.CHist)).T.tolist(), self._epsilon)
+        self.rdpGroups, self.rdpGroupAvgs = self.groupHqRdp()
+        print(self.rdpGroups)
+        print(self.rdpGroupAvgs)
+        # print(closeHist)
+        # print(self.myRdp)
+        # print(self.VHist[:6])
+
+    def groupHqRdp(self, delta=0.01):
+        avgList = []
+        groupList = []
+        prev = []   #None
+        group = []
+        sortedList = sorted(self.rdpList, key=lambda item: item[1])
+        for item in sortedList:
+            if not prev or (item[1] - prev[1]) / prev[1] <= delta:
+                group.append(item)
+            else:
+                if len(group) > 1:
+                    avgList.append(np.average(group, axis=0)[1])
+                groupList.append(sorted(group, key=lambda item: item[0]))
+                group = [item]
+            prev = item
+        if group:
+            if len(group) > 1:
+                avgList.append(np.average(group, axis=0)[1])
+            groupList.append(sorted(group, key=lambda item: item[0]))
+        return (groupList, avgList)
+
+    @property
+    def hqRdpGroups(self):
+        return self.rdpGroups, self.rdpGroupAvgs
+    @property
+    def epsilon(self):
+        return self._epsilon
+    @property
+    def rdpList(self):
+        return self.hqRdp
+    @property
+    def lastC(self):
+        return self.closeHist[-1]
+    @property
+    def CHist(self):
+        return self.closeHist
+    @property
+    def VHist(self):
+        return self.volHist
+
+def plot(ticker, hqDays=90):
+    # hqRepo = getDayFolder()
+    # hq = csvInput(ticker, hqRepo)
+
+    # shift_left = 0  # this shifts the window (size of hqDays) to left
+    # offset = len(hq) - hqDays - shift_left
+    # hq = np.array(hq[offset: offset + hqDays])
+    # # print(hq)
+    # closeHist = hq[:, 3].astype(np.float)   # close history
+    # # print(closeHist)
+    # latestClose = closeHist[-1]
+    # dayIdxs = range(len(closeHist))
 
     """
     RDP markers
     """
-    to2dim = np.vstack((dayIdxs, closeHist)).T
-    delta = max(closeHist) - min(closeHist)
+    # to2dim = np.vstack((dayIdxs, closeHist)).T
+    # delta = max(closeHist) - min(closeHist)
 
+    hqDetail = HqDetail(ticker)
     '''
     hq chart
     ro: red, yo: yellow
@@ -93,7 +165,7 @@ def plot(ticker, hqDays=90):
     '''
     fig = plt.figure()
     ax = fig.add_subplot(111)
-    ax.plot(dayIdxs, closeHist)
+    ax.plot(range(len(hqDetail.CHist)), hqDetail.CHist)
     # ax.plot(range(len(closeCol)), list(reversed(closeCol)), 'g')    # green
     # ax.plot(range(len(closeCol)), closeCol, 'ko', markersize = 5, label='turning points')   # black
 
@@ -104,20 +176,22 @@ def plot(ticker, hqDays=90):
     # ax.plot(rdpPoints[:, 0], rdpPoints[:, 1], 'ro', markersize=7, label="(epsilon:%.1f%%)" % (100*epsilon/latestClose))
 
     # epsilon = delta / 2
-    epsilon = latestClose * .1
-    rdpList = rdp(to2dim.tolist(), epsilon)
+    # epsilon = latestClose * .1
+    # rdpList = rdp(to2dim.tolist(), epsilon)
+    rdpList = hqDetail.rdpList
     rdpPoints = np.array(rdpList)
-    ax.plot(rdpPoints[:, 0], rdpPoints[:, 1], 'ko', markersize=4, label="(epsilon:%.1f%%)" % (100*epsilon/latestClose))
+    ax.plot(rdpPoints[:, 0], rdpPoints[:, 1], 'ko', markersize=4, label="(epsilon:%.1f%%)" % (100*hqDetail.epsilon/hqDetail.lastC))
 
     # group
     # print(sorted(rdpList, key=lambda item: item[1]))
-    groupAvgList = grouper(rdpList)
+    # groupAvgList = grouper(rdpList)
+    hqRdpGroup, groupAvgList = hqDetail.hqRdpGroups
     # print(groupAvgList)
     for avg in groupAvgList:
-        ax.plot((0, len(closeHist)), (avg, avg), 'r', label="%.2f" % avg)
+        ax.plot((0, len(hqDetail.CHist)), (avg, avg), 'r', label="%.2f" % avg)
     # return
 
-    fig.suptitle("%s %s %d days" % (hqRepo, ticker, hqDays))
+    fig.suptitle("%s %d days" % (ticker, hqDays))
     plt.legend(loc='best')
 
     # print(rdpPoints)
