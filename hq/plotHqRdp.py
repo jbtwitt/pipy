@@ -80,6 +80,9 @@ class HqDetail:
         offset = len(hq) - hqDays - shift_left
         hq = np.array(hq[offset: offset + hqDays])
         # print(hq)
+        """
+        HQ 1d array
+        """
         self.volHist = hq[:, 5].astype(np.int)   # volume history
         self.closeHist = hq[:, 3].astype(np.float)   # close history
         # dayIdxs = range(len(closeHist))
@@ -87,10 +90,10 @@ class HqDetail:
         # epsilon = self.lastC * .1
         # rdpList = rdp(to2dim.tolist(), epsilon)
         """
-        RDP points
+        RDP data
         """
-        self._epsilon = self.lastC * .1
-        self.hqRdp = rdp(np.vstack((range(len(self.CHist)), self.CHist)).T.tolist(), self._epsilon)
+        self.hqEpsilon = self.lastC * .1
+        self.hqRdp = rdp(np.vstack((range(len(self.CHist)), self.CHist)).T.tolist(), self.hqEpsilon)
         self.rdpGroups, self.rdpGroupAvgs = self.groupHqRdp()
         print(self.rdpGroups)
         print(self.rdpGroupAvgs)
@@ -103,7 +106,7 @@ class HqDetail:
         groupList = []
         prev = []   #None
         group = []
-        sortedList = sorted(self.rdpList, key=lambda item: item[1])
+        sortedList = sorted(self.hqRdp, key=lambda item: item[1])
         for item in sortedList:
             if not prev or (item[1] - prev[1]) / prev[1] <= delta:
                 group.append(item)
@@ -123,11 +126,8 @@ class HqDetail:
     def hqRdpGroups(self):
         return self.rdpGroups, self.rdpGroupAvgs
     @property
-    def epsilon(self):
-        return self._epsilon
-    @property
-    def rdpList(self):
-        return self.hqRdp
+    def rdpData(self):
+        return self.hqRdp, self.hqEpsilon
     @property
     def lastC(self):
         return self.closeHist[-1]
@@ -151,9 +151,6 @@ def plot(ticker, hqDays=90):
     # latestClose = closeHist[-1]
     # dayIdxs = range(len(closeHist))
 
-    """
-    RDP markers
-    """
     # to2dim = np.vstack((dayIdxs, closeHist)).T
     # delta = max(closeHist) - min(closeHist)
 
@@ -178,9 +175,12 @@ def plot(ticker, hqDays=90):
     # epsilon = delta / 2
     # epsilon = latestClose * .1
     # rdpList = rdp(to2dim.tolist(), epsilon)
-    rdpList = hqDetail.rdpList
+    """
+    RDP markers
+    """
+    rdpList, epsilon = hqDetail.rdpData
     rdpPoints = np.array(rdpList)
-    ax.plot(rdpPoints[:, 0], rdpPoints[:, 1], 'ko', markersize=4, label="(epsilon:%.1f%%)" % (100*hqDetail.epsilon/hqDetail.lastC))
+    ax.plot(rdpPoints[:, 0], rdpPoints[:, 1], 'ko', markersize=4, label="(epsilon:%.1f%%)" % (100*epsilon/hqDetail.lastC))
 
     # group
     # print(sorted(rdpList, key=lambda item: item[1]))
@@ -188,10 +188,9 @@ def plot(ticker, hqDays=90):
     hqRdpGroup, groupAvgList = hqDetail.hqRdpGroups
     # print(groupAvgList)
     for avg in groupAvgList:
-        ax.plot((0, len(hqDetail.CHist)), (avg, avg), 'r', label="%.2f" % avg)
-    # return
+        ax.plot((0, len(hqDetail.CHist)), (avg, avg), 'r', label="%.2f %.1f%%" % (avg, (100*abs(avg-hqDetail.lastC)/hqDetail.lastC)))
 
-    fig.suptitle("%s %d days" % (ticker, hqDays))
+    fig.suptitle("%s %.2f %d days" % (ticker, hqDetail.lastC, hqDays))
     plt.legend(loc='best')
 
     # print(rdpPoints)
@@ -200,8 +199,6 @@ def plot(ticker, hqDays=90):
 
 import argparse
 if __name__ == "__main__":
-    # numbers = [123, 124, 128, 160, 167, 213, 215, 230, 245, 255, 257, 400, 401, 402, 430]
-    # print(dict(enumerate(grouper(numbers), 1)))
     parser = argparse.ArgumentParser()
     parser.add_argument('tickers', metavar='tickers', type=str, nargs='+', help='ticker list')
     # parser.add_argument('-ticker', help='ticker')
