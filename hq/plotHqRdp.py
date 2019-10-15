@@ -59,8 +59,10 @@ class HqDetail:
         """
         HQ 1d array
         """
-        self.volHist = hq[:, 5].astype(np.int)   # volume history
-        self.closeHist = hq[:, 3].astype(np.float)   # close history
+        # self.volHist = hq[:, 5].astype(np.int)   # volume history
+        # print(self.VHist[:6])
+        self._CHist = hq[:, 3].astype(np.float)   # close history
+        cIdxHist = np.vstack((range(len(self.CHist)), self.CHist)).T.tolist()
         # dayIdxs = range(len(closeHist))
         # to2dim = np.vstack((dayIdxs, self.CHist)).T
         # epsilon = self.lastC * .1
@@ -69,20 +71,19 @@ class HqDetail:
         RDP data
         """
         self.hqEpsilon = self.lastC * .07
-        self.hqRdp = rdp(np.vstack((range(len(self.CHist)), self.CHist)).T.tolist(), self.hqEpsilon)
-        self.rdpGroups, self.rdpGroupAvgs = self.groupHqRdp()
-        print(self.rdpGroups)
-        print(self.rdpGroupAvgs)
-        # print(closeHist)
-        # print(self.myRdp)
-        # print(self.VHist[:6])
+        self.hqRdp = rdp(cIdxHist, self.hqEpsilon)
+        self.rdpGroups, self.rdpGroupAvgs = self.hqGrouping(self.hqRdp)
+        print(self.rdpGroups, self.rdpGroupAvgs)
+        # print(self.hqRdp)
+        self._lastNGroups, self._lastNGroupAvgs = self.hqGrouping(rdp(cIdxHist[len(cIdxHist) - self.lastN:], self.hqEpsilon))
+        print(self._lastNGroups, self._lastNGroupAvgs)
 
-    def groupHqRdp(self, delta=0.01):
+    def hqGrouping(self, hqList, delta=0.01):
         avgList = []
         groupList = []
         prev = []   #None
         group = []
-        sortedList = sorted(self.hqRdp, key=lambda item: item[1])
+        sortedList = sorted(hqList, key=lambda item: item[1])
         for item in sortedList:
             if not prev or (item[1] - prev[1]) / prev[1] <= delta:
                 group.append(item)
@@ -102,17 +103,23 @@ class HqDetail:
     def hqRdpGroups(self):
         return self.rdpGroups, self.rdpGroupAvgs
     @property
+    def lastN(self):
+        return 20
+    @property
+    def lastNGroups(self):
+        return self._lastNGroups, self._lastNGroupAvgs
+    @property
     def rdpData(self):
         return self.hqRdp, self.hqEpsilon
     @property
     def lastC(self):
-        return self.closeHist[-1]
+        return self._CHist[-1]
     @property
     def CHist(self):
-        return self.closeHist
-    @property
-    def VHist(self):
-        return self.volHist
+        return self._CHist
+    # @property
+    # def VHist(self):
+    #     return self.volHist
 
 def plot(ticker, hqDays=90):
 
@@ -149,9 +156,13 @@ def plot(ticker, hqDays=90):
     """
     RDP group and average
     """
-    hqRdpGroup, groupAvgList = hqDetail.hqRdpGroups
+    g, groupAvgList = hqDetail.hqRdpGroups
     for avg in groupAvgList:
         ax.plot((0, len(hqDetail.CHist)), (avg, avg), 'r', label="%.2f %.1f%%" % (avg, 100*(hqDetail.lastC-avg)/hqDetail.lastC))
+
+    g, lastNAvgList = hqDetail.lastNGroups
+    for avg in lastNAvgList:
+        ax.plot((len(hqDetail.CHist) - hqDetail.lastN, len(hqDetail.CHist)), (avg, avg), 'g', label="%.2f %.1f%%" % (avg, 100*(hqDetail.lastC-avg)/hqDetail.lastC))
 
     fig.suptitle("%s %.2f %d days" % (ticker, hqDetail.lastC, hqDays))
     plt.legend(loc='best')
