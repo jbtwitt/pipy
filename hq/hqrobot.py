@@ -56,7 +56,9 @@ def hqMetaFileCreate(hqConf, day):
     hqMetaFile = HqMetaFile(hqConf, day)
     hqMetaFile.writeJson(hqMetas)
 
-if __name__ == '__hqrobot__':
+if __name__ == '__main__':
     day = (datetime.now() + timedelta(days=-0)).strftime("%Y%m%d")
     print(day, 'hq date folder')
-    hqrobotMain(json.load(open('hqrobot.json')), day)
+    hqConf = json.load(open('hqrobot.json'))
+    for group in ['etf', 'idx', 'tickers']:
+        hqrobotMain(hqConf, day, tickerList=group)

@@ -75,7 +75,7 @@ class HqDetail:
         self.rdpGroups, self.rdpGroupAvgs = self.hqGrouping(self.hqRdp)
         print(self.rdpGroups, self.rdpGroupAvgs)
         # print(self.hqRdp)
-        self._lastNGroups, self._lastNGroupAvgs = self.hqGrouping(rdp(cIdxHist[len(cIdxHist) - self.lastN:], self.hqEpsilon))
+        self._lastNGroups, self._lastNGroupAvgs = self.hqGrouping(rdp(cIdxHist[len(cIdxHist) - self.lastN:], self.hqEpsilon/2))
         print(self._lastNGroups, self._lastNGroupAvgs)
 
     def hqGrouping(self, hqList, delta=0.01):
