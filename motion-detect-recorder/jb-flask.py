@@ -26,15 +26,11 @@ def after_request(response):
 def hello():
 	return "Hello World!"
 
-from pi-monitor-main import getPath
+from pi_monitor_main import getPath
 @app.route("/pi-monitor")
 def piMonitor():
-	jpgFile = ""
-	for i in [2, 3]:
-		tm = datetime.now() - timedelta(seconds=i)
-		jpgFile = getPath(tm)
-        if os.path.exists(jpgFile):
-			break
+	tm = datetime.now() - timedelta(seconds=2)
+	jpgFile = getPath(tm)
 	if not os.path.exists(jpgFile):
 		return
 	response = Response()
