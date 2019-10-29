@@ -29,14 +29,14 @@ def hello():
 from pi_monitor_main import getPath
 @app.route("/pi-monitor")
 def piMonitor():
-	tm = datetime.now() - timedelta(seconds=2)
-	jpgFile = getPath(tm)
-	if not os.path.exists(jpgFile):
-		return
-	response = Response()
-	# response.headers.add('Connection', 'close')
-	response.headers.add('Content-Lenght', str(os.path.getsize(jpgFile)))
-	return send_file(jpgFile, mimetype='image/jpg', cache_timeout=0, as_attachment=False, add_etags=False)
+	for i in (3, 2):
+		tm = datetime.now() - timedelta(seconds=i)
+		jpgFile = getPath(tm)
+		if os.path.exists(jpgFile):
+			response = Response()
+			# response.headers.add('Connection', 'close')
+			response.headers.add('Content-Lenght', str(os.path.getsize(jpgFile)))
+			return send_file(jpgFile, mimetype='image/jpg', cache_timeout=0, as_attachment=False, add_etags=False)
 
 @app.route("/snapshot")
 def snapshot():
