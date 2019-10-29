@@ -4,7 +4,7 @@ from time import sleep
 
 REPOS = "/tmp/pi-monitor"
 RECYCLE_DAYS = 3
-CAMERA_RESOLUTION = [800, 608]
+CAMERA_RESOLUTION = [1280, 960]
 
 def createFolder():
     for i in range(RECYCLE_DAYS):
@@ -51,8 +51,13 @@ def web_main():
 
     @app.route("/pi-monitor")
     def piMonitor():
+        hoursAgo = 0.0
+        if (request.args.get('hoursAgo') is not None):
+            hoursAgo = float(request.args.get('hoursAgo'))
         for i in range(5):
             tm = datetime.now() - timedelta(seconds=i)
+            if hoursAgo > 0.0:
+                tm = tm - timedelta(hours=hoursAgo)
             jpgFile = getPath(tm)
             if os.path.exists(jpgFile) and os.stat(jpgFile).st_size > 1000:
                 response = Response()
