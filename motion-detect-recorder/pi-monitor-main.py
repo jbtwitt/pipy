@@ -13,8 +13,7 @@ def createFolder():
         if not os.path.exists(dir):
             os.makedirs(dir)
 
-def getPath(extName='jpg'):
-    tm = datetime.now()
+def getPath(tm=datetime.now(), extName='jpg'):
     return "%s/%d/%s.%s" % (REPOS, (tm.timetuple().tm_yday % RECYCLE_DAYS), tm.strftime("%H%M%S"), extName)
 
 def cameraShot():

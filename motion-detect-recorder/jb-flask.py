@@ -4,6 +4,7 @@ from flask import send_file
 
 import os
 import json
+from datetime import datetime, timedelta
 from classes.MdrSnapshot import MdrSnapshot
 import glob
 
@@ -24,6 +25,22 @@ def after_request(response):
 @app.route("/")
 def hello():
 	return "Hello World!"
+
+from pi-monitor-main import getPath
+@app.route("/pi-monitor")
+def piMonitor():
+	jpgFile = ""
+	for i in [2, 3]:
+		tm = datetime.now() - timedelta(seconds=i)
+		jpgFile = getPath(tm)
+        if os.path.exists(jpgFile):
+			break
+	if not os.path.exists(jpgFile):
+		return
+	response = Response()
+	# response.headers.add('Connection', 'close')
+	response.headers.add('Content-Lenght', str(os.path.getsize(jpgFile)))
+	return send_file(jpgFile, mimetype='image/jpg', cache_timeout=0, as_attachment=False, add_etags=False)
 
 @app.route("/snapshot")
 def snapshot():
