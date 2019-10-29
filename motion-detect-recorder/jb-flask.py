@@ -29,7 +29,7 @@ def hello():
 from pi_monitor_main import getPath
 @app.route("/pi-monitor")
 def piMonitor():
-	for i in (3, 2):
+	for i in range(5):
 		tm = datetime.now() - timedelta(seconds=i)
 		jpgFile = getPath(tm)
 		if os.path.exists(jpgFile):
@@ -37,6 +37,7 @@ def piMonitor():
 			# response.headers.add('Connection', 'close')
 			response.headers.add('Content-Lenght', str(os.path.getsize(jpgFile)))
 			return send_file(jpgFile, mimetype='image/jpg', cache_timeout=0, as_attachment=False, add_etags=False)
+	return ""
 
 @app.route("/snapshot")
 def snapshot():

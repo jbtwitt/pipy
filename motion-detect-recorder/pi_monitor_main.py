@@ -28,7 +28,7 @@ def cameraShot():
 
         while True:
             sleep(2)
-            jpgName = getPath(datetime.now)
+            jpgName = getPath(datetime.now())
             camera.capture(jpgName)
     finally:
         camera.close()
