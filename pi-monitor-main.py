@@ -52,20 +52,20 @@ def web_main():
     @app.route("/pi-monitor")
     def piMonitor():
         minutesAgo = 0
-        tm = datetime.now()
         if (request.args.get('minutesAgo') is not None):
             minutesAgo = int(request.args.get('minutesAgo'))
-        for i in range(5):
-            tm = tm - timedelta(seconds=i)
+        for x in range(5):
+            tm = datetime.now() - timedelta(seconds=1)
             if minutesAgo > 0:
                 tm = tm - timedelta(minutes=minutesAgo)
             jpgFile = getPath(tm)
+            # print(jpgFile)
             if os.path.exists(jpgFile) and os.stat(jpgFile).st_size > 1000:
                 response = Response()
                 # response.headers.add('Connection', 'close')
                 response.headers.add('Content-Lenght', str(os.path.getsize(jpgFile)))
                 return send_file(jpgFile, mimetype='image/jpg', cache_timeout=0, as_attachment=False, add_etags=False)
-            # sleep(0.5)
+            sleep(0.5)
         return ""
 
     app.run(host='0.0.0.0', threaded=True)
