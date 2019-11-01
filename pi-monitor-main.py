@@ -2,7 +2,7 @@ import os
 from datetime import datetime, timedelta
 from time import sleep
 
-REPOS = "/tmp/pi-monitor"
+REPOS = "/home/pi/camCache"
 RECYCLE_DAYS = 3
 CAMERA_RESOLUTION = [640, 480]
 
@@ -61,7 +61,8 @@ def web_main():
             jpgFile = getPath(tm)
             if os.path.exists(jpgFile):
                 jpgStat = os.stat(jpgFile)
-                if jpgStat.st_size > 1000 and (tm - datetime.fromtimestamp(jpgStat.st_ctime)).total_seconds() < 5:
+                # if jpgStat.st_size > 1000 and (tm - datetime.fromtimestamp(jpgStat.st_ctime)).total_seconds() < 5:
+                if jpgStat.st_size > 10000 and tm.timetuple().tm_yday == datetime.fromtimestamp(jpgStat.st_ctime).timetuple().tm_yday:
                     response = Response()
                     response.headers.add('Content-Lenght', str(jpgStat.st_size))
                     return send_file(jpgFile, mimetype='image/jpg', cache_timeout=0, as_attachment=False, add_etags=False)
@@ -72,9 +73,9 @@ def web_main():
 
 import sys
 if __name__ == "__main__":
-    if sys.argv[1] == 'web_main':
+    if len(sys.argv) > 1 and sys.argv[1] == 'web_main':
         web_main()
-    elif sys.argv[1] == 'camera_main':
+    elif len(sys.argv) > 1 and sys.argv[1] == 'camera_main':
         if len(sys.argv) == 4:
             CAMERA_RESOLUTION = [int(sys.argv[2]), int(sys.argv[3])]
         camera_main()
