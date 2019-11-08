@@ -62,7 +62,9 @@ def web_main():
             if os.path.exists(jpgFile):
                 jpgStat = os.stat(jpgFile)
                 # if jpgStat.st_size > 1000 and (tm - datetime.fromtimestamp(jpgStat.st_ctime)).total_seconds() < 5:
-                if jpgStat.st_size > 10000 and tm.timetuple().tm_yday == datetime.fromtimestamp(jpgStat.st_ctime).timetuple().tm_yday:
+                if tm.timetuple().tm_yday != datetime.fromtimestamp(jpgStat.st_ctime).timetuple().tm_yday:
+                    os.remove(jpgFile)
+                elif jpgStat.st_size > 10000:
                     response = Response()
                     response.headers.add('Content-Lenght', str(jpgStat.st_size))
                     return send_file(jpgFile, mimetype='image/jpg', cache_timeout=0, as_attachment=False, add_etags=False)
