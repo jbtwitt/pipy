@@ -14,7 +14,7 @@ def createFolder():
 
 def getPath(tm, cleanPrevious=False, extName='jpg'):
     if cleanPrevious == True:
-        for x in range(1,4):
+        for x in range(1,5):
             tm2 = tm + timedelta(seconds=x)
             f = "%s/%d/%s.%s" % (REPOS, (tm2.timetuple().tm_yday % RECYCLE_DAYS), tm2.strftime("%H%M%S"), extName)
             if os.path.exists(f):
@@ -68,9 +68,9 @@ def web_main():
             if os.path.exists(jpgFile):
                 jpgStat = os.stat(jpgFile)
                 # # if jpgStat.st_size > 1000 and (tm - datetime.fromtimestamp(jpgStat.st_ctime)).total_seconds() < 5:
-                # if tm.timetuple().tm_yday != datetime.fromtimestamp(jpgStat.st_ctime).timetuple().tm_yday:
-                #     os.remove(jpgFile)
-                if jpgStat.st_size > 10000:
+                if tm.timetuple().tm_yday != datetime.fromtimestamp(jpgStat.st_ctime).timetuple().tm_yday:
+                    os.remove(jpgFile)
+                elif jpgStat.st_size > 10000:
                     response = Response()
                     response.headers.add('Content-Lenght', str(jpgStat.st_size))
                     return send_file(jpgFile, mimetype='image/jpg', cache_timeout=0, as_attachment=False, add_etags=False)
