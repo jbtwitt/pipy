@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from time import sleep
 
 REPOS = "/home/pi/camCache"
-RECYCLE_DAYS = 3
+RECYCLE_DAYS = 2
 CAMERA_RESOLUTION = [640, 480]
 
 def createFolder():
