@@ -12,7 +12,13 @@ def createFolder():
         if not os.path.exists(dir):
             os.makedirs(dir)
 
-def getPath(tm, extName='jpg'):
+def getPath(tm, cleanPrevious=False, extName='jpg'):
+    if cleanPrevious == True:
+        for x in range(1,4):
+            tm2 = tm + timedelta(seconds=x)
+            f = "%s/%d/%s.%s" % (REPOS, (tm2.timetuple().tm_yday % RECYCLE_DAYS), tm2.strftime("%H%M%S"), extName)
+            if os.path.exists(f):
+                os.remove(f)
     return "%s/%d/%s.%s" % (REPOS, (tm.timetuple().tm_yday % RECYCLE_DAYS), tm.strftime("%H%M%S"), extName)
 
 """
@@ -33,7 +39,7 @@ def camera_main():
 
             while True:
                 sleep(2)
-                jpgName = getPath(datetime.now())
+                jpgName = getPath(datetime.now(), cleanPrevious=True)
                 camera.capture(jpgName)
         finally:
             camera.close()
@@ -61,14 +67,14 @@ def web_main():
             jpgFile = getPath(tm)
             if os.path.exists(jpgFile):
                 jpgStat = os.stat(jpgFile)
-                # if jpgStat.st_size > 1000 and (tm - datetime.fromtimestamp(jpgStat.st_ctime)).total_seconds() < 5:
-                if tm.timetuple().tm_yday != datetime.fromtimestamp(jpgStat.st_ctime).timetuple().tm_yday:
-                    os.remove(jpgFile)
-                elif jpgStat.st_size > 10000:
+                # # if jpgStat.st_size > 1000 and (tm - datetime.fromtimestamp(jpgStat.st_ctime)).total_seconds() < 5:
+                # if tm.timetuple().tm_yday != datetime.fromtimestamp(jpgStat.st_ctime).timetuple().tm_yday:
+                #     os.remove(jpgFile)
+                if jpgStat.st_size > 10000:
                     response = Response()
                     response.headers.add('Content-Lenght', str(jpgStat.st_size))
                     return send_file(jpgFile, mimetype='image/jpg', cache_timeout=0, as_attachment=False, add_etags=False)
-            sleep(0.5)
+            sleep(1)
         return ""
 
     app.run(host='0.0.0.0', threaded=True)
