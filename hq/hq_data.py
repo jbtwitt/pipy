@@ -38,10 +38,12 @@ class HqData:
 
     def genData(idx_start, idx_end):
       x, y = ([], [])
+      maxLabel = len(y_labels) - (futureTsSize - 1)
       for i in range(idx_start, idx_end):
         end = i + tsSize
         x.append(x_data[range(i, end)])
-        y.append(y_labels[range(end, end + futureTsSize)])
+        if end < maxLabel:
+          y.append(y_labels[range(end, end + futureTsSize)])
       return x, y
 
     i_start = len(x_data) - tsSize - trainSize -valSize - (futureTsSize - 1)
@@ -52,18 +54,21 @@ class HqData:
     i_end = len(x_data) - tsSize - (futureTsSize - 1)
     x_val, y_val = genData(i_start, i_end)
 
-    return np.array(x_train), np.array(y_train), np.array(x_val), np.array(y_val)
+    train_batch_size = 100
+    x_predict, _ = genData(len(x_data) - train_batch_size - 1 - tsSize, len(x_data) - tsSize + 1)
+    return np.array(x_train), np.array(y_train), np.array(x_val), np.array(y_val), np.array(x_predict)
 
 
 def test():
   hqDataClass = HqData()
   trainSize, valSize, tsSize, futureTsSize = (900, 300, 10, 2)
-  x_train, y_train, x_val, y_val = hqDataClass.timeSeriesData(
+  x_train, y_train, x_val, y_val, x_predict = hqDataClass.timeSeriesData(
             ['OP', 'CP', 'HP', 'LP'], ['CP'], trainSize, valSize, tsSize, futureTsSize)
   print(x_train.shape, y_train.shape, x_val.shape, y_val.shape)
   print("x_train last row", x_train[-1], y_train[-1])
   print("x_val first row", x_val[1])
   print("x_val last row", x_val[-1], y_val[-1])
+  print("x_predict last row", x_predict.shape, x_predict[-1])
 
 def testGetFeatureDate():
   hqdate = 'hq20200114'
