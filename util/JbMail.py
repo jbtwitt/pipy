@@ -7,6 +7,15 @@ from email.mime.text import MIMEText    # python 3
 from email.mime.base import MIMEBase
 from email import encoders
 
+import re
+import json
+def var2Json(var):
+    jsonstr = json.dumps(var)
+    print(jsonstr)
+    jsonstr = jsonstr.replace('{"', '{').replace('":', ':')
+    jsonstr = re.sub(r'[,][ ]["]([a-z\-A-Z]*)[:]', r', \1:', jsonstr)
+    return jsonstr
+
 class JbMail:
     def __init__(self, mdrConf):
         self.mdrConf = mdrConf
